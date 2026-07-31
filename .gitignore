@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+coverage
+
+# 로컬 검증용 스크립트
+shot.mjs
