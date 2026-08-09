@@ -27,7 +27,7 @@ export function InputPanel() {
             resetAll();
           }
         }}
-        className="w-full rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-xs font-medium text-ink-500 transition hover:bg-ink-50 hover:text-ink-700"
+        className="w-full rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-xs font-medium text-ink-500 transition hover:bg-ink-50 hover:text-ink-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
       >
         입력값 초기화
       </button>

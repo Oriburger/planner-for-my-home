@@ -48,10 +48,10 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px] border-collapse text-right text-xs tabular-nums">
           <thead>
-            <tr className="border-b border-ink-200 text-ink-500">
+            <tr className="border-b border-ink-200 text-ink-500 dark:border-slate-800 dark:text-slate-400">
               <th
                 scope="col"
-                className="sticky left-0 z-10 bg-white px-3 py-2.5 text-left font-medium"
+                className="sticky left-0 z-10 bg-white px-3 py-2.5 text-left font-medium dark:bg-slate-900"
               >
                 연도
               </th>
@@ -71,14 +71,14 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
             {visible.map((row) => (
               <tr
                 key={row.index}
-                className="border-b border-ink-100 last:border-0 hover:bg-brand-50/40"
+                className="border-b border-ink-100 last:border-0 hover:bg-brand-50/40 dark:border-slate-800/80 dark:hover:bg-slate-800/50"
               >
                 <th
                   scope="row"
-                  className="sticky left-0 z-10 whitespace-nowrap bg-white px-3 py-2.5 text-left font-semibold text-ink-800"
+                  className="sticky left-0 z-10 whitespace-nowrap bg-white px-3 py-2.5 text-left font-semibold text-ink-800 dark:bg-slate-900 dark:text-slate-200"
                 >
                   {row.year}
-                  <span className="ml-1 font-normal text-ink-400">
+                  <span className="ml-1 font-normal text-ink-400 dark:text-slate-500">
                     {row.age !== null ? `${row.age}세` : `${row.index}년차`}
                   </span>
                 </th>
@@ -91,10 +91,10 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
                       key={col.key}
                       className={`whitespace-nowrap px-3 py-2.5 ${
                         value < 0
-                          ? 'text-[#d03b3b]'
+                          ? 'text-[#d03b3b] dark:text-red-400'
                           : negative
-                            ? 'text-ink-500'
-                            : 'text-ink-800'
+                            ? 'text-ink-500 dark:text-slate-400'
+                            : 'text-ink-800 dark:text-slate-200'
                       }`}
                     >
                       {col.tone === 'negative' && value > 0 ? '-' : ''}

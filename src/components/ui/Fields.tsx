@@ -23,8 +23,8 @@ export function Field({
   return (
     <label className={`block ${className}`} htmlFor={htmlFor}>
       <span className="mb-1 flex items-baseline justify-between gap-2">
-        <span className="text-xs font-medium text-ink-600">{label}</span>
-        {hint && <span className="text-[11px] text-ink-400">{hint}</span>}
+        <span className="text-xs font-medium text-ink-600 dark:text-slate-300">{label}</span>
+        {hint && <span className="text-[11px] text-ink-400 dark:text-slate-400">{hint}</span>}
       </span>
       {children}
     </label>
@@ -32,7 +32,7 @@ export function Field({
 }
 
 const inputClass =
-  'w-full rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-900 tabular-nums transition placeholder:text-ink-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:bg-ink-100 disabled:text-ink-400';
+  'w-full rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-900 tabular-nums transition placeholder:text-ink-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:bg-ink-100 disabled:text-ink-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-600 dark:disabled:bg-slate-800 dark:disabled:text-slate-500';
 
 /* ------------------------------------------------------------------ */
 /* 숫자 입력 (포커스 중에는 draft 문자열을 그대로 유지)                 */
@@ -294,11 +294,11 @@ export function Toggle({
 }) {
   const id = useId();
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-ink-200 bg-white px-3 py-2.5">
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-ink-200 bg-white px-3 py-2.5 dark:border-slate-700 dark:bg-slate-900">
       <label htmlFor={id} className="min-w-0 cursor-pointer">
-        <span className="block text-xs font-medium text-ink-700">{label}</span>
+        <span className="block text-xs font-medium text-ink-700 dark:text-slate-200">{label}</span>
         {description && (
-          <span className="mt-0.5 block text-[11px] text-ink-400">
+          <span className="mt-0.5 block text-[11px] text-ink-400 dark:text-slate-400">
             {description}
           </span>
         )}
@@ -310,7 +310,7 @@ export function Toggle({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative h-6 w-11 shrink-0 rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1 ${
-          checked ? 'bg-brand-600' : 'bg-ink-300'
+          checked ? 'bg-brand-600' : 'bg-ink-300 dark:bg-slate-700'
         }`}
       >
         <span
@@ -334,7 +334,7 @@ export function SegmentedControl<T extends string>({
   options: Array<{ value: T; label: string }>;
 }) {
   return (
-    <div className="flex rounded-xl border border-ink-200 bg-ink-100 p-0.5">
+    <div className="flex rounded-xl border border-ink-200 bg-ink-100 p-0.5 dark:border-slate-700 dark:bg-slate-800">
       {options.map((opt) => (
         <button
           key={opt.value}
@@ -342,8 +342,8 @@ export function SegmentedControl<T extends string>({
           onClick={() => onChange(opt.value)}
           className={`flex-1 rounded-[0.625rem] px-2 py-1.5 text-xs font-medium transition ${
             value === opt.value
-              ? 'bg-white text-brand-700 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700'
+              ? 'bg-white text-brand-700 shadow-sm dark:bg-slate-900 dark:text-brand-400'
+              : 'text-ink-500 hover:text-ink-700 dark:text-slate-400 dark:hover:text-slate-200'
           }`}
         >
           {opt.label}

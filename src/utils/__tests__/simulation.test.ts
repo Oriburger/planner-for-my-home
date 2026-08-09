@@ -201,6 +201,63 @@ describe('runSimulation', () => {
     expect(rows[1].liquidAssets).toBeCloseTo(1 * 100_000_000, 0);
   });
 
+  it('월 자동이체가 저축여력을 초과하면 감당 가능한 만큼만 반영하고, 총자산은 줄어들지 않는다', () => {
+    const build = (monthlyContribution: number) =>
+      makeData({
+        settings: { ...baseSettings, years: 5, applyAssetReturn: true, savingsReturnRate: 3 },
+        assets: [
+          {
+            id: 'a1',
+            type: 'isa',
+            name: 'ISA',
+            amount: 0,
+            annualReturnRate: 6,
+            liquid: false,
+            monthlyContribution,
+          },
+        ],
+        incomes: [
+          {
+            id: 'i1',
+            type: 'salary',
+            name: '연봉',
+            annualAmount: 3000 * 만,
+            growthMode: 'fixed',
+            growthRate: 0,
+            manualGrowthRates: [],
+            taxable: false,
+            startYear: 1,
+            endYear: null,
+          },
+        ],
+        expenses: [
+          {
+            id: 'e1',
+            category: 'food',
+            name: '생활비',
+            monthlyAmount: 200 * 만,
+            inflationRate: null,
+            startYear: 1,
+            endYear: null,
+          },
+        ],
+      });
+
+    // 연 저축액(annualSavings) = 3000만 - 2400만 = 600만.
+    // 자동이체를 저축여력(600만)보다 훨씬 크게(연 2400만) 잡아도
+    // 여유자금이 빚처럼 마이너스 복리로 굴러가서는 안 된다.
+    const overCommitted = runSimulation(build(200 * 만));
+    const modest = runSimulation(build(30 * 만));
+
+    const lastOver = overCommitted.rows[overCommitted.rows.length - 1];
+    const lastModest = modest.rows[modest.rows.length - 1];
+
+    // 실제 반영된 이체액은 그 해 감당 가능한 금액을 넘지 않는다.
+    expect(overCommitted.rows[0].contribution).toBeCloseTo(600 * 만, 0);
+    // 과도한 자동이체 설정이 적정 설정보다 최종 총자산을 더 깎아먹지 않는다.
+    expect(lastOver.totalAssets).toBeGreaterThanOrEqual(lastModest.totalAssets - 1);
+  });
+
   it('순자산은 대출 잔액을 뺀 값이며 상환에 따라 잔액이 줄어든다', () => {
     const data = makeData({
       settings: { ...baseSettings, years: 3 },
@@ -273,6 +330,69 @@ describe('loan', () => {
     expect(year2.balance).toBe(0);
   });
 
+  it('거치 기간 동안은 이자만 납부하고, 거치 후 원금 상환이 시작된다', () => {
+    const loan = {
+      id: 'l_grace',
+      name: '거치대출',
+      principal: 1200 * 만,
+      annualRate: 5,
+      termYears: 3,
+      graceYears: 1,
+      repaymentType: 'equalPrincipal' as const,
+      monthlyPayment: 0,
+      startYear: 1,
+    };
+
+    // 1년차(거치): 이자만 발생
+    const year1 = simulateLoanYear(loan, 1, 1200 * 만);
+    expect(year1.principalPaid).toBe(0);
+    expect(year1.balance).toBe(1200 * 만);
+
+    // 2년차(거치 후): 남은 2년간 원금균등 상환 (연 600만원씩)
+    const year2 = simulateLoanYear(loan, 2, year1.balance);
+    expect(year2.principalPaid).toBeCloseTo(600 * 만, 0);
+    expect(year2.balance).toBeCloseTo(600 * 만, 0);
+  });
+
+  it('만기 자동 연장(autoRenew) 시 만기 연도에도 원금을 갚지 않고 이자만 계속 납부한다', () => {
+    const loan = {
+      id: 'l_renew',
+      name: '버팀목 연장',
+      principal: 2000 * 만,
+      annualRate: 3,
+      termYears: 2,
+      repaymentType: 'interestOnly' as const,
+      monthlyPayment: 0,
+      startYear: 1,
+      autoRenew: true,
+    };
+
+    const year2 = simulateLoanYear(loan, 2, 2000 * 만);
+    expect(year2.principalPaid).toBe(0);
+    expect(year2.balance).toBe(2000 * 만);
+  });
+
+  it('보증금 상환 연동(isDepositLinked) 시 원금 상환액이 유동 현금 지출에서 제외된다', () => {
+    const loan = {
+      id: 'l_link',
+      name: '보증금 연동 대출',
+      principal: 2000 * 만,
+      annualRate: 4,
+      termYears: 1,
+      repaymentType: 'interestOnly' as const,
+      monthlyPayment: 0,
+      startYear: 1,
+      isDepositLinked: true,
+    };
+
+    const year1 = simulateLoanYear(loan, 1, 2000 * 만);
+    expect(year1.principalPaid).toBe(2000 * 만);
+    expect(year1.cashPrincipalPaid).toBe(0);
+    expect(year1.depositLinkedPrincipalPaid).toBe(2000 * 만);
+    // 현금 지출 payment 는 이자만 포함
+    expect(year1.payment).toBe(year1.interest);
+  });
+
   it('상환 시작 전에는 현금흐름이 없다', () => {
     const loan = {
       id: 'l2',
@@ -285,6 +405,68 @@ describe('loan', () => {
       startYear: 3,
     };
     expect(simulateLoanYear(loan, 1, 1000 * 만).payment).toBe(0);
+  });
+
+  it('미래 대출(startYear > 1)은 시작 연차 전까지 대출 잔액이 0이다', () => {
+    const data = makeData({
+      settings: { ...baseSettings, years: 5 },
+      loans: [
+        {
+          id: 'l_future',
+          name: '미래 주담대',
+          principal: 5000 * 만,
+          annualRate: 4,
+          termYears: 5,
+          repaymentType: 'interestOnly' as const,
+          monthlyPayment: 0,
+          startYear: 3,
+        },
+      ],
+    });
+
+    const res = runSimulation(data);
+    expect(res.rows[0].loanBalance).toBe(0); // 1년차: 대출 잔액 0
+    expect(res.rows[1].loanBalance).toBe(0); // 2년차: 대출 잔액 0
+    expect(res.rows[2].loanBalance).toBe(5000 * 만); // 3년차: 대출 실행
+  });
+
+  it('연금저축/ISA 자산 만기 시 자동이체가 중단되고 만기 요약에 집계된다', () => {
+    const data = makeData({
+      settings: { ...baseSettings, years: 5 },
+      incomes: [
+        {
+          id: 'i1',
+          type: 'salary' as const,
+          name: '연봉',
+          annualAmount: 5000 * 만,
+          growthMode: 'fixed' as const,
+          growthRate: 0,
+          manualGrowthRates: [],
+          taxable: false,
+          startYear: 1,
+          endYear: null,
+        },
+      ],
+      assets: [
+        {
+          id: 'a_pension',
+          type: 'pension' as const,
+          name: '연금저축펀드',
+          amount: 1000 * 만,
+          annualReturnRate: 0,
+          liquid: false,
+          monthlyContribution: 10 * 만,
+          maturityYear: 3,
+          convertLiquidOnMaturity: true,
+        },
+      ],
+    });
+
+    const res = runSimulation(data);
+    expect(res.summary.pensionMaturities).toHaveLength(1);
+    expect(res.summary.pensionMaturities[0].maturityYearIndex).toBe(3);
+    // 3년차 만기 이후에는 납입 중단되고 유동자산으로 전환
+    expect(res.rows[2].liquidAssets).toBeGreaterThan(1000 * 만);
   });
 });
 

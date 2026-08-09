@@ -50,6 +50,12 @@ export interface AssetItem {
   /** 매년 추가 납입액 (원/월). 청약·연금처럼 자동이체되는 항목용 */
   monthlyContribution: number;
   memo?: string;
+  /** 만기/수령 시점 연차 (1 = 첫 해) */
+  maturityYear?: number | null;
+  /** 만기/수령 시점 나이 (전역 나이가 설정된 경우) */
+  maturityAge?: number | null;
+  /** 만기 시 유동 자산으로 자동 전환 여부 (기본값: true) */
+  convertLiquidOnMaturity?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -150,6 +156,12 @@ export interface LoanItem {
   monthlyPayment: number;
   /** 상환이 시작되는 시뮬레이션 연차 */
   startYear: number;
+  /** 거치 기간 (년) — 이 기간 동안은 원금 상환 없이 이자만 납부 */
+  graceYears?: number;
+  /** 보증금 상환 연동 여부 — 만기 원금 상환 시 유동 현금이 아닌 보증금 자산과 상쇄 */
+  isDepositLinked?: boolean;
+  /** 만기 자동 연장 여부 — 만기 시 원금을 갚지 않고 대출을 연장하여 이자만 지속 납부 */
+  autoRenew?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -261,6 +273,22 @@ export interface YearResult {
   netWorth: number;
 }
 
+export interface PensionMaturityInfo {
+  assetId: string;
+  assetName: string;
+  assetType: AssetType;
+  /** 만기 시점 시뮬레이션 연차 */
+  maturityYearIndex: number;
+  /** 만기 시점 실제 연도 */
+  maturityCalendarYear: number;
+  /** 만기 시점 사용자 나이 (나이가 설정된 경우) */
+  maturityAge: number | null;
+  /** 만기 시점 예상 자산 평가액 (원금 + 누적 복리 수익) */
+  estimatedAmountAtMaturity: number;
+  /** 만기 시 유동자산 전환 여부 */
+  convertedToLiquid: boolean;
+}
+
 export interface SimulationSummary {
   /** 최종 연차의 총자산 */
   finalTotalAssets: number;
@@ -277,6 +305,8 @@ export interface SimulationSummary {
   savingsRate: number;
   /** 순자산이 마이너스로 떨어지는 첫 연차 (없으면 null) */
   firstNegativeYear: number | null;
+  /** 연금저축/IRP/ISA 만기 정보 리스트 */
+  pensionMaturities: PensionMaturityInfo[];
 }
 
 export interface SimulationResult {

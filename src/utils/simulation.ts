@@ -1,4 +1,5 @@
 import type {
+  AssetItem,
   ExpenseItem,
   HousingItem,
   IncomeItem,
@@ -107,9 +108,12 @@ export function runSimulation(data: PlannerData): SimulationResult {
   const assetBalances = new Map<string, number>(
     assets.map((a) => [a.id, a.amount]),
   );
-  /** 대출별 잔액 */
+  /** 연도별/자산별 잔액 스냅샷 이력 (만기 시점 평가액 추적용) */
+  const assetHistoryByYear = new Map<number, Map<string, number>>();
+
+  /** 대출별 잔액 (시작 연차가 1년차 이하인 대출만 초기 잔액으로 설정) */
   const loanBalances = new Map<string, number>(
-    loans.map((l) => [l.id, l.principal]),
+    loans.map((l) => [l.id, l.startYear <= 1 ? l.principal : 0]),
   );
   /** 주거 계약별로 "지금 묶여 있는 보증금" (1년차 시작 계약은 기존 자산에 이미 반영된 것으로 본다) */
   const depositHeld = new Map<string, number>(
@@ -121,7 +125,9 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
   const initialTotalAssets =
     assets.reduce((sum, a) => sum + a.amount, 0);
-  const initialLoanBalance = loans.reduce((sum, l) => sum + l.principal, 0);
+  const initialLoanBalance = loans
+    .filter((l) => l.startYear <= 1)
+    .reduce((sum, l) => sum + l.principal, 0);
 
   const rows: YearResult[] = [];
   let totalSaved = 0;
@@ -189,12 +195,49 @@ export function runSimulation(data: PlannerData): SimulationResult {
     let loanPrincipalPaid = 0;
 
     for (const loan of loans) {
-      const balance = loanBalances.get(loan.id) ?? 0;
+      let balance = loanBalances.get(loan.id) ?? 0;
+
+      // 미래 대출 시작 연차 도달 시 원금 대출 실행
+      if (yearIndex === loan.startYear && balance === 0) {
+        balance = loan.principal;
+        // 보증금 연동이 아닌 현금 대출이면 대출 실행금이 유동 현금으로 유입
+        if (!loan.isDepositLinked) {
+          savingsPool += loan.principal;
+        }
+      }
+
+      if (yearIndex < loan.startYear) {
+        loanBalances.set(loan.id, 0);
+        continue;
+      }
+
       const flow = simulateLoanYear(loan, yearIndex, balance);
       loanBalances.set(loan.id, flow.balance);
       loanPayment += flow.payment;
       loanInterest += flow.interest;
       loanPrincipalPaid += flow.principalPaid;
+
+      // 보증금 연동 원금 상환 발생 시, 비유동 임대보증금 자산에서 차감 상쇄
+      if (flow.depositLinkedPrincipalPaid > 0) {
+        let toOffset = flow.depositLinkedPrincipalPaid;
+        for (const asset of assets) {
+          if (asset.type === 'rentDeposit' && toOffset > 0) {
+            const current = assetBalances.get(asset.id) ?? 0;
+            const reduce = Math.min(current, toOffset);
+            assetBalances.set(asset.id, current - reduce);
+            toOffset -= reduce;
+          }
+        }
+        if (toOffset > 0) {
+          for (const [hId, held] of depositHeld.entries()) {
+            if (held > 0 && toOffset > 0) {
+              const reduce = Math.min(held, toOffset);
+              depositHeld.set(hId, held - reduce);
+              toOffset -= reduce;
+            }
+          }
+        }
+      }
     }
 
     /* ---- 6. 연간 저축액 ---- */
@@ -202,15 +245,39 @@ export function runSimulation(data: PlannerData): SimulationResult {
       netIncome - livingExpense - housingCost - loanPayment;
 
     /* ---- 7. 자동이체 납입 (여유자금 -> 개별 자산) ---- */
+    // 만기 연차에 도달한 자산은 정기 납입 중단
+    const activeAssetsForContribution = assets.filter((a) => {
+      if (a.monthlyContribution <= 0) return false;
+      const matIndex = getAssetMaturityYearIndex(a, settings.currentAge);
+      if (matIndex !== null && yearIndex >= matIndex) return false;
+      return true;
+    });
+
+    const desiredContribution = activeAssetsForContribution.reduce(
+      (sum, a) => sum + a.monthlyContribution * 12,
+      0,
+    );
+    const availableForContribution =
+      Math.max(0, annualSavings) + Math.max(0, savingsPool);
+    const contributionScale =
+      desiredContribution > 0 && desiredContribution > availableForContribution
+        ? availableForContribution / desiredContribution
+        : 1;
+
     let contribution = 0;
-    for (const asset of assets) {
-      if (asset.monthlyContribution <= 0) continue;
-      const yearly = asset.monthlyContribution * 12;
+    for (const asset of activeAssetsForContribution) {
+      const yearly = asset.monthlyContribution * 12 * contributionScale;
       assetBalances.set(asset.id, (assetBalances.get(asset.id) ?? 0) + yearly);
       contribution += yearly;
     }
 
     savingsPool += annualSavings - contribution;
+
+    // 해당 연차 말 자산 잔액 스냅샷 기록
+    assetHistoryByYear.set(
+      yearIndex,
+      new Map<string, number>(assetBalances.entries()),
+    );
 
     /* ---- 8. 집계 ---- */
     let liquidAssets = savingsPool;
@@ -218,8 +285,16 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
     for (const asset of assets) {
       const balance = assetBalances.get(asset.id) ?? 0;
-      if (asset.liquid) liquidAssets += balance;
-      else lockedAssets += balance;
+      const matIndex = getAssetMaturityYearIndex(asset, settings.currentAge);
+      const isMatured = matIndex !== null && yearIndex >= matIndex;
+
+      // 만기가 되었고 유동자산 전환 옵션이 켜져있으면(기본값 true) 유동자산으로 분류
+      const convertLiquid = asset.convertLiquidOnMaturity ?? true;
+      if (asset.liquid || (isMatured && convertLiquid)) {
+        liquidAssets += balance;
+      } else {
+        lockedAssets += balance;
+      }
     }
     for (const held of depositHeld.values()) {
       lockedAssets += held;
@@ -265,6 +340,30 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
   const firstNegative = rows.find((row) => row.netWorth < 0);
 
+  // 연금저축/IRP/ISA 만기 요약 생성
+  const pensionMaturities: SimulationResult['summary']['pensionMaturities'] = [];
+  for (const asset of assets) {
+    const matIndex = getAssetMaturityYearIndex(asset, settings.currentAge);
+    if (matIndex !== null && matIndex >= 1 && matIndex <= years) {
+      const yearSnapshot = assetHistoryByYear.get(matIndex);
+      const estimatedAmountAtMaturity =
+        yearSnapshot?.get(asset.id) ?? asset.amount;
+      pensionMaturities.push({
+        assetId: asset.id,
+        assetName: asset.name,
+        assetType: asset.type,
+        maturityYearIndex: matIndex,
+        maturityCalendarYear: settings.startYear + matIndex - 1,
+        maturityAge:
+          settings.currentAge === null
+            ? null
+            : settings.currentAge + matIndex - 1,
+        estimatedAmountAtMaturity,
+        convertedToLiquid: asset.convertLiquidOnMaturity ?? true,
+      });
+    }
+  }
+
   return {
     rows,
     summary: {
@@ -279,8 +378,23 @@ export function runSimulation(data: PlannerData): SimulationResult {
           ? (firstRow.annualSavings / firstRow.netIncome) * 100
           : 0,
       firstNegativeYear: firstNegative ? firstNegative.index : null,
+      pensionMaturities,
     },
   };
+}
+
+/** 자산의 만기 시점 연차 계산 헬퍼 */
+export function getAssetMaturityYearIndex(
+  asset: AssetItem,
+  currentAge: number | null,
+): number | null {
+  if (asset.maturityYear && asset.maturityYear > 0) {
+    return asset.maturityYear;
+  }
+  if (asset.maturityAge && currentAge && asset.maturityAge > currentAge) {
+    return asset.maturityAge - currentAge + 1;
+  }
+  return null;
 }
 
 /** 시작 시점(0년차) 스냅샷 — 차트의 출발점으로 사용한다 */

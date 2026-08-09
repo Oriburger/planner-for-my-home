@@ -20,22 +20,34 @@ function StatTile({
 }: StatTileProps) {
   const valueColor =
     tone === 'good'
-      ? 'text-[#006300]'
+      ? 'text-emerald-600 dark:text-emerald-400'
       : tone === 'critical'
-        ? 'text-[#d03b3b]'
+        ? 'text-rose-600 dark:text-rose-400'
         : emphasis
-          ? 'text-brand-700'
-          : 'text-ink-900';
+          ? 'text-brand-700 dark:text-blue-300'
+          : 'text-ink-900 dark:text-slate-100';
 
   return (
     <div
-      className={`rounded-2xl border p-4 shadow-card ${
+      className={`relative overflow-hidden rounded-2xl border p-4 shadow-card transition-all ${
         emphasis
-          ? 'border-brand-200 bg-gradient-to-br from-brand-50 to-white'
-          : 'border-ink-200 bg-white'
+          ? 'border-brand-300 bg-gradient-to-br from-blue-50 via-indigo-50/40 to-white dark:border-blue-700/80 dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-950/40 dark:to-slate-900'
+          : 'border-ink-200 bg-white dark:border-slate-800 dark:bg-slate-900'
       }`}
     >
-      <p className="text-xs font-medium text-ink-500">{label}</p>
+      {emphasis && (
+        <div
+          className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-brand-500/10 blur-xl dark:bg-blue-400/15"
+          aria-hidden="true"
+        />
+      )}
+      <p
+        className={`text-xs font-semibold ${
+          emphasis ? 'text-brand-800 dark:text-blue-200' : 'text-ink-500 dark:text-slate-400'
+        }`}
+      >
+        {label}
+      </p>
       <p
         className={`mt-1.5 break-keep leading-tight ${valueColor} ${
           emphasis
@@ -45,12 +57,22 @@ function StatTile({
       >
         {value}
         {unit && (
-          <span className="ml-0.5 text-sm font-semibold text-ink-500">
+          <span className="ml-0.5 text-sm font-semibold text-ink-500 dark:text-slate-300">
             {unit}
           </span>
         )}
       </p>
-      {caption && <p className="mt-1 text-[11px] text-ink-400">{caption}</p>}
+      {caption && (
+        <p
+          className={`mt-1.5 text-[11px] ${
+            emphasis
+              ? 'font-medium text-brand-900/70 dark:text-blue-300/80'
+              : 'text-ink-400 dark:text-slate-400'
+          }`}
+        >
+          {caption}
+        </p>
+      )}
     </div>
   );
 }
@@ -111,6 +133,41 @@ export function SummaryCards({
         }
         tone={summary.firstNegativeYear === null ? 'good' : 'critical'}
       />
+
+      {summary.pensionMaturities && summary.pensionMaturities.length > 0 && (
+        <div className="col-span-2 lg:col-span-4 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 shadow-card dark:border-brand-900 dark:bg-brand-950/40">
+          <p className="text-xs font-semibold text-brand-800 dark:text-brand-300 flex items-center gap-1.5">
+            <span>🎯</span> 연금저축 · ISA 만기 요약
+          </p>
+          <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {summary.pensionMaturities.map((item) => (
+              <div
+                key={item.assetId}
+                className="rounded-xl border border-brand-200/80 bg-white p-3 shadow-xs dark:border-slate-800 dark:bg-slate-900"
+              >
+                <div className="flex items-center justify-between text-xs font-medium text-ink-900 dark:text-slate-100">
+                  <span className="truncate pr-2">{item.assetName}</span>
+                  <span className="shrink-0 rounded bg-brand-100 px-1.5 py-0.5 text-[11px] font-semibold text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
+                    {item.maturityYearIndex}년 차 ({item.maturityCalendarYear}년
+                    {item.maturityAge !== null ? `, 만 ${item.maturityAge}세` : ''})
+                  </span>
+                </div>
+                <div className="mt-2 flex items-baseline justify-between text-xs">
+                  <span className="text-ink-500 dark:text-slate-400">만기 예상 평가액</span>
+                  <span className="font-bold text-brand-700 dark:text-brand-400">
+                    {formatKRWShort(item.estimatedAmountAtMaturity)}원
+                  </span>
+                </div>
+                {item.convertedToLiquid && (
+                  <p className="mt-1 text-[10px] text-ink-400 dark:text-slate-500">
+                    * 만기 시 자동이체 중단 및 유동자산(현금)으로 전환
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

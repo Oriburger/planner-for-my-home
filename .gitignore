@@ -8,3 +8,6 @@ coverage
 
 # 로컬 검증용 스크립트
 shot.mjs
+
+# TypeScript build info
+tsconfig.tsbuildinfo

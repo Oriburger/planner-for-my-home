@@ -8,11 +8,11 @@ export function MobileSummaryBar() {
   const { summary } = useSimulation();
 
   return (
-    <div className="sticky bottom-0 z-30 border-t border-ink-200 bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+    <div className="sticky bottom-0 z-30 border-t border-ink-200 bg-white/95 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 lg:hidden">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] text-ink-500">{years}년 후 예상 순자산</p>
-          <p className="truncate text-lg font-bold text-brand-700">
+          <p className="text-[11px] text-ink-500 dark:text-slate-400">{years}년 후 예상 순자산</p>
+          <p className="truncate text-lg font-bold text-brand-700 dark:text-brand-400">
             {formatKRWShort(summary.finalNetWorth)}원
           </p>
         </div>

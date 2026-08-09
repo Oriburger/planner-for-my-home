@@ -9,6 +9,7 @@ import {
   PercentInput,
   Select,
   TextInput,
+  Toggle,
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
 import { monthlyEqualPayment } from '@/utils/loan';
@@ -19,6 +20,7 @@ const TYPE_OPTIONS = (
 
 export function LoanSection() {
   const loans = usePlannerStore((s) => s.loans);
+  const settings = usePlannerStore((s) => s.settings);
   const addLoan = usePlannerStore((s) => s.addLoan);
   const updateLoan = usePlannerStore((s) => s.updateLoan);
   const removeItem = usePlannerStore((s) => s.removeItem);
@@ -35,16 +37,21 @@ export function LoanSection() {
       {loans.length === 0 && <EmptyState message="대출이 없다면 비워두세요." />}
 
       {loans.map((loan) => {
-        // 상환 방식별 예상 월 납입액 (직접입력 방식은 입력값 그대로)
+        const graceYears = loan.graceYears ?? 0;
+        const amortizationYears = Math.max(1, loan.termYears - graceYears);
+
+        // 상환 방식별 예상 월 납입액 (거치 기간 중이면 이자만)
         const estimatedMonthly =
-          loan.repaymentType === 'fixedMonthly'
-            ? loan.monthlyPayment
-            : loan.repaymentType === 'equalPayment'
-              ? monthlyEqualPayment(loan.principal, loan.annualRate, loan.termYears)
-              : loan.repaymentType === 'equalPrincipal'
-                ? loan.principal / Math.max(1, loan.termYears * 12) +
-                  (loan.principal * loan.annualRate) / 100 / 12
-                : (loan.principal * loan.annualRate) / 100 / 12;
+          graceYears > 0
+            ? (loan.principal * loan.annualRate) / 100 / 12
+            : loan.repaymentType === 'fixedMonthly'
+              ? loan.monthlyPayment
+              : loan.repaymentType === 'equalPayment'
+                ? monthlyEqualPayment(loan.principal, loan.annualRate, amortizationYears)
+                : loan.repaymentType === 'equalPrincipal'
+                  ? loan.principal / Math.max(1, amortizationYears * 12) +
+                    (loan.principal * loan.annualRate) / 100 / 12
+                  : (loan.principal * loan.annualRate) / 100 / 12;
 
         return (
           <ItemCard
@@ -96,7 +103,29 @@ export function LoanSection() {
                 />
               </Field>
 
-              <Field label="상환 시작 연차">
+              <Field label="거치 기간" hint="이자만 내는 기간">
+                <CountInput
+                  value={graceYears}
+                  onChange={(g) =>
+                    updateLoan(loan.id, {
+                      graceYears: Math.min(g, Math.max(0, loan.termYears - 1)),
+                    })
+                  }
+                  min={0}
+                  max={Math.max(0, loan.termYears - 1)}
+                  suffix="년"
+                />
+              </Field>
+
+              <Field
+                label="대출 실행/상환 시작 연차"
+                hint={
+                  loan.startYear > 1
+                    ? `미래 대출 (${settings.startYear + loan.startYear - 1}년)`
+                    : '1년차부터 시작'
+                }
+                className="col-span-2"
+              >
                 <CountInput
                   value={loan.startYear}
                   onChange={(startYear) => updateLoan(loan.id, { startYear })}
@@ -104,6 +133,12 @@ export function LoanSection() {
                   max={40}
                 />
               </Field>
+
+              {loan.startYear > 1 && (
+                <p className="col-span-2 rounded-lg bg-brand-50/80 px-2.5 py-1.5 text-[11px] font-medium text-brand-700">
+                  💡 시뮬레이션 {loan.startYear}년 차({settings.startYear + loan.startYear - 1}년)부터 실행되는 미래 대출입니다.
+                </p>
+              )}
 
               {loan.repaymentType === 'fixedMonthly' && (
                 <Field label="월 상환액" className="col-span-2">
@@ -115,14 +150,36 @@ export function LoanSection() {
                   />
                 </Field>
               )}
+
+              <div className="col-span-2 space-y-2 pt-1">
+                <Toggle
+                  checked={loan.isDepositLinked ?? false}
+                  onChange={(isDepositLinked) =>
+                    updateLoan(loan.id, { isDepositLinked })
+                  }
+                  label="보증금 상환 연동"
+                  description="만기 시 유동 현금이 아닌 임대보증금 자산에서 차감 상쇄됩니다."
+                />
+
+                {loan.repaymentType === 'interestOnly' && (
+                  <Toggle
+                    checked={loan.autoRenew ?? false}
+                    onChange={(autoRenew) => updateLoan(loan.id, { autoRenew })}
+                    label="만기 자동 연장"
+                    description="만기 시 원금을 갚지 않고 이자만 지속 납부합니다."
+                  />
+                )}
+              </div>
             </div>
 
             <p className="mt-2 rounded-lg bg-brand-50 px-2.5 py-2 text-[11px] text-brand-800">
-              {loan.repaymentType === 'equalPrincipal'
-                ? '첫 달 납입액'
-                : loan.repaymentType === 'interestOnly'
-                  ? '월 이자'
-                  : '월 납입액'}{' '}
+              {graceYears > 0
+                ? `거치 기간(첫 ${graceYears}년) 월 이자`
+                : loan.repaymentType === 'equalPrincipal'
+                  ? '첫 달 납입액'
+                  : loan.repaymentType === 'interestOnly'
+                    ? '월 이자'
+                    : '월 납입액'}{' '}
               약{' '}
               <strong className="font-semibold tabular-nums">
                 {formatKRWShort(estimatedMonthly)}원

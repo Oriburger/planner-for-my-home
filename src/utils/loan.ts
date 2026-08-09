@@ -1,10 +1,14 @@
 import type { LoanItem } from '@/types/planner';
 
 export interface LoanYearFlow {
-  /** 해당 연도에 실제로 나간 총 상환액 (원금 + 이자) */
+  /** 해당 연도에 실제로 유동 현금에서 나간 총 상환액 (현금 원금 + 이자) */
   payment: number;
   interest: number;
   principalPaid: number;
+  /** 현금으로 납부된 원금 */
+  cashPrincipalPaid: number;
+  /** 보증금과 상쇄(Offset)되어 유동 현금 지출에서 제외된 원금 */
+  depositLinkedPrincipalPaid: number;
   /** 연말 잔액 */
   balance: number;
 }
@@ -40,6 +44,8 @@ export function simulateLoanYear(
     payment: 0,
     interest: 0,
     principalPaid: 0,
+    cashPrincipalPaid: 0,
+    depositLinkedPrincipalPaid: 0,
     balance,
   };
 
@@ -49,11 +55,20 @@ export function simulateLoanYear(
   const endYear = loan.startYear + loan.termYears - 1;
   const monthlyRate = loan.annualRate / 100 / 12;
 
+  const graceYears = Math.min(
+    Math.max(0, loan.graceYears ?? 0),
+    Math.max(0, loan.termYears - 1),
+  );
+  const graceEndYear = loan.startYear + graceYears - 1;
+  const inGracePeriod = yearIndex <= graceEndYear;
+
+  // 거치기간 후 실제 상환 기간 (년)
+  const amortizationYears = Math.max(1, loan.termYears - graceYears);
+
   let remaining = balance;
   let interestSum = 0;
   let principalSum = 0;
 
-  // 만기 이후에도 잔액이 남아 있으면 이자만 계속 발생하는 것으로 처리
   const pastMaturity = yearIndex > endYear;
 
   for (let month = 0; month < 12; month += 1) {
@@ -62,7 +77,11 @@ export function simulateLoanYear(
     const interest = remaining * monthlyRate;
     let principal = 0;
 
-    if (pastMaturity) {
+    if (inGracePeriod) {
+      // 거치 기간 중에는 이자만 납부 (원금 상환 0)
+      principal = 0;
+    } else if (pastMaturity) {
+      // 만기 이후에는 만기 연장 여부에 관계없이 잔액에 대한 이자만 발생
       principal = 0;
     } else {
       switch (loan.repaymentType) {
@@ -70,18 +89,22 @@ export function simulateLoanYear(
           const payment = monthlyEqualPayment(
             loan.principal,
             loan.annualRate,
-            loan.termYears,
+            amortizationYears,
           );
           principal = payment - interest;
           break;
         }
         case 'equalPrincipal': {
-          principal = loan.principal / Math.max(1, loan.termYears * 12);
+          principal = loan.principal / Math.max(1, amortizationYears * 12);
           break;
         }
         case 'interestOnly': {
-          // 만기에 원금 일시 상환
-          principal = yearIndex === endYear && month === 11 ? remaining : 0;
+          // 만기에 원금 일시 상환 (autoRenew 가 켜져있으면 만기에도 0)
+          if (loan.autoRenew) {
+            principal = 0;
+          } else {
+            principal = yearIndex === endYear && month === 11 ? remaining : 0;
+          }
           break;
         }
         case 'fixedMonthly': {
@@ -99,10 +122,16 @@ export function simulateLoanYear(
     principalSum += principal;
   }
 
+  const isDepositLinked = loan.isDepositLinked ?? false;
+  const cashPrincipalPaid = isDepositLinked ? 0 : principalSum;
+  const depositLinkedPrincipalPaid = isDepositLinked ? principalSum : 0;
+
   return {
-    payment: interestSum + principalSum,
+    payment: interestSum + cashPrincipalPaid,
     interest: interestSum,
     principalPaid: principalSum,
+    cashPrincipalPaid,
+    depositLinkedPrincipalPaid,
     balance: Math.max(0, remaining),
   };
 }

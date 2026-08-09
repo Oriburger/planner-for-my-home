@@ -234,6 +234,9 @@ export const createLoan = (): LoanItem => ({
   repaymentType: 'equalPayment',
   monthlyPayment: 0,
   startYear: 1,
+  graceYears: 0,
+  isDepositLinked: false,
+  autoRenew: false,
 });
 
 export const createExpense = (): ExpenseItem => ({
