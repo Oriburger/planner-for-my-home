@@ -12,6 +12,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
+  TextArea,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -91,6 +92,15 @@ export function AssetSection() {
                 />
               </Field>
 
+              <Field label="시작 연차" hint="1 = 지금부터 보유">
+                <CountInput
+                  value={asset.startYear ?? 1}
+                  onChange={(startYear) => updateAsset(asset.id, { startYear })}
+                  min={1}
+                  max={40}
+                />
+              </Field>
+
               <Field label="월 자동이체" hint="정기 납입" className="col-span-2">
                 <MoneyInput
                   value={asset.monthlyContribution}
@@ -134,6 +144,14 @@ export function AssetSection() {
                   )}
                 </>
               )}
+
+              <Field label="메모" className="col-span-2">
+                <TextArea
+                  value={asset.memo ?? ''}
+                  onChange={(memo) => updateAsset(asset.id, { memo })}
+                  placeholder="선택 입력"
+                />
+              </Field>
 
               <div className="col-span-2 space-y-2 pt-1">
                 <Toggle

@@ -50,6 +50,8 @@ export interface AssetItem {
   /** 매년 추가 납입액 (원/월). 청약·연금처럼 자동이체되는 항목용 */
   monthlyContribution: number;
   memo?: string;
+  /** 자산이 존재/납입을 시작하는 시뮬레이션 연차 (1 = 첫 해, 미지정 시 1) */
+  startYear?: number;
   /** 만기/수령 시점 연차 (1 = 첫 해) */
   maturityYear?: number | null;
   /** 만기/수령 시점 나이 (전역 나이가 설정된 경우) */
@@ -71,7 +73,7 @@ export const INCOME_TYPE_LABEL: Record<IncomeType, string> = {
   etc: '기타 수입',
 };
 
-export type GrowthMode = 'fixed' | 'manual';
+export type GrowthMode = 'fixed' | 'manual' | 'custom';
 
 export interface IncomeItem {
   id: ID;
@@ -79,7 +81,7 @@ export interface IncomeItem {
   name: string;
   /** 세전 연간 금액 (원) */
   annualAmount: number;
-  /** fixed: 고정 인상률 복리 / manual: 연도별 인상률 수동 입력 */
+  /** fixed: 고정 인상률 복리 / manual: 연도별 인상률 수동 입력 / custom: 연차별 금액 직접 지정 */
   growthMode: GrowthMode;
   /** growthMode === 'fixed' 일 때 사용하는 연 인상률 (%) */
   growthRate: number;
@@ -88,12 +90,18 @@ export interface IncomeItem {
    * 인덱스 0 = 시뮬레이션 1년차의 인상률(%). 배열이 짧으면 마지막 값을 계속 사용한다.
    */
   manualGrowthRates: number[];
+  /**
+   * growthMode === 'custom' 일 때 사용. 인상률이 아닌 그 해의 세전 금액(원)을 직접 지정.
+   * 인덱스 0 = startYear 연차의 금액. 배열이 짧으면 마지막 값을 계속 사용한다.
+   */
+  customAnnualAmounts?: number[];
   /** 소득세 + 4대보험 공제 대상 여부 (false면 전액 실수령으로 계산) */
   taxable: boolean;
   /** 수입이 발생하기 시작하는 시뮬레이션 연차 (1 = 첫 해) */
   startYear: number;
   /** 수입이 종료되는 연차 (null = 기간 끝까지) */
   endYear: number | null;
+  memo?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -123,6 +131,7 @@ export interface HousingItem {
   annualIncreaseRate: number;
   startYear: number;
   endYear: number | null;
+  memo?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -162,6 +171,7 @@ export interface LoanItem {
   isDepositLinked?: boolean;
   /** 만기 자동 연장 여부 — 만기 시 원금을 갚지 않고 대출을 연장하여 이자만 지속 납부 */
   autoRenew?: boolean;
+  memo?: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -197,6 +207,7 @@ export interface ExpenseItem {
   inflationRate: number | null;
   startYear: number;
   endYear: number | null;
+  memo?: string;
 }
 
 /* ------------------------------------------------------------------ */

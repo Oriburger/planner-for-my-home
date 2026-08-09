@@ -31,7 +31,6 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
     <Card>
       <CardHeader
         title="연도별 상세"
-        description="가로로 스크롤해서 항목별 금액을 확인할 수 있어요."
         action={
           rows.length > 10 ? (
             <button

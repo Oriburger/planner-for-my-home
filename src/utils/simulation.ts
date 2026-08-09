@@ -43,6 +43,14 @@ export function incomeForYear(item: IncomeItem, yearIndex: number): number {
     return item.annualAmount * Math.pow(1 + item.growthRate / 100, steps);
   }
 
+  if (item.growthMode === 'custom') {
+    // 인상률이 아닌 그 해의 금액을 직접 지정. 배열이 짧으면 마지막 값을 이어 쓰고,
+    // 비어 있으면 기본 연간 금액을 그대로 쓴다.
+    const amounts = item.customAnnualAmounts ?? [];
+    if (amounts.length === 0) return item.annualAmount;
+    return amounts[steps] ?? amounts[amounts.length - 1];
+  }
+
   // manual: 연도별 인상률을 순차 적용. 배열이 짧으면 마지막 값을 반복 사용한다.
   let amount = item.annualAmount;
   for (let i = 0; i < steps; i += 1) {
@@ -104,9 +112,9 @@ export function runSimulation(data: PlannerData): SimulationResult {
   const years = Math.max(1, Math.min(40, Math.round(settings.years)));
 
   // ---- 초기 상태 ----------------------------------------------------
-  /** 자산 항목별 잔액 */
+  /** 자산 항목별 잔액 (시작 연차가 1년차 이하인 자산만 초기 평가액으로 설정) */
   const assetBalances = new Map<string, number>(
-    assets.map((a) => [a.id, a.amount]),
+    assets.map((a) => [a.id, (a.startYear ?? 1) <= 1 ? a.amount : 0]),
   );
   /** 연도별/자산별 잔액 스냅샷 이력 (만기 시점 평가액 추적용) */
   const assetHistoryByYear = new Map<number, Map<string, number>>();
@@ -123,8 +131,9 @@ export function runSimulation(data: PlannerData): SimulationResult {
   /** 매년 남는 저축액이 쌓이는 여유자금 풀 */
   let savingsPool = 0;
 
-  const initialTotalAssets =
-    assets.reduce((sum, a) => sum + a.amount, 0);
+  const initialTotalAssets = assets
+    .filter((a) => (a.startYear ?? 1) <= 1)
+    .reduce((sum, a) => sum + a.amount, 0);
   const initialLoanBalance = loans
     .filter((l) => l.startYear <= 1)
     .reduce((sum, l) => sum + l.principal, 0);
@@ -189,6 +198,16 @@ export function runSimulation(data: PlannerData): SimulationResult {
       }
     }
 
+    // 2년차 이후 시작하는 자산: 최초 평가액을 여유자금에서 빼서 해당 자산으로 이동
+    // (1년차 자산은 이미 '현재 보유 자산'으로 반영된 것으로 간주)
+    for (const asset of assets) {
+      const assetStart = asset.startYear ?? 1;
+      if (yearIndex === assetStart && assetStart > 1) {
+        assetBalances.set(asset.id, (assetBalances.get(asset.id) ?? 0) + asset.amount);
+        savingsPool -= asset.amount;
+      }
+    }
+
     /* ---- 5. 대출 상환 ---- */
     let loanPayment = 0;
     let loanInterest = 0;
@@ -245,9 +264,10 @@ export function runSimulation(data: PlannerData): SimulationResult {
       netIncome - livingExpense - housingCost - loanPayment;
 
     /* ---- 7. 자동이체 납입 (여유자금 -> 개별 자산) ---- */
-    // 만기 연차에 도달한 자산은 정기 납입 중단
+    // 시작 연차 전이거나 만기 연차에 도달한 자산은 정기 납입 중단
     const activeAssetsForContribution = assets.filter((a) => {
       if (a.monthlyContribution <= 0) return false;
+      if (yearIndex < (a.startYear ?? 1)) return false;
       const matIndex = getAssetMaturityYearIndex(a, settings.currentAge);
       if (matIndex !== null && yearIndex >= matIndex) return false;
       return true;
@@ -403,7 +423,9 @@ export function initialSnapshot(data: PlannerData): {
   totalAssets: number;
   netWorth: number;
 } {
-  const totalAssets = data.assets.reduce((sum, a) => sum + a.amount, 0);
+  const totalAssets = data.assets
+    .filter((a) => (a.startYear ?? 1) <= 1)
+    .reduce((sum, a) => sum + a.amount, 0);
   const loanBalance = data.loans.reduce((sum, l) => sum + l.principal, 0);
   return {
     year: data.settings.startYear - 1,

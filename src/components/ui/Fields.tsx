@@ -236,6 +236,32 @@ export function TextInput({
   );
 }
 
+/** 메모 등 짧은 자유 서술용 입력 (여러 줄, 리사이즈 불가) */
+export function TextArea({
+  value,
+  onChange,
+  placeholder,
+  id,
+  rows = 2,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  id?: string;
+  rows?: number;
+}) {
+  return (
+    <textarea
+      id={id}
+      rows={rows}
+      className={`${inputClass} resize-none`}
+      value={value}
+      placeholder={placeholder}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
 export function Select<T extends string>({
   value,
   onChange,

@@ -9,6 +9,7 @@ import {
   PercentInput,
   SegmentedControl,
   Select,
+  TextArea,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -59,6 +60,54 @@ function ManualGrowthEditor({
             onChange={(v) => setAt(i, v)}
             min={-50}
             max={100}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** 연차별 금액 커스텀 직접 입력 그리드 (인상률이 아닌 그 해의 금액 자체를 지정) */
+function CustomAmountEditor({
+  income,
+  totalYears,
+  onChange,
+}: {
+  income: IncomeItem;
+  totalYears: number;
+  onChange: (amounts: number[]) => void;
+}) {
+  // 시작 연차부터 기간 끝까지 매년 금액을 입력한다
+  const steps = Math.max(0, totalYears - income.startYear + 1);
+
+  if (steps === 0) {
+    return (
+      <p className="text-[11px] text-ink-400">
+        기간을 늘리면 연도별 금액을 입력할 수 있어요.
+      </p>
+    );
+  }
+
+  const existing = income.customAnnualAmounts ?? [];
+
+  const setAt = (index: number, value: number) => {
+    const next = Array.from({ length: steps }, (_, i) =>
+      i < existing.length ? existing[i] : income.annualAmount,
+    );
+    next[index] = value;
+    onChange(next);
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+      {Array.from({ length: steps }, (_, i) => (
+        <div key={i}>
+          <span className="mb-0.5 block text-[10px] text-ink-400">
+            {income.startYear + i}년차
+          </span>
+          <MoneyInput
+            value={existing[i] ?? income.annualAmount}
+            onChange={(v) => setAt(i, v)}
           />
         </div>
       ))}
@@ -127,11 +176,12 @@ export function IncomeSection() {
                 options={[
                   { value: 'fixed', label: '고정 비율' },
                   { value: 'manual', label: '연도별 입력' },
+                  { value: 'custom', label: '커스텀' },
                 ]}
               />
             </div>
 
-            {income.growthMode === 'fixed' ? (
+            {income.growthMode === 'fixed' && (
               <Field label="연 인상률" hint="복리 적용" className="col-span-2">
                 <PercentInput
                   value={income.growthRate}
@@ -142,13 +192,27 @@ export function IncomeSection() {
                   max={100}
                 />
               </Field>
-            ) : (
+            )}
+
+            {income.growthMode === 'manual' && (
               <div className="col-span-2 rounded-lg bg-ink-50 p-2">
                 <ManualGrowthEditor
                   income={income}
                   totalYears={years}
                   onChange={(manualGrowthRates) =>
                     updateIncome(income.id, { manualGrowthRates })
+                  }
+                />
+              </div>
+            )}
+
+            {income.growthMode === 'custom' && (
+              <div className="col-span-2 rounded-lg bg-ink-50 p-2">
+                <CustomAmountEditor
+                  income={income}
+                  totalYears={years}
+                  onChange={(customAnnualAmounts) =>
+                    updateIncome(income.id, { customAnnualAmounts })
                   }
                 />
               </div>
@@ -173,6 +237,14 @@ export function IncomeSection() {
                 max={40}
                 blankOnZero
                 placeholder="끝까지"
+              />
+            </Field>
+
+            <Field label="메모" className="col-span-2">
+              <TextArea
+                value={income.memo ?? ''}
+                onChange={(memo) => updateIncome(income.id, { memo })}
+                placeholder="선택 입력"
               />
             </Field>
 

@@ -8,6 +8,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
+  TextArea,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -93,13 +94,16 @@ export function LoanSection() {
                 />
               </Field>
 
-              <Field label="상환 기간">
+              <Field label="종료 연차" hint={`총 ${loan.termYears}년`}>
                 <CountInput
-                  value={loan.termYears}
-                  onChange={(termYears) => updateLoan(loan.id, { termYears })}
-                  min={1}
+                  value={loan.startYear + loan.termYears - 1}
+                  onChange={(endYear) =>
+                    updateLoan(loan.id, {
+                      termYears: Math.max(1, endYear - loan.startYear + 1),
+                    })
+                  }
+                  min={loan.startYear}
                   max={40}
-                  suffix="년"
                 />
               </Field>
 
@@ -170,6 +174,14 @@ export function LoanSection() {
                   />
                 )}
               </div>
+
+              <Field label="메모" className="col-span-2">
+                <TextArea
+                  value={loan.memo ?? ''}
+                  onChange={(memo) => updateLoan(loan.id, { memo })}
+                  placeholder="선택 입력"
+                />
+              </Field>
             </div>
 
             <p className="mt-2 rounded-lg bg-brand-50 px-2.5 py-2 text-[11px] text-brand-800">

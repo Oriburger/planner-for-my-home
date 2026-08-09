@@ -89,6 +89,48 @@ describe('incomeForYear', () => {
     expect(incomeForYear(income, 3)).toBe(1000);
     expect(incomeForYear(income, 4)).toBe(0);
   });
+
+  it('커스텀 모드는 연차별 금액을 그대로 사용하고, 배열이 짧으면 마지막 값을 이어 쓴다', () => {
+    const income = {
+      id: 'i4',
+      type: 'salary' as const,
+      name: '연봉',
+      annualAmount: 999 * 만, // 커스텀 배열이 있으면 무시되어야 함
+      growthMode: 'custom' as const,
+      growthRate: 0,
+      manualGrowthRates: [],
+      customAnnualAmounts: [4000 * 만, 4500 * 만, 6000 * 만],
+      taxable: true,
+      startYear: 2,
+      endYear: null,
+    };
+
+    expect(incomeForYear(income, 1)).toBe(0); // 시작 전
+    expect(incomeForYear(income, 2)).toBe(4000 * 만); // 시작 연차 = 배열 인덱스 0
+    expect(incomeForYear(income, 3)).toBe(4500 * 만);
+    expect(incomeForYear(income, 4)).toBe(6000 * 만);
+    // 5년차는 배열이 짧아 마지막 값(6000만)을 재사용
+    expect(incomeForYear(income, 5)).toBe(6000 * 만);
+  });
+
+  it('커스텀 모드에서 배열이 비어 있으면 기본 연간 금액을 사용한다', () => {
+    const income = {
+      id: 'i5',
+      type: 'salary' as const,
+      name: '연봉',
+      annualAmount: 3000 * 만,
+      growthMode: 'custom' as const,
+      growthRate: 0,
+      manualGrowthRates: [],
+      customAnnualAmounts: [],
+      taxable: true,
+      startYear: 1,
+      endYear: null,
+    };
+
+    expect(incomeForYear(income, 1)).toBe(3000 * 만);
+    expect(incomeForYear(income, 3)).toBe(3000 * 만);
+  });
 });
 
 describe('runSimulation', () => {
@@ -161,6 +203,41 @@ describe('runSimulation', () => {
     const { rows } = runSimulation(data);
     expect(rows[0].totalAssets).toBeCloseTo(1100 * 만, 0);
     expect(rows[1].totalAssets).toBeCloseTo(1210 * 만, 0);
+  });
+
+  it('시작 연차가 미래인 자산은 그 전까지 총자산에 잡히지 않고, 시작 연차에 여유자금에서 이동한다', () => {
+    const data = makeData({
+      settings: { ...baseSettings, years: 4 },
+      assets: [
+        {
+          id: 'a1',
+          type: 'cash',
+          name: '현금',
+          amount: 5000 * 만,
+          annualReturnRate: 0,
+          liquid: true,
+          monthlyContribution: 0,
+        },
+        {
+          id: 'a2',
+          type: 'savings',
+          name: '3년차 시작 적금',
+          amount: 1000 * 만,
+          annualReturnRate: 0,
+          liquid: true,
+          monthlyContribution: 0,
+          startYear: 3,
+        },
+      ],
+    });
+
+    const { rows } = runSimulation(data);
+
+    // 1~2년차: a2 는 아직 존재하지 않으므로 총자산은 a1(5000만)만 반영
+    expect(rows[0].totalAssets).toBeCloseTo(5000 * 만, 0);
+    expect(rows[1].totalAssets).toBeCloseTo(5000 * 만, 0);
+    // 3년차: a2 의 최초 평가액(1000만)이 여유자금에서 이동해 오므로 총자산은 그대로 유지된다
+    expect(rows[2].totalAssets).toBeCloseTo(5000 * 만, 0);
   });
 
   it('보증금은 총자산에 중립적이고 유동 -> 비유동으로만 이동한다', () => {

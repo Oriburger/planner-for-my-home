@@ -32,10 +32,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
 
   return (
     <Card>
-      <CardHeader
-        title="연간 현금흐름"
-        description="실수령액이 지출·주거비·대출 상환을 거쳐 얼마가 남는지 보여줍니다."
-      />
+      <CardHeader title="연간 현금흐름" />
       <div className="px-1 py-4 pr-3 sm:px-2 sm:pr-5">
         <ResponsiveContainer width="100%" height={260}>
           <BarChart
