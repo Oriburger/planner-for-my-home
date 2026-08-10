@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { InputPanel } from '@/components/form/InputPanel';
 import { ResultPanel } from '@/components/result/ResultPanel';
+import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
+import { usePlannerStore } from '@/store/plannerStore';
 import { AppHeader } from './AppHeader';
 import { MobileSummaryBar } from './MobileSummaryBar';
 
@@ -9,9 +12,17 @@ import { MobileSummaryBar } from './MobileSummaryBar';
  * - PC(lg~): 좌측 입력 패널(고정 폭, 독립 스크롤) + 우측 결과 패널
  */
 export function DashboardLayout() {
+  const onboarded = usePlannerStore((s) => s.onboarded);
+  const [wizardOpen, setWizardOpen] = useState(false);
+
+  // 첫 방문이면 자동으로 띄운다. (localStorage 복원이 끝난 뒤 판단)
+  useEffect(() => {
+    if (!onboarded) setWizardOpen(true);
+  }, [onboarded]);
+
   return (
     <div className="flex min-h-screen flex-col bg-ink-100">
-      <AppHeader />
+      <AppHeader onOpenWizard={() => setWizardOpen(true)} />
 
       <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-4 sm:px-6 sm:py-6">
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] lg:gap-6">
@@ -28,6 +39,10 @@ export function DashboardLayout() {
       </main>
 
       <MobileSummaryBar />
+
+      {wizardOpen && (
+        <OnboardingModal onClose={() => setWizardOpen(false)} />
+      )}
     </div>
   );
 }

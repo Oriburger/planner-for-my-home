@@ -38,7 +38,20 @@ export const DEFAULT_SETTINGS: SimulationSettings = {
   currentAge: null,
 };
 
-function createDefaultData(): PlannerData {
+/** 초기 설정을 마치기 전의 빈 상태 */
+function createEmptyData(): PlannerData {
+  return {
+    settings: { ...DEFAULT_SETTINGS },
+    assets: [],
+    incomes: [],
+    housings: [],
+    loans: [],
+    expenses: [],
+  };
+}
+
+/** '샘플로 채우기' 로 불러오는 예시 시나리오 */
+function createSampleData(): PlannerData {
   return {
     settings: { ...DEFAULT_SETTINGS },
     assets: [
@@ -256,6 +269,11 @@ interface PlannerActions {
   updateSettings: (patch: Partial<SimulationSettings>) => void;
   setYears: (years: number) => void;
 
+  /** 초기 설정 마법사 완료 여부 표시 */
+  setOnboarded: (value: boolean) => void;
+  /** 예시 시나리오 불러오기 */
+  loadSample: () => void;
+
   addAsset: () => void;
   addIncome: () => void;
   addHousing: () => void;
@@ -276,7 +294,11 @@ interface PlannerActions {
   importData: (data: PlannerData) => void;
 }
 
-export type PlannerStore = PlannerData & PlannerActions;
+export type PlannerStore = PlannerData &
+  PlannerActions & {
+    /** 초기 설정 마법사를 이미 마쳤는지 (false 면 첫 방문으로 보고 자동으로 띄운다) */
+    onboarded: boolean;
+  };
 
 /** 리스트 항목 부분 수정 헬퍼 */
 function patchList<T extends { id: ID }>(
@@ -290,7 +312,11 @@ function patchList<T extends { id: ID }>(
 export const usePlannerStore = create<PlannerStore>()(
   persist(
     (set, get) => ({
-      ...createDefaultData(),
+      ...createEmptyData(),
+      onboarded: false,
+
+      setOnboarded: (value) => set({ onboarded: value }),
+      loadSample: () => set({ ...createSampleData(), onboarded: true }),
 
       updateSettings: (patch) =>
         set((state) => ({ settings: { ...state.settings, ...patch } })),
@@ -339,7 +365,8 @@ export const usePlannerStore = create<PlannerStore>()(
           return { [key]: next } as Partial<PlannerStore>;
         }),
 
-      resetAll: () => set({ ...createDefaultData() }),
+      /** 전부 비우고 초기 설정 마법사를 다시 띄운다 */
+      resetAll: () => set({ ...createEmptyData(), onboarded: false }),
 
       clearAll: () =>
         set({
@@ -357,6 +384,7 @@ export const usePlannerStore = create<PlannerStore>()(
       name: 'planner-for-my-home:v1',
       version: 1,
       partialize: (state) => ({
+        onboarded: state.onboarded,
         settings: state.settings,
         assets: state.assets,
         incomes: state.incomes,

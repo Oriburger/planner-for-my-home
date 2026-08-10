@@ -1,6 +1,6 @@
 import { usePlannerStore } from '@/store/plannerStore';
 
-export function AppHeader() {
+export function AppHeader({ onOpenWizard }: { onOpenWizard: () => void }) {
   const years = usePlannerStore((s) => s.settings.years);
 
   return (
@@ -22,6 +22,14 @@ export function AppHeader() {
         <span className="hidden shrink-0 rounded-full bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-700 sm:block">
           {years}년 시뮬레이션
         </span>
+
+        <button
+          type="button"
+          onClick={onOpenWizard}
+          className="shrink-0 rounded-xl border border-ink-200 px-3 py-1.5 text-xs font-medium text-ink-600 transition hover:bg-ink-50 hover:text-ink-800"
+        >
+          초기설정
+        </button>
       </div>
     </header>
   );
