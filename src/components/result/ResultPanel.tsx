@@ -22,10 +22,8 @@ export function ResultPanel() {
       <CashflowChart rows={rows} />
       <YearTable rows={rows} />
 
-      <p className="px-1 pb-2 text-[11px] leading-relaxed text-ink-400">
-        * 세금과 4대보험은 연봉 구간별 실효 공제율로 단순화한 추정치이며, 실제
-        연말정산 결과와 다를 수 있습니다. 물가상승률·수익률 등 가정값에 따라
-        결과가 크게 달라지므로 참고용으로만 활용해 주세요.
+      <p className="px-1 pb-2 text-[11px] text-ink-400">
+        * 가정값 기반 추정치이며 참고용입니다.
       </p>
     </div>
   );

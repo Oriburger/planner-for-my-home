@@ -3,15 +3,13 @@ import { InputPanel } from '@/components/form/InputPanel';
 import { ResultPanel } from '@/components/result/ResultPanel';
 import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
 import { usePlannerStore } from '@/store/plannerStore';
+import { useUIStore } from '@/store/uiStore';
+import { AppFooter } from './AppFooter';
 import { AppHeader } from './AppHeader';
 import { MobileSummaryBar } from './MobileSummaryBar';
 
-/**
- * 대시보드 레이아웃
- * - 모바일: 입력 폼(상단) -> 결과(하단) 세로 스택 + 하단 고정 요약 바
- * - PC(lg~): 좌측 입력 패널(고정 폭, 독립 스크롤) + 우측 결과 패널
- */
 export function DashboardLayout() {
+  const viewMode = useUIStore((s) => s.viewMode);
   const onboarded = usePlannerStore((s) => s.onboarded);
   const [wizardOpen, setWizardOpen] = useState(false);
 
@@ -21,13 +19,34 @@ export function DashboardLayout() {
   }, [onboarded]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-ink-100">
+    <div className="flex min-h-screen flex-col bg-ink-100 dark:bg-slate-950">
       <AppHeader onOpenWizard={() => setWizardOpen(true)} />
 
-      <main className="mx-auto w-full max-w-[1440px] flex-1 px-4 py-4 sm:px-6 sm:py-6">
-        <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] lg:gap-6">
-          {/* 입력 패널 — PC 에서는 헤더 아래에 붙어 따로 스크롤된다 */}
-          <div className="lg:sticky lg:top-[4.25rem] lg:max-h-[calc(100vh-5.5rem)] lg:overflow-y-auto lg:pr-1">
+      <main
+        className={`w-full flex-1 px-4 py-4 sm:px-6 sm:py-6 transition-all duration-300 ${
+          viewMode === 'mobile'
+            ? 'mx-auto my-4 max-w-[420px] rounded-3xl border border-ink-200 bg-white p-4 shadow-2xl dark:border-slate-800 dark:bg-slate-900'
+            : 'mx-auto max-w-[1440px]'
+        }`}
+      >
+
+        <div
+          className={
+            viewMode === 'mobile'
+              ? 'flex flex-col gap-4'
+              : viewMode === 'pc'
+                ? 'grid grid-cols-[380px_minmax(0,1fr)] items-start gap-6'
+                : 'grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] lg:gap-6'
+          }
+        >
+          {/* 입력 패널 */}
+          <div
+            className={
+              viewMode === 'mobile'
+                ? 'w-full'
+                : 'lg:sticky lg:top-[4.25rem] lg:max-h-[calc(100vh-5.5rem)] lg:overflow-y-auto lg:pr-1'
+            }
+          >
             <InputPanel />
           </div>
 
@@ -38,6 +57,7 @@ export function DashboardLayout() {
         </div>
       </main>
 
+      <AppFooter />
       <MobileSummaryBar />
 
       {wizardOpen && (

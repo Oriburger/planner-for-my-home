@@ -43,10 +43,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
 
   return (
     <Card>
-      <CardHeader
-        title="연도별 자산 변화"
-        description="총자산은 대출을 갚기 전 금액, 순자산은 대출 잔액을 뺀 금액이에요."
-      />
+      <CardHeader title="연도별 자산 변화" />
       <div className="px-1 py-4 pr-3 sm:px-2 sm:pr-5">
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart

@@ -113,7 +113,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/40 p-0 backdrop-blur-md sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/40 p-0 backdrop-blur-md dark:bg-slate-950/60 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="onboarding-title"
@@ -121,28 +121,28 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
         if (e.target === e.currentTarget) skipAll();
       }}
     >
-      <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-ink-200 bg-white shadow-card sm:rounded-3xl">
+      <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-ink-200 bg-white shadow-card dark:border-slate-800 dark:bg-slate-900 sm:rounded-3xl">
         {/* 헤더 */}
-        <header className="border-b border-ink-100 px-5 pb-4 pt-5">
+        <header className="border-b border-ink-100 px-5 pb-4 pt-5 dark:border-slate-800">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-medium text-brand-600">
+              <p className="text-[11px] font-medium text-brand-600 dark:text-blue-400">
                 초기 설정 {stepIndex + 1} / {STEPS.length}
               </p>
               <h2
                 id="onboarding-title"
-                className="mt-0.5 text-lg font-bold text-ink-900"
+                className="mt-0.5 text-lg font-bold text-ink-900 dark:text-slate-100"
               >
                 {step.title}
               </h2>
-              <p className="mt-0.5 text-xs text-ink-500">{step.description}</p>
+              <p className="mt-0.5 text-xs text-ink-500 dark:text-slate-400">{step.description}</p>
             </div>
 
             <button
               type="button"
               onClick={skipAll}
               aria-label="설정 창 닫기"
-              className="shrink-0 rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-600"
+              className="shrink-0 rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
@@ -156,7 +156,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
               <span
                 key={s.key}
                 className={`h-1 flex-1 rounded-full transition-colors ${
-                  i <= stepIndex ? 'bg-brand-600' : 'bg-ink-200'
+                  i <= stepIndex ? 'bg-brand-600' : 'bg-ink-200 dark:bg-slate-700'
                 }`}
               />
             ))}
@@ -168,14 +168,14 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
           <step.Body draft={draft} patch={patch} />
 
           {isLast && preview && (
-            <div className="mt-4 rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50 to-white p-4">
-              <p className="text-xs font-medium text-ink-500">
+            <div className="mt-4 rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50 to-white p-4 dark:border-blue-900/70 dark:from-blue-950/40 dark:to-slate-900">
+              <p className="text-xs font-medium text-ink-500 dark:text-slate-400">
                 {draft.settings.years}년 후 예상 순자산
               </p>
-              <p className="mt-1 text-2xl font-bold leading-tight text-brand-700">
+              <p className="mt-1 text-2xl font-bold leading-tight text-brand-700 dark:text-blue-300">
                 {formatKRWShort(preview.finalNetWorth)}원
               </p>
-              <p className="mt-1 text-[11px] text-ink-400">
+              <p className="mt-1 text-[11px] text-ink-400 dark:text-slate-500">
                 완료를 누르면 대시보드에서 자세히 볼 수 있어요.
               </p>
             </div>
@@ -183,13 +183,13 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
         </div>
 
         {/* 푸터 */}
-        <footer className="border-t border-ink-100 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <footer className="border-t border-ink-100 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] dark:border-slate-800">
           <div className="flex gap-2">
             {!isFirst && (
               <button
                 type="button"
                 onClick={() => setStepIndex((i) => i - 1)}
-                className="rounded-xl border border-ink-200 px-4 py-3 text-sm font-medium text-ink-600 transition hover:bg-ink-50"
+                className="rounded-xl border border-ink-200 px-4 py-3 text-sm font-medium text-ink-600 transition hover:bg-ink-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 이전
               </button>
@@ -211,7 +211,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
                 loadSample();
                 onClose();
               }}
-              className="text-xs text-ink-400 underline-offset-2 transition hover:text-ink-600 hover:underline"
+              className="text-xs text-ink-400 underline-offset-2 transition hover:text-ink-600 hover:underline dark:text-slate-500 dark:hover:text-slate-300"
             >
               예시 데이터로 둘러보기
             </button>
@@ -220,7 +220,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
               <button
                 type="button"
                 onClick={skipAll}
-                className="text-xs text-ink-400 underline-offset-2 transition hover:text-ink-600 hover:underline"
+                className="text-xs text-ink-400 underline-offset-2 transition hover:text-ink-600 hover:underline dark:text-slate-500 dark:hover:text-slate-300"
               >
                 나중에 하기
               </button>

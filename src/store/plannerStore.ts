@@ -211,6 +211,8 @@ export const createAsset = (): AssetItem => ({
   annualReturnRate: 0,
   liquid: true,
   monthlyContribution: 0,
+  memo: '',
+  startYear: 1,
 });
 
 export const createIncome = (): IncomeItem => ({
@@ -221,9 +223,11 @@ export const createIncome = (): IncomeItem => ({
   growthMode: 'fixed',
   growthRate: 0,
   manualGrowthRates: [],
+  customAnnualAmounts: [],
   taxable: true,
   startYear: 1,
   endYear: null,
+  memo: '',
 });
 
 export const createHousing = (): HousingItem => ({
@@ -236,6 +240,7 @@ export const createHousing = (): HousingItem => ({
   annualIncreaseRate: 2,
   startYear: 1,
   endYear: null,
+  memo: '',
 });
 
 export const createLoan = (): LoanItem => ({
@@ -247,6 +252,10 @@ export const createLoan = (): LoanItem => ({
   repaymentType: 'equalPayment',
   monthlyPayment: 0,
   startYear: 1,
+  graceYears: 0,
+  isDepositLinked: false,
+  autoRenew: false,
+  memo: '',
 });
 
 export const createExpense = (): ExpenseItem => ({
@@ -256,6 +265,7 @@ export const createExpense = (): ExpenseItem => ({
   monthlyAmount: 0,
   inflationRate: null,
   startYear: 1,
+  memo: '',
   endYear: null,
 });
 

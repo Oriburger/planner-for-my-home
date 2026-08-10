@@ -26,10 +26,10 @@ export function PeriodSection() {
       <div className="space-y-4 px-4 py-4 sm:px-5">
         <div>
           <div className="mb-2 flex items-end justify-between">
-            <span className="text-xs font-medium text-ink-600">기간</span>
-            <span className="text-2xl font-bold tabular-nums text-brand-700">
+            <span className="text-xs font-medium text-ink-600 dark:text-slate-300">기간</span>
+            <span className="text-2xl font-bold tabular-nums text-brand-700 dark:text-brand-400">
               {settings.years}
-              <span className="ml-0.5 text-sm font-semibold text-ink-500">
+              <span className="ml-0.5 text-sm font-semibold text-ink-500 dark:text-slate-400">
                 년
               </span>
             </span>
@@ -43,7 +43,7 @@ export function PeriodSection() {
             value={settings.years}
             onChange={(e) => setYears(Number(e.target.value))}
             aria-label="시뮬레이션 기간(년)"
-            className="h-2 w-full cursor-pointer appearance-none rounded-full bg-ink-200 accent-brand-600"
+            className="h-2 w-full cursor-pointer appearance-none rounded-full bg-ink-200 accent-brand-600 dark:bg-slate-800 dark:accent-brand-500"
           />
 
           <div className="mt-2 flex gap-1.5">
@@ -54,8 +54,8 @@ export function PeriodSection() {
                 onClick={() => setYears(y)}
                 className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition ${
                   settings.years === y
-                    ? 'bg-brand-600 text-white'
-                    : 'bg-ink-100 text-ink-600 hover:bg-ink-200'
+                    ? 'bg-brand-600 text-white shadow-sm dark:bg-brand-600 dark:text-white'
+                    : 'bg-ink-100 text-ink-600 hover:bg-ink-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
                 }`}
               >
                 {y}년
@@ -109,7 +109,7 @@ export function PeriodSection() {
         </div>
 
         <div>
-          <span className="mb-1 block text-xs font-medium text-ink-600">
+          <span className="mb-1 block text-xs font-medium text-ink-600 dark:text-slate-300">
             세금 · 4대보험 계산 방식
           </span>
           <SegmentedControl

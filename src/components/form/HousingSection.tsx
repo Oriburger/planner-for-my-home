@@ -8,6 +8,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
+  TextArea,
   TextInput,
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
@@ -117,6 +118,14 @@ export function HousingSection() {
                 max={40}
                 blankOnZero
                 placeholder="끝까지"
+              />
+            </Field>
+
+            <Field label="메모" className="col-span-2">
+              <TextArea
+                value={housing.memo ?? ''}
+                onChange={(memo) => updateHousing(housing.id, { memo })}
+                placeholder="선택 입력"
               />
             </Field>
           </div>
