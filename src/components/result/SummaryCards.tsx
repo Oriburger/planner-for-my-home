@@ -81,10 +81,12 @@ export function SummaryCards({
   summary,
   years,
   finalYear,
+  firstYear,
 }: {
   summary: SimulationResult['summary'];
   years: number;
   finalYear: number;
+  firstYear: SimulationResult['rows'][number];
 }) {
   const shortfallYear = summary.firstContributionShortfallYear;
 
@@ -106,6 +108,11 @@ export function SummaryCards({
               월 자동이체 합계가 그 해 쓸 수 있는 여유자금을 넘어섭니다. 최대{' '}
               {formatKRWShort(summary.maxContributionShortfall)}원까지 모자라요.
               자동이체 금액을 줄이거나 지출을 조정해 주세요.
+            </p>
+            <p className="mt-1 text-[11px] text-rose-700/80 dark:text-rose-400/80">
+              참고 · 1년차 세후 월 실수령{' '}
+              {formatKRWShort(firstYear.netIncome / 12)}원 · 월 자동이체{' '}
+              {formatKRWShort(firstYear.contribution / 12)}원
             </p>
           </div>
         </div>
@@ -139,7 +146,7 @@ export function SummaryCards({
       <StatTile
         label="첫 해 저축률"
         value={formatPercent(summary.savingsRate)}
-        caption="실수령액 대비"
+        caption={`세후 월 ${formatKRWShort(firstYear.netIncome / 12)}원 대비`}
       />
 
       <StatTile

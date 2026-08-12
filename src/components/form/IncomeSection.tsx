@@ -13,6 +13,7 @@ import {
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
+import { useSimulation } from '@/hooks/useSimulation';
 import { formatKRWShort } from '@/utils/format';
 
 const TYPE_OPTIONS = (Object.keys(INCOME_TYPE_LABEL) as IncomeType[]).map(
@@ -115,6 +116,33 @@ function CustomAmountEditor({
   );
 }
 
+/**
+ * 세금·4대보험은 과세 대상 수입을 모두 합쳐서 계산하므로 항목별로 쪼갤 수 없다.
+ * 그래서 섹션 단위로 첫 해 실수령액을 월 단위까지 풀어서 보여준다.
+ */
+function NetIncomeHint() {
+  const { rows } = useSimulation();
+  const first = rows[0];
+
+  if (first.grossIncome <= 0) return null;
+
+  return (
+    <div className="rounded-xl bg-brand-50 px-3 py-2.5 text-xs text-brand-800 dark:bg-blue-950/40 dark:text-blue-200">
+      <p>
+        1년차 세후 월 실수령{' '}
+        <strong className="font-semibold tabular-nums">
+          {formatKRWShort(first.netIncome / 12)}원
+        </strong>
+      </p>
+      <p className="mt-1 text-[11px] text-brand-700/80 dark:text-blue-300/80">
+        세전 연 {formatKRWShort(first.grossIncome)}원 · 세금·4대보험{' '}
+        {formatKRWShort(first.taxAndInsurance)}원 · 실수령 연{' '}
+        {formatKRWShort(first.netIncome)}원
+      </p>
+    </div>
+  );
+}
+
 export function IncomeSection() {
   const incomes = usePlannerStore((s) => s.incomes);
   const years = usePlannerStore((s) => s.settings.years);
@@ -124,11 +152,14 @@ export function IncomeSection() {
   const duplicateItem = usePlannerStore((s) => s.duplicateItem);
 
   const total = incomes.reduce((sum, i) => sum + i.annualAmount, 0);
+  const { rows } = useSimulation();
 
   return (
     <Accordion
       title="수입"
-      summary={`${incomes.length}개 · 첫 해 세전 ${formatKRWShort(total)}원`}
+      summary={`${incomes.length}개 · 세전 연 ${formatKRWShort(
+        total,
+      )}원 · 세후 월 ${formatKRWShort(rows[0].netIncome / 12)}원`}
       icon="💰"
     >
       {incomes.length === 0 && <EmptyState message="수입 항목을 추가해 주세요." />}
@@ -259,6 +290,8 @@ export function IncomeSection() {
           </div>
         </ItemCard>
       ))}
+
+      <NetIncomeHint />
 
       <AddItemButton onClick={addIncome} label="수입 항목 추가" />
     </Accordion>

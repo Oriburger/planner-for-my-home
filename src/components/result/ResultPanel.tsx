@@ -16,6 +16,7 @@ export function ResultPanel() {
         summary={summary}
         years={years}
         finalYear={rows[rows.length - 1].year}
+        firstYear={rows[0]}
       />
 
       <AssetChart rows={rows} start={start} />
