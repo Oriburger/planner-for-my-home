@@ -16,6 +16,7 @@ import {
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
+import { useSimulation } from '@/hooks/useSimulation';
 import { formatKRWShort } from '@/utils/format';
 
 const TYPE_OPTIONS = (Object.keys(ASSET_TYPE_LABEL) as AssetType[]).map(
@@ -177,7 +178,52 @@ export function AssetSection() {
         );
       })}
 
+      <ContributionBalanceHint />
+
       <AddItemButton onClick={addAsset} label="자산 항목 추가" />
     </Accordion>
+  );
+}
+
+/**
+ * 자동이체는 전액 집행되므로, 여유자금이 이를 감당하는지 바로 보여준다.
+ * 첫 해 기준으로 안내하고 부족해지는 해가 있으면 함께 알린다.
+ */
+function ContributionBalanceHint() {
+  const { rows, summary } = useSimulation();
+  const first = rows[0];
+
+  if (first.contribution <= 0) return null;
+
+  const shortfallYear = summary.firstContributionShortfallYear;
+  const short = shortfallYear !== null;
+
+  return (
+    <div
+      role={short ? 'alert' : undefined}
+      className={`rounded-xl px-3 py-2.5 text-xs ${
+        short
+          ? 'bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300'
+          : 'bg-brand-50 text-brand-800 dark:bg-blue-950/40 dark:text-blue-200'
+      }`}
+    >
+      <p>
+        1년차 자동이체{' '}
+        <strong className="font-semibold tabular-nums">
+          {formatKRWShort(first.contribution)}원
+        </strong>{' '}
+        · 남은 여유자금{' '}
+        <strong className="font-semibold tabular-nums">
+          {formatKRWShort(first.contributionBalance)}원
+        </strong>
+      </p>
+      {short && (
+        <p className="mt-1 leading-relaxed">
+          {shortfallYear}년차에 여유자금이 최대{' '}
+          {formatKRWShort(summary.maxContributionShortfall)}원 모자랍니다.
+          자동이체 금액을 줄여주세요.
+        </p>
+      )}
+    </div>
   );
 }

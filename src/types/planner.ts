@@ -272,6 +272,13 @@ export interface YearResult {
   /** 연간 저축액 = netIncome - 생활비 - 주거비 - 대출상환 */
   annualSavings: number;
 
+  /**
+   * 자동이체를 전부 집행하고 남은 여유자금.
+   * = (이전까지 쌓인 여유자금 + 당해 연간 저축액) - 당해 자동이체 총계
+   * 음수면 자동이체를 감당할 현금이 부족하다는 뜻이다.
+   */
+  contributionBalance: number;
+
   /** 유동자산 (즉시 인출 가능) */
   liquidAssets: number;
   /** 비유동자산 (보증금·연금·청약 등) */
@@ -316,6 +323,10 @@ export interface SimulationSummary {
   savingsRate: number;
   /** 순자산이 마이너스로 떨어지는 첫 연차 (없으면 null) */
   firstNegativeYear: number | null;
+  /** 자동이체가 여유자금을 초과하는 첫 연차 (없으면 null) */
+  firstContributionShortfallYear: number | null;
+  /** 자동이체 부족액이 가장 큰 해의 부족 금액 (양수, 부족이 없으면 0) */
+  maxContributionShortfall: number;
   /** 연금저축/IRP/ISA 만기 정보 리스트 */
   pensionMaturities: PensionMaturityInfo[];
 }

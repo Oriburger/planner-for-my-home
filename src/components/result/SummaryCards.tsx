@@ -86,8 +86,31 @@ export function SummaryCards({
   years: number;
   finalYear: number;
 }) {
+  const shortfallYear = summary.firstContributionShortfallYear;
+
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {shortfallYear !== null && (
+        <div
+          role="alert"
+          className="col-span-2 flex items-start gap-2.5 rounded-2xl border border-rose-300 bg-rose-50 p-4 shadow-card lg:col-span-4 dark:border-rose-900 dark:bg-rose-950/40"
+        >
+          <span aria-hidden="true" className="text-base leading-none">
+            ⚠️
+          </span>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-rose-800 dark:text-rose-300">
+              {shortfallYear}년차부터 자동이체를 감당할 현금이 부족해요
+            </p>
+            <p className="mt-1 text-[11px] leading-relaxed text-rose-700 dark:text-rose-400">
+              월 자동이체 합계가 그 해 쓸 수 있는 여유자금을 넘어섭니다. 최대{' '}
+              {formatKRWShort(summary.maxContributionShortfall)}원까지 모자라요.
+              자동이체 금액을 줄이거나 지출을 조정해 주세요.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="col-span-2">
         <StatTile
           label={`${years}년 후 (${finalYear}년) 예상 순자산`}

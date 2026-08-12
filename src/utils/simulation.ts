@@ -273,25 +273,21 @@ export function runSimulation(data: PlannerData): SimulationResult {
       return true;
     });
 
-    const desiredContribution = activeAssetsForContribution.reduce(
-      (sum, a) => sum + a.monthlyContribution * 12,
-      0,
-    );
-    const availableForContribution =
-      Math.max(0, annualSavings) + Math.max(0, savingsPool);
-    const contributionScale =
-      desiredContribution > 0 && desiredContribution > availableForContribution
-        ? availableForContribution / desiredContribution
-        : 1;
+    // 자동이체는 "무조건 저축"이다. 여유자금이 모자라도 깎지 않고 전액 집행하며,
+    // 모자란 만큼은 여유자금이 마이너스로 남아 부족분으로 드러난다.
+    const availableForContribution = savingsPool + annualSavings;
 
     let contribution = 0;
     for (const asset of activeAssetsForContribution) {
-      const yearly = asset.monthlyContribution * 12 * contributionScale;
+      const yearly = asset.monthlyContribution * 12;
       assetBalances.set(asset.id, (assetBalances.get(asset.id) ?? 0) + yearly);
       contribution += yearly;
     }
 
     savingsPool += annualSavings - contribution;
+
+    /** 자동이체를 전부 집행하고 남은 여유자금 (음수면 현금 부족) */
+    const contributionBalance = availableForContribution - contribution;
 
     // 해당 연차 말 자산 잔액 스냅샷 기록
     assetHistoryByYear.set(
@@ -345,6 +341,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
       investmentReturn,
       contribution,
       annualSavings,
+      contributionBalance,
       liquidAssets,
       lockedAssets,
       totalAssets,
@@ -359,6 +356,11 @@ export function runSimulation(data: PlannerData): SimulationResult {
   const initialNetWorth = initialTotalAssets - initialLoanBalance;
 
   const firstNegative = rows.find((row) => row.netWorth < 0);
+  const firstShortfall = rows.find((row) => row.contributionBalance < 0);
+  const maxContributionShortfall = rows.reduce(
+    (worst, row) => Math.max(worst, -row.contributionBalance),
+    0,
+  );
 
   // 연금저축/IRP/ISA 만기 요약 생성
   const pensionMaturities: SimulationResult['summary']['pensionMaturities'] = [];
@@ -398,6 +400,8 @@ export function runSimulation(data: PlannerData): SimulationResult {
           ? (firstRow.annualSavings / firstRow.netIncome) * 100
           : 0,
       firstNegativeYear: firstNegative ? firstNegative.index : null,
+      firstContributionShortfallYear: firstShortfall ? firstShortfall.index : null,
+      maxContributionShortfall,
       pensionMaturities,
     },
   };

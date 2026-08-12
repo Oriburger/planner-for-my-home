@@ -13,6 +13,8 @@ const COLUMNS: Array<{
   { key: 'housingCost', label: '주거비', tone: 'negative' },
   { key: 'loanPayment', label: '대출상환', tone: 'negative' },
   { key: 'annualSavings', label: '연 저축' },
+  { key: 'contribution', label: '자동이체', tone: 'negative' },
+  { key: 'contributionBalance', label: '남은 여유자금' },
   { key: 'investmentReturn', label: '운용수익' },
   { key: 'totalAssets', label: '총자산' },
   { key: 'loanBalance', label: '대출잔액', tone: 'negative' },
@@ -45,7 +47,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
       />
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px] border-collapse text-right text-xs tabular-nums">
+        <table className="w-full min-w-[880px] border-collapse text-right text-xs tabular-nums">
           <thead>
             <tr className="border-b border-ink-200 text-ink-500 dark:border-slate-800 dark:text-slate-400">
               <th

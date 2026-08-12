@@ -278,7 +278,7 @@ describe('runSimulation', () => {
     expect(rows[1].liquidAssets).toBeCloseTo(1 * 100_000_000, 0);
   });
 
-  it('월 자동이체가 저축여력을 초과하면 감당 가능한 만큼만 반영하고, 총자산은 줄어들지 않는다', () => {
+  it('월 자동이체는 저축여력을 넘어도 전액 집행되고, 부족분이 남은 여유자금에 음수로 드러난다', () => {
     const build = (monthlyContribution: number) =>
       makeData({
         settings: { ...baseSettings, years: 5, applyAssetReturn: true, savingsReturnRate: 3 },
@@ -321,18 +321,65 @@ describe('runSimulation', () => {
       });
 
     // 연 저축액(annualSavings) = 3000만 - 2400만 = 600만.
-    // 자동이체를 저축여력(600만)보다 훨씬 크게(연 2400만) 잡아도
-    // 여유자금이 빚처럼 마이너스 복리로 굴러가서는 안 된다.
-    const overCommitted = runSimulation(build(200 * 만));
-    const modest = runSimulation(build(30 * 만));
+    const overCommitted = runSimulation(build(200 * 만)); // 연 2400만 — 여력 초과
+    const modest = runSimulation(build(30 * 만)); // 연 360만 — 여력 안쪽
 
-    const lastOver = overCommitted.rows[overCommitted.rows.length - 1];
-    const lastModest = modest.rows[modest.rows.length - 1];
+    // 설정한 금액은 깎이지 않고 전액 집행된다.
+    expect(overCommitted.rows[0].contribution).toBeCloseTo(2400 * 만, 0);
+    expect(modest.rows[0].contribution).toBeCloseTo(360 * 만, 0);
 
-    // 실제 반영된 이체액은 그 해 감당 가능한 금액을 넘지 않는다.
-    expect(overCommitted.rows[0].contribution).toBeCloseTo(600 * 만, 0);
-    // 과도한 자동이체 설정이 적정 설정보다 최종 총자산을 더 깎아먹지 않는다.
-    expect(lastOver.totalAssets).toBeGreaterThanOrEqual(lastModest.totalAssets - 1);
+    // 남은 여유자금 = 저축여력 - 자동이체. 초과분은 음수로 드러난다.
+    expect(overCommitted.rows[0].contributionBalance).toBeCloseTo(-1800 * 만, 0);
+    expect(modest.rows[0].contributionBalance).toBeCloseTo(240 * 만, 0);
+
+    // 부족이 발생한 첫 연차와 최대 부족액을 요약으로 알려준다.
+    expect(overCommitted.summary.firstContributionShortfallYear).toBe(1);
+    expect(overCommitted.summary.maxContributionShortfall).toBeGreaterThan(1800 * 만 - 1);
+    expect(modest.summary.firstContributionShortfallYear).toBeNull();
+    expect(modest.summary.maxContributionShortfall).toBe(0);
+  });
+
+  it('자동이체는 여유자금에서 자산으로 옮기는 것이므로 그 해 총자산을 바꾸지 않는다', () => {
+    const build = (monthlyContribution: number) =>
+      makeData({
+        settings: { ...baseSettings, years: 3, applyAssetReturn: false },
+        assets: [
+          {
+            id: 'a1',
+            type: 'cash',
+            name: '파킹통장',
+            amount: 1000 * 만,
+            annualReturnRate: 0,
+            liquid: true,
+            monthlyContribution,
+          },
+        ],
+        incomes: [
+          {
+            id: 'i1',
+            type: 'salary',
+            name: '연봉',
+            annualAmount: 3000 * 만,
+            growthMode: 'fixed',
+            growthRate: 0,
+            manualGrowthRates: [],
+            taxable: false,
+            startYear: 1,
+            endYear: null,
+          },
+        ],
+      });
+
+    // 운용수익을 끈 상태에서는 자동이체 금액과 무관하게 총자산이 같아야 한다.
+    const small = runSimulation(build(5 * 만));
+    const large = runSimulation(build(50 * 만));
+
+    expect(large.rows[2].totalAssets).toBeCloseTo(small.rows[2].totalAssets, 0);
+    // 다만 자산 계좌로 옮겨간 금액 자체는 10배 차이가 난다.
+    expect(large.rows[0].contribution).toBeCloseTo(
+      small.rows[0].contribution * 10,
+      0,
+    );
   });
 
   it('순자산은 대출 잔액을 뺀 값이며 상환에 따라 잔액이 줄어든다', () => {
