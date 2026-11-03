@@ -32,7 +32,7 @@ export function Field({
 }
 
 const inputClass =
-  'w-full rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-900 tabular-nums transition placeholder:text-ink-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:bg-ink-100 disabled:text-ink-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-600 dark:disabled:bg-slate-800 dark:disabled:text-slate-500';
+  'w-full rounded-xl border border-white/80 bg-white/70 px-3 py-2.5 text-sm text-ink-900 tabular-nums shadow-xs backdrop-blur-md transition-all duration-200 placeholder:text-ink-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/25 disabled:bg-slate-100/60 disabled:text-ink-400 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-brand-400 dark:focus:bg-slate-900/90 dark:disabled:bg-slate-800/40';
 
 /* ------------------------------------------------------------------ */
 /* 숫자 입력 (포커스 중에는 draft 문자열을 그대로 유지)                 */

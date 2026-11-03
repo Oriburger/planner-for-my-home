@@ -8,7 +8,7 @@ interface ItemCardProps {
   children: ReactNode;
 }
 
-/** 동적으로 추가/삭제되는 개별 입력 항목 카드 */
+/** 동적으로 추가/삭제되는 개별 입력 항목 카드 (Liquid Glass) */
 export function ItemCard({
   title,
   badge,
@@ -17,12 +17,12 @@ export function ItemCard({
   children,
 }: ItemCardProps) {
   return (
-    <div className="rounded-xl border border-ink-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="rounded-xl border border-white/70 bg-white/70 p-3.5 shadow-xs backdrop-blur-md transition-all duration-200 hover:border-brand-300/80 dark:border-white/10 dark:bg-slate-900/70 dark:hover:border-brand-500/50">
       <div className="mb-3 flex items-center gap-2">
         <div className="min-w-0 flex-1">{title}</div>
 
         {badge && (
-          <span className="shrink-0 rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-medium text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
+          <span className="shrink-0 rounded-full border border-brand-200/60 bg-brand-50/80 px-2.5 py-0.5 text-[11px] font-semibold text-brand-700 backdrop-blur-xs dark:border-brand-800/60 dark:bg-brand-950/60 dark:text-brand-300">
             {badge}
           </span>
         )}
@@ -33,7 +33,7 @@ export function ItemCard({
             onClick={onDuplicate}
             aria-label="항목 복제"
             title="복제"
-            className="shrink-0 rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-100 hover:text-ink-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+            className="shrink-0 rounded-lg p-1.5 text-ink-400 transition hover:bg-white/80 hover:text-ink-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           >
             <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M7 3.5A1.5 1.5 0 018.5 2h6A1.5 1.5 0 0116 3.5v8a1.5 1.5 0 01-1.5 1.5h-6A1.5 1.5 0 017 11.5v-8z" />
@@ -48,7 +48,7 @@ export function ItemCard({
             onClick={onRemove}
             aria-label="항목 삭제"
             title="삭제"
-            className="shrink-0 rounded-lg p-1.5 text-ink-400 transition hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-950/50 dark:hover:text-red-400"
+            className="shrink-0 rounded-lg p-1.5 text-ink-400 transition hover:bg-red-50/80 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-950/50 dark:hover:text-red-400"
           >
             <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path
@@ -66,7 +66,7 @@ export function ItemCard({
   );
 }
 
-/** '항목 추가' 버튼 */
+/** '항목 추가' 버튼 (Liquid Glass Dashed) */
 export function AddItemButton({
   onClick,
   label,
@@ -78,7 +78,7 @@ export function AddItemButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-brand-300 bg-brand-50/50 px-3 py-2.5 text-xs font-semibold text-brand-700 transition hover:border-brand-400 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-brand-700/60 dark:bg-brand-950/30 dark:text-brand-300 dark:hover:bg-brand-950/50"
+      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-brand-300/80 bg-brand-50/40 px-3 py-2.5 text-xs font-semibold text-brand-700 shadow-xs backdrop-blur-xs transition-all duration-200 hover:border-brand-500 hover:bg-brand-50/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-brand-700/60 dark:bg-brand-950/30 dark:text-brand-300 dark:hover:bg-brand-950/60"
     >
       <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
         <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
@@ -91,7 +91,7 @@ export function AddItemButton({
 /** 항목이 하나도 없을 때의 빈 상태 */
 export function EmptyState({ message }: { message: string }) {
   return (
-    <p className="rounded-xl border border-dashed border-ink-200 px-3 py-6 text-center text-xs text-ink-400 dark:border-slate-800 dark:text-slate-500">
+    <p className="rounded-xl border border-dashed border-white/60 bg-white/30 px-3 py-6 text-center text-xs text-ink-400 backdrop-blur-xs dark:border-white/10 dark:bg-slate-900/30 dark:text-slate-500">
       {message}
     </p>
   );

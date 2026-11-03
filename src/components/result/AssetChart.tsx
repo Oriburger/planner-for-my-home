@@ -14,14 +14,14 @@ import type { SimulationResult } from '@/types/planner';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { formatAxis } from '@/utils/format';
 import { ChartTooltip } from './ChartTooltip';
-import { CHART, SERIES, axisTick } from './chartTheme';
+import { CHART, axisTick } from './chartTheme';
 
 interface AssetChartProps {
   rows: SimulationResult['rows'];
   start: { year: number; totalAssets: number; netWorth: number };
 }
 
-/** 연도별 자산 변화 — 총자산 / 순자산 / 대출 잔액 (모두 원 단위, 단일 축) */
+/** 연도별 자산 변화 — 총자산 / 순자산 / 대출 잔액 (Liquid Glass) */
 export function AssetChart({ rows, start }: AssetChartProps) {
   const data = useMemo(
     () => [
@@ -43,7 +43,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
 
   return (
     <Card>
-      <CardHeader title="연도별 자산 변화" />
+      <CardHeader title="연도별 자산 변화 추이" />
       <div className="px-1 py-4 pr-3 sm:px-2 sm:pr-5">
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart
@@ -52,8 +52,9 @@ export function AssetChart({ rows, start }: AssetChartProps) {
           >
             <defs>
               <linearGradient id="totalAssetsFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={SERIES.slot1} stopOpacity={0.28} />
-                <stop offset="100%" stopColor={SERIES.slot1} stopOpacity={0.02} />
+                <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.35} />
+                <stop offset="60%" stopColor="#6366F1" stopOpacity={0.12} />
+                <stop offset="100%" stopColor="#3B82F6" stopOpacity={0.0} />
               </linearGradient>
             </defs>
 
@@ -92,29 +93,29 @@ export function AssetChart({ rows, start }: AssetChartProps) {
               type="monotone"
               dataKey="totalAssets"
               name="총자산"
-              stroke={SERIES.slot1}
-              strokeWidth={2}
+              stroke="#3B82F6"
+              strokeWidth={2.5}
               fill="url(#totalAssetsFill)"
-              activeDot={{ r: 4, strokeWidth: 2, stroke: CHART.surface }}
+              activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}
             />
             <Line
               type="monotone"
               dataKey="netWorth"
               name="순자산"
-              stroke={SERIES.slot2}
-              strokeWidth={2}
+              stroke="#10B981"
+              strokeWidth={2.5}
               dot={false}
-              activeDot={{ r: 4, strokeWidth: 2, stroke: CHART.surface }}
+              activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}
             />
             <Line
               type="monotone"
               dataKey="loanBalance"
               name="대출 잔액"
-              stroke={SERIES.slot3}
+              stroke="#F43F5E"
               strokeWidth={2}
               strokeDasharray="4 3"
               dot={false}
-              activeDot={{ r: 4, strokeWidth: 2, stroke: CHART.surface }}
+              activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}
             />
           </ComposedChart>
         </ResponsiveContainer>

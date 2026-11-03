@@ -113,7 +113,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink-900/40 p-0 backdrop-blur-md dark:bg-slate-950/60 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/40 p-0 backdrop-blur-md transition-all sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="onboarding-title"
@@ -121,7 +121,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
         if (e.target === e.currentTarget) skipAll();
       }}
     >
-      <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-ink-200 bg-white shadow-card dark:border-slate-800 dark:bg-slate-900 sm:rounded-3xl">
+      <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-white/60 bg-white/85 shadow-2xl backdrop-blur-2xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/85 dark:ring-white/5 sm:rounded-3xl">
         {/* 헤더 */}
         <header className="border-b border-ink-100 px-5 pb-4 pt-5 dark:border-slate-800">
           <div className="mb-3 flex items-start justify-between gap-3">
@@ -168,7 +168,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
           <step.Body draft={draft} patch={patch} />
 
           {isLast && preview && (
-            <div className="mt-4 rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50 to-white p-4 dark:border-blue-900/70 dark:from-blue-950/40 dark:to-slate-900">
+            <div className="mt-4 rounded-2xl border border-blue-400/60 bg-gradient-to-br from-blue-50/90 to-indigo-50/70 p-4 shadow-glass backdrop-blur-xl ring-1 ring-inset ring-blue-300/40 dark:border-blue-500/30 dark:from-blue-950/60 dark:to-slate-900/80">
               <p className="text-xs font-medium text-ink-500 dark:text-slate-400">
                 {draft.settings.years}년 후 예상 순자산
               </p>
@@ -198,7 +198,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
             <button
               type="button"
               onClick={() => (isLast ? finish() : setStepIndex((i) => i + 1))}
-              className="flex-1 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+              className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 px-4 py-3 text-sm font-bold text-white shadow-md shadow-blue-500/25 transition-all hover:shadow-blue-500/40 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
             >
               {isLast ? '완료' : '다음'}
             </button>

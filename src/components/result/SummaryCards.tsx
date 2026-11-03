@@ -29,15 +29,15 @@ function StatTile({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border p-4 shadow-card transition-all ${
+      className={`relative overflow-hidden rounded-2xl border p-4 backdrop-blur-xl transition-all duration-300 ring-1 ring-inset hover:-translate-y-0.5 hover:shadow-glass-lg ${
         emphasis
-          ? 'border-brand-300 bg-gradient-to-br from-blue-50 via-indigo-50/40 to-white dark:border-blue-700/80 dark:bg-gradient-to-br dark:from-slate-900 dark:via-blue-950/40 dark:to-slate-900'
-          : 'border-ink-200 bg-white dark:border-slate-800 dark:bg-slate-900'
+          ? 'border-blue-400/60 bg-gradient-to-br from-blue-50/90 via-indigo-50/60 to-white/80 shadow-glass-glow ring-blue-300/40 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-slate-900/90 dark:via-blue-950/60 dark:to-slate-900/80 dark:ring-blue-500/20'
+          : 'border-white/60 bg-white/70 shadow-glass ring-white/30 dark:border-white/10 dark:bg-slate-900/65 dark:shadow-glass-dark dark:ring-white/5'
       }`}
     >
       {emphasis && (
         <div
-          className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-brand-500/10 blur-xl dark:bg-blue-400/15"
+          className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-500/20 blur-xl dark:from-blue-400/15 dark:to-indigo-500/15"
           aria-hidden="true"
         />
       )}
@@ -95,13 +95,13 @@ export function SummaryCards({
       {shortfallYear !== null && (
         <div
           role="alert"
-          className="col-span-2 flex items-start gap-2.5 rounded-2xl border border-rose-300 bg-rose-50 p-4 shadow-card lg:col-span-4 dark:border-rose-900 dark:bg-rose-950/40"
+          className="col-span-2 flex items-start gap-2.5 rounded-2xl border border-rose-300/80 bg-rose-50/75 p-4 shadow-glass backdrop-blur-xl ring-1 ring-inset ring-rose-200/50 lg:col-span-4 dark:border-rose-900/60 dark:bg-rose-950/40 dark:ring-rose-800/20"
         >
           <span aria-hidden="true" className="text-base leading-none">
             ⚠️
           </span>
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-rose-800 dark:text-rose-300">
+            <p className="text-xs font-bold text-rose-800 dark:text-rose-300">
               {shortfallYear}년차부터 자동이체를 감당할 현금이 부족해요
             </p>
             <p className="mt-1 text-[11px] leading-relaxed text-rose-700 dark:text-rose-400">
@@ -165,26 +165,26 @@ export function SummaryCards({
       />
 
       {summary.pensionMaturities && summary.pensionMaturities.length > 0 && (
-        <div className="col-span-2 lg:col-span-4 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 shadow-card dark:border-brand-900 dark:bg-brand-950/40">
-          <p className="text-xs font-semibold text-brand-800 dark:text-brand-300 flex items-center gap-1.5">
+        <div className="col-span-2 lg:col-span-4 rounded-2xl border border-white/60 bg-white/70 p-4 shadow-glass backdrop-blur-xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/65 dark:shadow-glass-dark dark:ring-white/5">
+          <p className="text-xs font-bold text-brand-800 dark:text-brand-300 flex items-center gap-1.5">
             <span>🎯</span> 연금저축 · ISA 만기 요약
           </p>
-          <div className="mt-2.5 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
             {summary.pensionMaturities.map((item) => (
               <div
                 key={item.assetId}
-                className="rounded-xl border border-brand-200/80 bg-white p-3 shadow-xs dark:border-slate-800 dark:bg-slate-900"
+                className="rounded-xl border border-white/80 bg-white/70 p-3 shadow-xs backdrop-blur-md transition-all hover:border-brand-200 dark:border-white/10 dark:bg-slate-800/60 dark:hover:border-slate-700"
               >
-                <div className="flex items-center justify-between text-xs font-medium text-ink-900 dark:text-slate-100">
+                <div className="flex items-center justify-between text-xs font-semibold text-ink-900 dark:text-slate-100">
                   <span className="truncate pr-2">{item.assetName}</span>
-                  <span className="shrink-0 rounded bg-brand-100 px-1.5 py-0.5 text-[11px] font-semibold text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
+                  <span className="shrink-0 rounded-full border border-brand-200/60 bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:border-brand-800/60 dark:bg-brand-950/80 dark:text-brand-300">
                     {item.maturityYearIndex}년 차 ({item.maturityCalendarYear}년
                     {item.maturityAge !== null ? `, 만 ${item.maturityAge}세` : ''})
                   </span>
                 </div>
                 <div className="mt-2 flex items-baseline justify-between text-xs">
                   <span className="text-ink-500 dark:text-slate-400">만기 예상 평가액</span>
-                  <span className="font-bold text-brand-700 dark:text-brand-400">
+                  <span className="font-bold text-brand-700 dark:text-brand-400 tabular-nums">
                     {formatKRWShort(item.estimatedAmountAtMaturity)}원
                   </span>
                 </div>

@@ -11,7 +11,7 @@ interface AccordionProps {
 
 /**
  * 카테고리별 입력을 접어두어 모바일에서의 시각적 피로도를 줄인다.
- * 열림 상태는 각 섹션이 로컬로 관리한다.
+ * Liquid Glass 스타일로 유려하게 렌더링한다.
  */
 export function Accordion({
   title,
@@ -24,34 +24,34 @@ export function Accordion({
   const panelId = useId();
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-ink-200 bg-white shadow-card dark:border-slate-800 dark:bg-slate-900">
+    <div className="overflow-hidden rounded-2xl border border-white/60 bg-white/70 shadow-glass backdrop-blur-xl ring-1 ring-inset ring-white/30 transition-all duration-300 dark:border-white/10 dark:bg-slate-900/65 dark:shadow-glass-dark dark:ring-white/5">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex w-full items-center gap-3 px-4 py-4 text-left transition hover:bg-ink-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1 dark:hover:bg-slate-800/60 sm:px-5"
+        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1 dark:hover:bg-slate-800/60 sm:px-5"
       >
         {icon && (
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-base dark:bg-brand-950/60">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-200/50 bg-gradient-to-br from-blue-50 to-indigo-50/80 text-base shadow-xs dark:border-blue-900/40 dark:from-blue-950/50 dark:to-slate-800">
             {icon}
           </span>
         )}
 
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold text-ink-900 dark:text-slate-100">
+          <span className="block truncate text-sm font-bold text-ink-900 dark:text-slate-100">
             {title}
           </span>
           {summary && (
-            <span className="mt-0.5 block truncate text-xs text-ink-500 dark:text-slate-400">
+            <span className="mt-0.5 block truncate text-xs font-medium text-ink-500 dark:text-slate-400">
               {summary}
             </span>
           )}
         </span>
 
         <svg
-          className={`h-5 w-5 shrink-0 text-ink-400 transition-transform duration-200 dark:text-slate-400 ${
-            open ? 'rotate-180' : ''
+          className={`h-5 w-5 shrink-0 text-ink-400 transition-transform duration-300 dark:text-slate-400 ${
+            open ? 'rotate-180 text-brand-600 dark:text-brand-400' : ''
           }`}
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -68,7 +68,7 @@ export function Accordion({
       {open && (
         <div
           id={panelId}
-          className="space-y-3 border-t border-ink-100 bg-ink-50/50 px-3 py-4 dark:border-slate-800 dark:bg-slate-900/40 sm:px-4"
+          className="space-y-3 border-t border-white/40 bg-white/40 px-3 py-4 backdrop-blur-md dark:border-white/10 dark:bg-slate-950/30 sm:px-4"
         >
           {children}
         </div>

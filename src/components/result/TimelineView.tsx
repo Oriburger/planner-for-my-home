@@ -13,23 +13,23 @@ interface TimelineViewProps {
 
 const BADGE_COLOR_MAP: Record<TimelineEvent['badgeColor'], { badge: string; border: string }> = {
   emerald: {
-    badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-    border: 'border-emerald-300 dark:border-emerald-800',
+    badge: 'border border-emerald-300/60 bg-emerald-100/80 text-emerald-900 dark:border-emerald-700/60 dark:bg-emerald-950/80 dark:text-emerald-300',
+    border: 'border-emerald-300/80 dark:border-emerald-800',
   },
   blue: {
-    badge: 'bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-300',
-    border: 'border-brand-300 dark:border-brand-800',
+    badge: 'border border-blue-300/60 bg-brand-100/80 text-brand-900 dark:border-blue-700/60 dark:bg-brand-950/80 dark:text-brand-300',
+    border: 'border-brand-300/80 dark:border-brand-800',
   },
   amber: {
-    badge: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-    border: 'border-amber-300 dark:border-amber-800',
+    badge: 'border border-amber-300/60 bg-amber-100/80 text-amber-900 dark:border-amber-700/60 dark:bg-amber-950/80 dark:text-amber-300',
+    border: 'border-amber-300/80 dark:border-amber-800',
   },
   purple: {
-    badge: 'bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300',
-    border: 'border-purple-300 dark:border-purple-800',
+    badge: 'border border-purple-300/60 bg-purple-100/80 text-purple-900 dark:border-purple-700/60 dark:bg-purple-950/80 dark:text-purple-300',
+    border: 'border-purple-300/80 dark:border-purple-800',
   },
   slate: {
-    badge: 'bg-ink-100 text-ink-800 dark:bg-slate-800 dark:text-slate-300',
+    badge: 'border border-slate-300/60 bg-slate-100/80 text-slate-900 dark:border-slate-700/60 dark:bg-slate-800/80 dark:text-slate-300',
     border: 'border-ink-200 dark:border-slate-700',
   },
 };
@@ -70,31 +70,34 @@ export function TimelineView({
   return (
     <div className="space-y-4">
       {/* 타임라인 헤더 안내 */}
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between px-1">
+      <div className="flex flex-col gap-1 px-1 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-bold text-ink-900 dark:text-slate-100 flex items-center gap-1.5">
-            <span>🗺️</span> 라이프 & 머니 타임라인
+          <h3 className="flex items-center gap-2 text-sm font-bold text-ink-900 dark:text-slate-100">
+            <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:bg-indigo-400/15 dark:text-indigo-300">
+              🗺️
+            </span>
+            라이프 & 머니 타임라인
           </h3>
           <p className="text-xs text-ink-500 dark:text-slate-400">
             만기, 주거 갱신, 대출 완납 및 목표 달성 이벤트를 시간 순서로 한눈에 확인합니다.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-[11px] text-ink-500 dark:text-slate-400">
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" /> 목표/완납
+        <div className="flex items-center gap-2.5 text-[11px] font-medium text-ink-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-xs" /> 목표/완납
           </span>
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-brand-500" /> 만기/현금화
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-brand-500 shadow-xs" /> 만기/현금화
           </span>
-          <span className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-purple-500" /> 주거 갱신
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-purple-500 shadow-xs" /> 주거 갱신
           </span>
         </div>
       </div>
 
       {/* 가로 스크롤 타임라인 트랙 */}
-      <div className="overflow-x-auto pb-2 pt-1 scrollbar-thin">
-        <div className="flex gap-3 min-w-max px-0.5">
+      <div className="overflow-x-auto pb-3 pt-1 thin-scrollbar">
+        <div className="flex min-w-max gap-3.5 px-0.5">
           {rows.map((row) => {
             const yearEvents = eventsByYear.get(row.index) ?? [];
             const isSelected = activeRow?.index === row.index;
@@ -106,49 +109,49 @@ export function TimelineView({
                 key={row.index}
                 type="button"
                 onClick={() => onSelectYear(row.index)}
-                className={`relative w-[220px] rounded-2xl border p-3.5 text-left transition-all duration-150 flex flex-col justify-between ${
+                className={`group relative flex w-[220px] flex-col justify-between rounded-2xl border p-4 text-left backdrop-blur-xl transition-all duration-300 ring-1 ring-inset ${
                   isSelected
-                    ? 'border-brand-600 bg-brand-50/70 ring-2 ring-brand-500/30 shadow-md dark:border-brand-400 dark:bg-brand-950/60'
+                    ? 'border-brand-500 bg-brand-50/85 shadow-glass-glow ring-brand-500/40 -translate-y-1 dark:border-brand-400 dark:bg-brand-950/70'
                     : hasMilestone || hasMaturity
-                      ? 'border-emerald-300/80 bg-white hover:border-brand-400 dark:border-emerald-900 dark:bg-slate-900'
-                      : 'border-ink-200 bg-white hover:border-ink-300 dark:border-slate-800 dark:bg-slate-900'
+                      ? 'border-emerald-300/80 bg-white/75 shadow-glass ring-emerald-200/40 hover:-translate-y-1 hover:border-brand-400 dark:border-emerald-800/80 dark:bg-slate-900/65 dark:ring-emerald-900/20'
+                      : 'border-white/60 bg-white/65 shadow-glass-sm ring-white/30 hover:-translate-y-1 hover:border-white/90 hover:bg-white/80 dark:border-white/10 dark:bg-slate-900/55 dark:ring-white/5'
                 }`}
               >
                 <div>
                   {/* 상단 연도 & 나이 */}
-                  <div className="flex items-center justify-between border-b border-ink-100 pb-2 dark:border-slate-800">
+                  <div className="flex items-center justify-between border-b border-ink-100/60 pb-2.5 dark:border-white/10">
                     <div>
-                      <span className="text-sm font-bold text-ink-900 dark:text-slate-100">
+                      <span className="text-sm font-extrabold text-ink-900 dark:text-slate-100">
                         {row.year}년
                       </span>
-                      <span className="ml-1 text-xs text-ink-500 dark:text-slate-400">
-                        ({row.index}년차{row.age !== null ? `, ${row.age}세` : ''})
+                      <span className="ml-1 text-xs font-semibold text-ink-500 dark:text-slate-400">
+                        ({row.index}년차{row.age !== null ? ` · ${row.age}세` : ''})
                       </span>
                     </div>
                     {yearEvents.length > 0 && (
-                      <span className="rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                        {yearEvents.length}개 이벤트
+                      <span className="rounded-full border border-brand-200/60 bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:border-brand-800/60 dark:bg-brand-950 dark:text-brand-300">
+                        {yearEvents.length}개
                       </span>
                     )}
                   </div>
 
                   {/* 그 해의 핵심 머니 지표 */}
-                  <div className="mt-2.5 space-y-1">
+                  <div className="mt-2.5 space-y-1.5">
                     <div className="flex items-baseline justify-between text-xs">
                       <span className="text-ink-500 dark:text-slate-400">순자산</span>
-                      <span className="font-bold text-ink-900 dark:text-slate-100 tabular-nums">
+                      <span className="font-extrabold text-ink-900 dark:text-slate-100 tabular-nums">
                         {formatKRWShort(row.netWorth)}원
                       </span>
                     </div>
                     <div className="flex items-baseline justify-between text-[11px]">
                       <span className="text-ink-500 dark:text-slate-400">가용 현금</span>
-                      <span className="font-semibold text-brand-700 dark:text-brand-400 tabular-nums">
+                      <span className="font-bold text-brand-700 dark:text-brand-400 tabular-nums">
                         {formatKRWShort(row.liquidAssets)}원
                       </span>
                     </div>
                     <div className="flex items-baseline justify-between text-[11px]">
                       <span className="text-ink-500 dark:text-slate-400">연간 저축</span>
-                      <span className="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
                         +{formatKRWShort(row.annualSavings)}원
                       </span>
                     </div>
@@ -156,16 +159,16 @@ export function TimelineView({
                 </div>
 
                 {/* 해당 연도 이벤트 태그 목록 */}
-                <div className="mt-3 min-h-[52px] space-y-1.5 border-t border-ink-100 pt-2 dark:border-slate-800">
+                <div className="mt-3 min-h-[54px] space-y-1.5 border-t border-ink-100/60 pt-2.5 dark:border-white/10">
                   {yearEvents.length === 0 ? (
-                    <p className="text-[11px] text-ink-400 dark:text-slate-500 italic">
-                      정기 저축 및 운용 진행
+                    <p className="text-[11px] italic text-ink-400 dark:text-slate-500">
+                      정기 저축 및 복리 운용
                     </p>
                   ) : (
                     yearEvents.slice(0, 2).map((e) => (
                       <div
                         key={e.id}
-                        className={`truncate rounded-lg px-2 py-1 text-[11px] font-medium ${
+                        className={`truncate rounded-lg px-2 py-1 text-[11px] font-medium backdrop-blur-xs ${
                           BADGE_COLOR_MAP[e.badgeColor].badge
                         }`}
                         title={`${e.title}: ${e.description}`}
@@ -175,8 +178,8 @@ export function TimelineView({
                     ))
                   )}
                   {yearEvents.length > 2 && (
-                    <p className="text-[10px] text-ink-500 font-medium dark:text-slate-400">
-                      외 {yearEvents.length - 2}개 더보기...
+                    <p className="text-[10px] font-semibold text-ink-500 dark:text-slate-400">
+                      외 {yearEvents.length - 2}개 이벤트...
                     </p>
                   )}
                 </div>
@@ -188,11 +191,11 @@ export function TimelineView({
 
       {/* 선택된 연도 인터랙티브 상세 인스펙터 */}
       {activeRow && (
-        <div className="rounded-2xl border border-brand-200 bg-brand-50/40 p-4 shadow-card dark:border-slate-700 dark:bg-slate-900/90">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-brand-100 pb-3 dark:border-slate-800">
+        <div className="relative overflow-hidden rounded-2xl border border-white/70 bg-white/75 p-4 shadow-glass backdrop-blur-2xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/70 dark:shadow-glass-dark dark:ring-white/5">
+          <div className="flex flex-col gap-2 border-b border-ink-100/60 pb-3.5 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="rounded-lg bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">
+                <span className="rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-2.5 py-0.5 text-xs font-bold text-white shadow-xs">
                   {activeRow.index}년차 포커스
                 </span>
                 <h4 className="text-base font-bold text-ink-900 dark:text-slate-100">
@@ -200,26 +203,26 @@ export function TimelineView({
                   {activeRow.age !== null ? ` (만 ${activeRow.age}세)` : ''}
                 </h4>
               </div>
-              <p className="mt-1 text-xs text-ink-600 dark:text-slate-400">
-                해당 시점에 모인 자산 구성과 발생할 이벤트를 요약합니다.
+              <p className="mt-1 text-xs text-ink-500 dark:text-slate-400">
+                해당 시점에 모인 자산 구성과 발생할 주요 금융 이벤트를 요약합니다.
               </p>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-[11px] text-ink-500 dark:text-slate-400">예상 순자산</p>
-                <p className="text-lg font-bold text-brand-800 dark:text-brand-300 tabular-nums">
+                <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">예상 순자산</p>
+                <p className="text-xl font-extrabold text-brand-700 dark:text-brand-300 tabular-nums">
                   {formatKRWShort(activeRow.netWorth)}원
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 지표 그리드 */}
+          {/* 지표 그리드 (Liquid Glass Chips) */}
           <div className="mt-3.5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-xl bg-white p-3 border border-ink-100 dark:bg-slate-800 dark:border-slate-700">
-              <p className="text-[11px] text-ink-500 dark:text-slate-400">즉시 가용 현금</p>
-              <p className="mt-1 text-sm font-bold text-brand-700 dark:text-brand-400 tabular-nums">
+            <div className="rounded-xl border border-white/70 bg-white/70 p-3 shadow-xs backdrop-blur-md transition-all hover:border-brand-200 dark:border-white/10 dark:bg-slate-800/60">
+              <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">즉시 가용 현금</p>
+              <p className="mt-1 text-base font-extrabold text-brand-700 dark:text-brand-400 tabular-nums">
                 {formatKRWShort(activeRow.liquidAssets)}원
               </p>
               <p className="mt-0.5 text-[10px] text-ink-400 dark:text-slate-500">
@@ -227,9 +230,9 @@ export function TimelineView({
               </p>
             </div>
 
-            <div className="rounded-xl bg-white p-3 border border-ink-100 dark:bg-slate-800 dark:border-slate-700">
-              <p className="text-[11px] text-ink-500 dark:text-slate-400">묶인 자산(보증금/연금)</p>
-              <p className="mt-1 text-sm font-bold text-ink-900 dark:text-slate-100 tabular-nums">
+            <div className="rounded-xl border border-white/70 bg-white/70 p-3 shadow-xs backdrop-blur-md transition-all hover:border-brand-200 dark:border-white/10 dark:bg-slate-800/60">
+              <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">묶인 자산(보증금/연금)</p>
+              <p className="mt-1 text-base font-extrabold text-ink-900 dark:text-slate-100 tabular-nums">
                 {formatKRWShort(activeRow.lockedAssets)}원
               </p>
               <p className="mt-0.5 text-[10px] text-ink-400 dark:text-slate-500">
@@ -237,9 +240,9 @@ export function TimelineView({
               </p>
             </div>
 
-            <div className="rounded-xl bg-white p-3 border border-ink-100 dark:bg-slate-800 dark:border-slate-700">
-              <p className="text-[11px] text-ink-500 dark:text-slate-400">연간 순수 저축액</p>
-              <p className="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+            <div className="rounded-xl border border-white/70 bg-white/70 p-3 shadow-xs backdrop-blur-md transition-all hover:border-brand-200 dark:border-white/10 dark:bg-slate-800/60">
+              <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">연간 순수 저축액</p>
+              <p className="mt-1 text-base font-extrabold text-emerald-600 dark:text-emerald-400 tabular-nums">
                 +{formatKRWShort(activeRow.annualSavings)}원
               </p>
               <p className="mt-0.5 text-[10px] text-ink-400 dark:text-slate-500">
@@ -247,9 +250,9 @@ export function TimelineView({
               </p>
             </div>
 
-            <div className="rounded-xl bg-white p-3 border border-ink-100 dark:bg-slate-800 dark:border-slate-700">
-              <p className="text-[11px] text-ink-500 dark:text-slate-400">남은 대출 잔액</p>
-              <p className="mt-1 text-sm font-bold text-rose-600 dark:text-rose-400 tabular-nums">
+            <div className="rounded-xl border border-white/70 bg-white/70 p-3 shadow-xs backdrop-blur-md transition-all hover:border-brand-200 dark:border-white/10 dark:bg-slate-800/60">
+              <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">남은 대출 잔액</p>
+              <p className="mt-1 text-base font-extrabold text-rose-600 dark:text-rose-400 tabular-nums">
                 {formatKRWShort(activeRow.loanBalance)}원
               </p>
               <p className="mt-0.5 text-[10px] text-ink-400 dark:text-slate-500">
@@ -264,7 +267,7 @@ export function TimelineView({
               📌 {activeRow.year}년에 일어나는 주요 이벤트
             </h5>
             {activeEvents.length === 0 ? (
-              <div className="mt-2 rounded-xl bg-white p-3 text-xs text-ink-500 border border-ink-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400">
+              <div className="mt-2 rounded-xl border border-white/60 bg-white/50 p-3 text-xs text-ink-500 backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/40 dark:text-slate-400">
                 특별한 만기나 대출 변동 없이 정기적인 저축과 복리 증식이 진행되는 해입니다.
               </div>
             ) : (
@@ -272,7 +275,7 @@ export function TimelineView({
                 {activeEvents.map((e) => (
                   <div
                     key={e.id}
-                    className="flex items-start gap-2.5 rounded-xl bg-white p-3 border border-ink-100 shadow-xs dark:bg-slate-800 dark:border-slate-700"
+                    className="flex items-start gap-2.5 rounded-xl border border-white/80 bg-white/70 p-3 shadow-xs backdrop-blur-md transition-all hover:border-brand-300 dark:border-white/10 dark:bg-slate-800/70"
                   >
                     <span
                       className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold ${

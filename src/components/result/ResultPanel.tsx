@@ -10,7 +10,7 @@ import { YearTable } from './YearTable';
 
 type ActiveTab = 'timeline' | 'charts' | 'table';
 
-/** 우측(모바일에서는 하단) 결과 패널 */
+/** 우측(모바일에서는 하단) 결과 패널 (Liquid Glass) */
 export function ResultPanel() {
   const storeData = usePlannerStore((s) => ({
     settings: s.settings,
@@ -41,16 +41,16 @@ export function ResultPanel() {
         onSelectYear={handleSelectYear}
       />
 
-      {/* 2. 뷰 전환 탭 (타임라인 / 차트 / 상세표) */}
-      <div className="flex items-center justify-between border-b border-ink-200 pb-1 dark:border-slate-800">
-        <div className="flex gap-1.5">
+      {/* 2. 뷰 전환 Liquid Glass Segmented Control */}
+      <div className="flex flex-col gap-2 border-b border-white/40 pb-2 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
+        <div className="inline-flex rounded-2xl border border-white/70 bg-white/60 p-1 shadow-glass-sm backdrop-blur-xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/60 dark:ring-white/5">
           <button
             type="button"
             onClick={() => setActiveTab('timeline')}
-            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
               activeTab === 'timeline'
-                ? 'bg-brand-600 text-white shadow-xs dark:bg-brand-500'
-                : 'text-ink-600 hover:bg-ink-100 dark:text-slate-400 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
+                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <span>🗺️</span> 라이프 타임라인
@@ -59,10 +59,10 @@ export function ResultPanel() {
           <button
             type="button"
             onClick={() => setActiveTab('charts')}
-            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
               activeTab === 'charts'
-                ? 'bg-brand-600 text-white shadow-xs dark:bg-brand-500'
-                : 'text-ink-600 hover:bg-ink-100 dark:text-slate-400 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
+                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <span>📊</span> 자산 & 현금흐름 차트
@@ -71,17 +71,17 @@ export function ResultPanel() {
           <button
             type="button"
             onClick={() => setActiveTab('table')}
-            className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
               activeTab === 'table'
-                ? 'bg-brand-600 text-white shadow-xs dark:bg-brand-500'
-                : 'text-ink-600 hover:bg-ink-100 dark:text-slate-400 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
+                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             <span>📋</span> 연도별 상세 데이터
           </button>
         </div>
 
-        <span className="hidden text-xs text-ink-500 dark:text-slate-400 sm:inline">
+        <span className="text-xs font-medium text-ink-500 dark:text-slate-400">
           총 {rows.length}개년 시뮬레이션
         </span>
       </div>
@@ -108,7 +108,7 @@ export function ResultPanel() {
 
       {/* 4. 종합 재무 분석 카드 (누적 저축액, 수익률, 적자 전환 여부) */}
       <div className="pt-2">
-        <h4 className="mb-2 text-xs font-bold text-ink-500 dark:text-slate-400 px-1">
+        <h4 className="mb-2.5 px-1 text-xs font-bold text-ink-500 dark:text-slate-400">
           종합 재무 성향 및 위험도 분석
         </h4>
         <SummaryCards

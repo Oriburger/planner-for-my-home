@@ -10,7 +10,7 @@ export function ChartTooltip({
   if (!active || !payload || payload.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-ink-200 bg-white/95 px-3 py-2 shadow-card backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
+    <div className="rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2.5 shadow-glass-lg backdrop-blur-2xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/85 dark:shadow-glass-dark dark:ring-white/5">
       <p className="mb-1.5 text-xs font-semibold text-ink-900 dark:text-slate-100">{label}</p>
       <ul className="space-y-1">
         {payload.map((entry) => (

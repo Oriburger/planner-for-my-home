@@ -13,31 +13,49 @@
   }
 
   body {
-    @apply bg-ink-100 text-ink-900 antialiased transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100;
-    /* iOS 에서 입력 시 자동 확대되지 않도록 최소 폰트 크기를 확보 */
+    @apply bg-slate-50 text-ink-900 antialiased transition-colors duration-300 dark:bg-[#0B0F19] dark:text-slate-100;
     font-size: 16px;
   }
 
-  /* 레인지 슬라이더 thumb */
+  /* Liquid Glass 레인지 슬라이더 */
+  input[type='range'] {
+    @apply h-2 w-full appearance-none rounded-lg bg-slate-200/80 backdrop-blur-sm dark:bg-slate-800;
+  }
+
   input[type='range']::-webkit-slider-thumb {
-    @apply h-5 w-5 cursor-pointer rounded-full border-2 border-white bg-brand-600 shadow;
+    @apply h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-white bg-gradient-to-tr from-brand-600 to-indigo-500 shadow-md shadow-brand-500/30 transition-transform duration-150 hover:scale-110 active:scale-95;
     -webkit-appearance: none;
-    appearance: none;
   }
 
   input[type='range']::-moz-range-thumb {
-    @apply h-5 w-5 cursor-pointer rounded-full border-2 border-white bg-brand-600 shadow;
+    @apply h-5 w-5 cursor-pointer appearance-none rounded-full border-2 border-white bg-gradient-to-tr from-brand-600 to-indigo-500 shadow-md shadow-brand-500/30 transition-transform duration-150 hover:scale-110 active:scale-95;
     border: 2px solid #fff;
   }
 }
 
 @layer utilities {
-  /* 모바일 스크롤 영역의 스크롤바를 얇게 */
+  /* Liquid Glass Components */
+  .glass-panel {
+    @apply backdrop-blur-2xl bg-white/75 dark:bg-slate-900/65 border border-white/60 dark:border-white/10 shadow-glass dark:shadow-glass-dark ring-1 ring-inset ring-white/30 dark:ring-white/5;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/70 dark:bg-slate-900/60 border border-white/60 dark:border-white/10 shadow-glass-sm dark:shadow-glass-dark ring-1 ring-inset ring-white/20 dark:ring-white/5 hover:border-brand-300/80 dark:hover:border-brand-500/40 transition-all duration-300;
+  }
+
+  .glass-button-primary {
+    @apply relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200;
+  }
+
+  /* 스크롤바 */
   .thin-scrollbar::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
   .thin-scrollbar::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-ink-300;
+    @apply rounded-full bg-slate-300/70 dark:bg-slate-700/60 hover:bg-slate-400 dark:hover:bg-slate-600;
   }
 }

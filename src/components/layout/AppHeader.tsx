@@ -7,41 +7,54 @@ export function AppHeader({ onOpenWizard }: { onOpenWizard: () => void }) {
   const toggleTheme = useUIStore((s) => s.toggleTheme);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-ink-200 bg-white/85 backdrop-blur dark:border-slate-800 dark:bg-slate-900/85">
-      <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-3 sm:px-6">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-base text-white shadow-sm">
-          📈
-        </span>
+    <header className="sticky top-0 z-30 border-b border-white/60 bg-white/70 backdrop-blur-2xl transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/65 shadow-glass-sm dark:shadow-glass-dark">
+      <div className="mx-auto flex max-w-[1440px] items-center gap-3.5 px-4 py-3 sm:px-6">
+        {/* Glowing Brand Emblem */}
+        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 p-0.5 shadow-md shadow-blue-500/25 ring-1 ring-white/30">
+          <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-gradient-to-tr from-blue-600 to-indigo-600 text-lg text-white">
+            🏡
+          </div>
+        </div>
 
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-sm font-bold text-ink-900 dark:text-slate-100 sm:text-base">
-            저축 예상액 계산기
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="truncate text-sm font-bold tracking-tight text-ink-900 dark:text-slate-100 sm:text-base">
+              내 집 마련 플래너
+            </h1>
+            <span className="hidden rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-bold text-brand-600 dark:bg-brand-400/10 dark:text-brand-300 sm:inline-block">
+              Liquid Glass Edition
+            </span>
+          </div>
           <p className="truncate text-[11px] text-ink-500 dark:text-slate-400">
-            지금의 수입과 지출로 {years}년 뒤 자산을 예측해 보세요
+            지금의 자산과 수입으로 {years}년 후 내 집 마련 시점을 시뮬레이션하세요
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={toggleTheme}
-          title={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-          className="flex h-8 w-8 items-center justify-center rounded-lg border border-ink-200 bg-ink-50 text-sm text-ink-600 transition hover:bg-ink-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-        >
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </button>
+        {/* 액션 버튼 그룹 */}
+        <div className="flex items-center gap-2">
+          <span className="hidden shrink-0 rounded-full border border-white/60 bg-white/60 px-3 py-1 text-xs font-semibold text-brand-700 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60 dark:text-brand-300 sm:block">
+            {years}년 시뮬레이션
+          </span>
 
-        <span className="hidden shrink-0 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 dark:border-blue-800/80 dark:bg-blue-950/50 dark:text-blue-300 sm:block">
-          {years}년 시뮬레이션
-        </span>
+          <button
+            type="button"
+            onClick={onOpenWizard}
+            className="flex items-center gap-1.5 rounded-xl border border-white/60 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink-700 shadow-xs backdrop-blur-md transition-all duration-200 hover:border-brand-300 hover:bg-white hover:text-brand-700 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:border-brand-500 dark:hover:bg-slate-800"
+          >
+            <span>✨</span>
+            <span className="hidden sm:inline">초기설정 마법사</span>
+            <span className="sm:hidden">설정</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={onOpenWizard}
-          className="shrink-0 rounded-xl border border-ink-200 px-3 py-1.5 text-xs font-medium text-ink-600 transition hover:bg-ink-50 hover:text-ink-800"
-        >
-          초기설정
-        </button>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
+            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/60 bg-white/70 text-sm text-ink-600 shadow-xs backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-white active:scale-95 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+        </div>
       </div>
     </header>
   );
