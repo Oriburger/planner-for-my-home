@@ -20,19 +20,14 @@ function StatTile({
 }: StatTileProps) {
   if (emphasis) {
     return (
-      <div className="relative flex h-full min-h-[9rem] flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br from-[#4f8dff] via-brand-600 to-indigo-700 p-5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_24px_48px_-20px_rgba(37,99,235,0.85)] sm:p-6">
-        {/* 유리 하이라이트 */}
+      <div className="aurora-card aurora-shimmer flex h-full min-h-[9rem] flex-col justify-between rounded-3xl p-5 sm:p-6">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-white/20 blur-2xl"
+          className="pointer-events-none absolute -bottom-20 -right-10 -z-10 h-56 w-56 rounded-full bg-fuchsia-300/40 blur-3xl"
         />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.14] to-transparent"
-        />
-        <p className="relative text-[13px] font-semibold text-white/85">{label}</p>
-        <div className="relative">
-          <p className="mt-3 break-keep text-[32px] font-bold leading-none tracking-tight tabular-nums sm:text-[40px]">
+        <p className="flex items-center gap-1.5 text-[13px] font-semibold text-white/90"><span aria-hidden="true">✨</span>{label}</p>
+        <div>
+          <p className="mt-3 break-keep text-[30px] drop-shadow-[0_2px_10px_rgba(30,20,90,0.25)] min-[360px]:text-[32px] font-bold leading-none tracking-tight tabular-nums sm:text-[40px]">
             {value}
           </p>
           {caption && <p className="mt-2.5 text-xs font-medium text-white/80">{caption}</p>}

@@ -171,7 +171,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
                 key={s.key}
                 className={`h-1 flex-1 rounded-full transition-all duration-500 ${
                   i <= stepIndex
-                    ? 'bg-gradient-to-r from-brand-500 to-indigo-500'
+                    ? 'bg-aurora'
                     : 'bg-ink-900/[0.08] dark:bg-white/10'
                 }`}
               />
@@ -187,13 +187,13 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
           <step.Body draft={draft} patch={patch} />
 
           {isLast && preview && (
-            <div className="mt-4 rounded-2xl border border-brand-500/20 bg-gradient-to-br from-brand-500/10 via-indigo-500/[0.06] to-transparent p-4 dark:border-brand-400/25 dark:from-brand-400/15">
+            <div className="icon-badge mt-4 rounded-2xl p-4">
               <p className="text-xs font-semibold text-ink-500 dark:text-slate-400">
                 {draft.settings.years}년 후 예상 순자산
               </p>
-              <p className="mt-1 text-[28px] font-bold leading-tight tracking-tight tabular-nums text-ink-900 dark:text-white">
+              <p className="text-aurora mt-1 text-[28px] font-bold leading-tight tracking-tight tabular-nums">
                 {formatKRWShort(preview.finalNetWorth)}
-                <span className="ml-0.5 text-base font-semibold text-ink-400">원</span>
+                <span className="ml-0.5 text-base font-semibold">원</span>
               </p>
               <p className="mt-1 text-[11px] text-ink-500 dark:text-slate-400">
                 완료를 누르면 대시보드에서 자세히 볼 수 있어요.

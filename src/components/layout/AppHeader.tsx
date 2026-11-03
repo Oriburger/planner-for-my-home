@@ -12,7 +12,7 @@ export function AppHeader({ onOpenWizard }: { onOpenWizard: () => void }) {
         {/* 브랜드 */}
         <div
           aria-hidden="true"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-b from-[#5b9bff] to-indigo-600 text-[17px] shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_6px_14px_-6px_rgba(37,99,235,0.8)] sm:h-10 sm:w-10"
+          className="aurora-card flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[17px] sm:h-10 sm:w-10"
         >
           🏡
         </div>
@@ -28,20 +28,21 @@ export function AppHeader({ onOpenWizard }: { onOpenWizard: () => void }) {
 
         <div className="flex items-center gap-1 sm:gap-1.5">
           <span className="chip hidden px-3 py-1 text-xs text-ink-600 dark:text-slate-300 md:inline-flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" aria-hidden="true" />
             {years}년 시뮬레이션
           </span>
 
           <button
             type="button"
             onClick={onOpenWizard}
-            className="btn-glass min-h-[2.5rem] px-3 text-[13px]"
+            aria-label="초기 설정 마법사 열기"
+            className="btn-glass min-h-[2.5rem] px-2.5 text-[13px] min-[340px]:px-3"
           >
             <svg className="h-4 w-4 text-brand-600 dark:text-brand-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
               <path d="M10 1a.75.75 0 01.7.48l1.37 3.6a1.5 1.5 0 00.85.85l3.6 1.37a.75.75 0 010 1.4l-3.6 1.37a1.5 1.5 0 00-.85.85l-1.37 3.6a.75.75 0 01-1.4 0l-1.37-3.6a1.5 1.5 0 00-.85-.85L3.48 8.7a.75.75 0 010-1.4l3.6-1.37a1.5 1.5 0 00.85-.85l1.37-3.6A.75.75 0 0110 1zM15.5 13a.5.5 0 01.47.33l.44 1.26 1.26.44a.5.5 0 010 .94l-1.26.44-.44 1.26a.5.5 0 01-.94 0l-.44-1.26-1.26-.44a.5.5 0 010-.94l1.26-.44.44-1.26A.5.5 0 0115.5 13z" />
             </svg>
             <span className="hidden sm:inline">초기 설정 마법사</span>
-            <span className="sm:hidden">설정</span>
+            <span className="hidden min-[340px]:inline sm:hidden">설정</span>
           </button>
 
           <button

@@ -38,16 +38,16 @@ export function MobileSummaryBar() {
           <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">
             {years}년 후 예상 순자산
           </p>
-          <p className="truncate text-lg font-bold leading-tight tracking-tight tabular-nums text-ink-900 dark:text-white">
+          <p className="text-aurora text-base font-bold leading-tight tracking-tight tabular-nums min-[360px]:text-lg">
             {formatKRWShort(summary.finalNetWorth)}
-            <span className="ml-0.5 text-xs font-semibold text-ink-400">원</span>
+            <span className="ml-0.5 text-xs font-semibold">원</span>
           </p>
         </div>
 
         <button
           type="button"
           onClick={goTo}
-          className={resultVisible ? 'btn-glass min-h-[2.75rem] px-4' : 'btn-primary min-h-[2.75rem] px-4'}
+          className={`${resultVisible ? 'btn-glass' : 'btn-primary'} min-h-[2.75rem] shrink-0 px-3.5 min-[360px]:px-4`}
         >
           {resultVisible ? '입력 수정' : '결과 보기'}
           <svg

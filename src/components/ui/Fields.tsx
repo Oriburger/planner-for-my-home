@@ -23,9 +23,9 @@ export function Field({
   return (
     <label className={`block ${className}`} htmlFor={htmlFor}>
       <span className="mb-1.5 flex items-baseline justify-between gap-2 px-0.5">
-        <span className="shrink-0 text-xs font-semibold text-ink-600 dark:text-slate-300">{label}</span>
+        <span className="min-w-0 break-keep text-xs font-semibold text-ink-600 dark:text-slate-300">{label}</span>
         {hint && (
-          <span className="truncate text-[11px] text-ink-400 dark:text-slate-500">{hint}</span>
+          <span className="min-w-0 shrink truncate text-[11px] text-ink-400 dark:text-slate-500 max-[359px]:hidden">{hint}</span>
         )}
       </span>
       {children}
@@ -340,7 +340,7 @@ export function Toggle({
         onClick={() => onChange(!checked)}
         className={`relative h-[30px] w-[50px] shrink-0 rounded-full transition-colors duration-300 ${
           checked
-            ? 'bg-gradient-to-b from-[#4f8dff] to-brand-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]'
+            ? 'bg-aurora shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_6px_14px_-6px_rgba(91,92,246,0.7)]'
             : 'bg-ink-900/[0.12] dark:bg-white/[0.14]'
         }`}
       >

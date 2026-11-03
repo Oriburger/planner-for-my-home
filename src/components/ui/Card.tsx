@@ -43,7 +43,7 @@ export function IconBadge({ children }: { children: ReactNode }) {
   return (
     <span
       aria-hidden="true"
-      className="glass-tile flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[17px] leading-none"
+      className="icon-badge flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[17px] leading-none"
     >
       {children}
     </span>

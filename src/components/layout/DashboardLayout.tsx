@@ -35,6 +35,7 @@ export function DashboardLayout() {
   return (
     <div className="relative flex min-h-screen min-h-[100dvh] flex-col overflow-x-clip text-ink-900 dark:text-slate-100">
       <div className="app-backdrop" aria-hidden="true" />
+      <div className="app-grain" aria-hidden="true" />
 
       <AppHeader onOpenWizard={() => setWizardOpen(true)} />
 

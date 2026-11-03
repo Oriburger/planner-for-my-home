@@ -51,9 +51,9 @@ export function PeriodStep({ draft, patch }: StepProps) {
           <span className="text-xs font-semibold text-ink-500 dark:text-slate-400">
             몇 년 뒤까지 볼까요?
           </span>
-          <span className="text-[28px] font-bold leading-none tracking-tight tabular-nums text-ink-900 dark:text-white">
+          <span className="text-aurora text-[28px] font-bold leading-none tracking-tight tabular-nums">
             {settings.years}
-            <span className="ml-0.5 text-sm font-semibold text-ink-400 dark:text-slate-400">
+            <span className="ml-0.5 text-sm font-semibold">
               년
             </span>
           </span>

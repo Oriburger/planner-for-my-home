@@ -48,12 +48,12 @@ export function ResultPanel() {
       />
 
       {/* 2. 뷰 전환 세그먼트 컨트롤 */}
-      <div className="sticky top-[4.75rem] z-20 -mx-1 px-1 sm:static sm:mx-0 sm:px-0">
+      <div className="sticky top-[4.75rem] z-20 sm:static">
         <div className="flex items-center gap-3">
           <div
             role="tablist"
             aria-label="결과 보기 방식"
-            className="glass glass-strong flex flex-1 gap-0.5 rounded-2xl p-1 sm:flex-none"
+            className="glass glass-strong flex min-w-0 flex-1 gap-0.5 rounded-2xl p-1 sm:max-w-md"
           >
             {TABS.map((tab) => (
               <button
@@ -61,17 +61,19 @@ export function ResultPanel() {
                 type="button"
                 role="tab"
                 aria-selected={activeTab === tab.key}
+                title={tab.label}
                 onClick={() => setActiveTab(tab.key)}
-                className="segmented-item min-h-[2.5rem] px-3 text-[13px] sm:px-4"
+                className="segmented-item min-h-[2.5rem] px-1.5 text-[13px] sm:px-3"
               >
-                <span aria-hidden="true">{tab.icon}</span>
-                <span className="sm:hidden">{tab.short}</span>
-                <span className="hidden sm:inline">{tab.label}</span>
+                <span aria-hidden="true" className="max-[339px]:hidden">
+                  {tab.icon}
+                </span>
+                <span>{tab.short}</span>
               </button>
             ))}
           </div>
 
-          <span className="ml-auto hidden text-xs font-medium text-ink-500 dark:text-slate-400 sm:block">
+          <span className="ml-auto hidden shrink-0 text-xs font-medium text-ink-500 dark:text-slate-400 md:block">
             총 {rows.length}개년 시뮬레이션
           </span>
         </div>

@@ -51,7 +51,7 @@ export function MilestoneHorizonSummary({
           </span>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-1 gap-2 min-[340px]:grid-cols-2 sm:gap-3 lg:grid-cols-4">
           {snapshots.map((item) => {
             const isSelected =
               selectedYearIndex === item.yearIndex ||
@@ -66,7 +66,7 @@ export function MilestoneHorizonSummary({
                 onClick={() => onSelectYear(item.yearIndex)}
                 className={`group relative flex min-w-0 flex-col rounded-2xl p-3 text-left transition-all duration-300 sm:p-3.5 ${
                   isSelected
-                    ? 'bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_14px_30px_-14px_rgba(37,99,235,0.9)]'
+                    ? 'aurora-card'
                     : 'glass-tile-interactive hover:-translate-y-0.5'
                 }`}
               >
@@ -174,7 +174,7 @@ export function MilestoneHorizonSummary({
                   onClick={() => onSelectYear(m.reachedYearIndex)}
                   className={`inline-flex shrink-0 items-center gap-2 rounded-full py-1.5 pl-3 pr-3.5 text-xs transition-all duration-200 ${
                     isSelected
-                      ? 'bg-gradient-to-b from-emerald-500 to-emerald-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_18px_-8px_rgba(5,150,105,0.8)]'
+                      ? 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_18px_-8px_rgba(5,150,105,0.8)]'
                       : 'glass-tile-interactive text-ink-700 dark:text-slate-200'
                   }`}
                 >
