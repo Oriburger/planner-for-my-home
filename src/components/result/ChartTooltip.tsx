@@ -10,7 +10,7 @@ export function ChartTooltip({
   if (!active || !payload || payload.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2.5 shadow-glass-lg backdrop-blur-2xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/85 dark:shadow-glass-dark dark:ring-white/5">
+    <div className="glass glass-strong min-w-[11rem] rounded-2xl px-3.5 py-3">
       <p className="mb-1.5 text-xs font-semibold text-ink-900 dark:text-slate-100">{label}</p>
       <ul className="space-y-1">
         {payload.map((entry) => (
@@ -19,12 +19,12 @@ export function ChartTooltip({
             className="flex items-center gap-2 text-xs"
           >
             <span
-              className="h-2 w-2 shrink-0 rounded-full ring-2 ring-white dark:ring-slate-900"
+              className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: entry.color }}
               aria-hidden="true"
             />
             <span className="text-ink-500 dark:text-slate-400">{entry.name}</span>
-            <span className="ml-auto font-medium tabular-nums text-ink-900 dark:text-slate-100">
+            <span className="ml-auto pl-3 font-semibold tabular-nums text-ink-900 dark:text-slate-100">
               {formatKRWShort(Number(entry.value ?? 0))}원
             </span>
           </li>

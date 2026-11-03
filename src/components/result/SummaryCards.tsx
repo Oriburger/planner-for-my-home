@@ -18,42 +18,41 @@ function StatTile({
   emphasis,
   tone = 'default',
 }: StatTileProps) {
+  if (emphasis) {
+    return (
+      <div className="relative flex h-full min-h-[9rem] flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br from-[#4f8dff] via-brand-600 to-indigo-700 p-5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_24px_48px_-20px_rgba(37,99,235,0.85)] sm:p-6">
+        {/* 유리 하이라이트 */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-white/20 blur-2xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.14] to-transparent"
+        />
+        <p className="relative text-[13px] font-semibold text-white/85">{label}</p>
+        <div className="relative">
+          <p className="mt-3 break-keep text-[32px] font-bold leading-none tracking-tight tabular-nums sm:text-[40px]">
+            {value}
+          </p>
+          {caption && <p className="mt-2.5 text-xs font-medium text-white/80">{caption}</p>}
+        </div>
+      </div>
+    );
+  }
+
   const valueColor =
     tone === 'good'
       ? 'text-emerald-600 dark:text-emerald-400'
       : tone === 'critical'
         ? 'text-rose-600 dark:text-rose-400'
-        : emphasis
-          ? 'text-brand-700 dark:text-blue-300'
-          : 'text-ink-900 dark:text-slate-100';
+        : 'text-ink-900 dark:text-white';
 
   return (
-    <div
-      className={`relative overflow-hidden rounded-2xl border p-4 backdrop-blur-xl transition-all duration-300 ring-1 ring-inset hover:-translate-y-0.5 hover:shadow-glass-lg ${
-        emphasis
-          ? 'border-blue-400/60 bg-gradient-to-br from-blue-50/90 via-indigo-50/60 to-white/80 shadow-glass-glow ring-blue-300/40 dark:border-blue-500/30 dark:bg-gradient-to-br dark:from-slate-900/90 dark:via-blue-950/60 dark:to-slate-900/80 dark:ring-blue-500/20'
-          : 'border-white/60 bg-white/70 shadow-glass ring-white/30 dark:border-white/10 dark:bg-slate-900/65 dark:shadow-glass-dark dark:ring-white/5'
-      }`}
-    >
-      {emphasis && (
-        <div
-          className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-500/20 blur-xl dark:from-blue-400/15 dark:to-indigo-500/15"
-          aria-hidden="true"
-        />
-      )}
+    <div className="glass flex min-w-0 flex-col rounded-3xl p-4">
+      <p className="truncate text-xs font-semibold text-ink-500 dark:text-slate-400">{label}</p>
       <p
-        className={`text-xs font-semibold ${
-          emphasis ? 'text-brand-800 dark:text-blue-200' : 'text-ink-500 dark:text-slate-400'
-        }`}
-      >
-        {label}
-      </p>
-      <p
-        className={`mt-1.5 break-keep leading-tight ${valueColor} ${
-          emphasis
-            ? 'text-2xl font-bold sm:text-3xl'
-            : 'text-base font-bold sm:text-xl'
-        }`}
+        className={`mt-1.5 break-keep text-lg font-bold leading-tight tracking-tight tabular-nums sm:text-xl ${valueColor}`}
       >
         {value}
         {unit && (
@@ -63,13 +62,7 @@ function StatTile({
         )}
       </p>
       {caption && (
-        <p
-          className={`mt-1.5 text-[11px] ${
-            emphasis
-              ? 'font-medium text-brand-900/70 dark:text-blue-300/80'
-              : 'text-ink-400 dark:text-slate-400'
-          }`}
-        >
+        <p className="mt-auto pt-1.5 text-[11px] leading-snug text-ink-400 dark:text-slate-500">
           {caption}
         </p>
       )}
@@ -91,25 +84,25 @@ export function SummaryCards({
   const shortfallYear = summary.firstContributionShortfallYear;
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-4">
       {shortfallYear !== null && (
         <div
           role="alert"
-          className="col-span-2 flex items-start gap-2.5 rounded-2xl border border-rose-300/80 bg-rose-50/75 p-4 shadow-glass backdrop-blur-xl ring-1 ring-inset ring-rose-200/50 lg:col-span-4 dark:border-rose-900/60 dark:bg-rose-950/40 dark:ring-rose-800/20"
+          className="callout-danger col-span-2 flex items-start gap-2.5 rounded-2xl p-4 lg:col-span-4"
         >
           <span aria-hidden="true" className="text-base leading-none">
             ⚠️
           </span>
           <div className="min-w-0">
-            <p className="text-xs font-bold text-rose-800 dark:text-rose-300">
+            <p className="text-[13px] font-bold">
               {shortfallYear}년차부터 자동이체를 감당할 현금이 부족해요
             </p>
-            <p className="mt-1 text-[11px] leading-relaxed text-rose-700 dark:text-rose-400">
+            <p className="mt-1 text-xs leading-relaxed opacity-90">
               월 자동이체 합계가 그 해 쓸 수 있는 여유자금을 넘어섭니다. 최대{' '}
               {formatKRWShort(summary.maxContributionShortfall)}원까지 모자라요.
               자동이체 금액을 줄이거나 지출을 조정해 주세요.
             </p>
-            <p className="mt-1 text-[11px] text-rose-700/80 dark:text-rose-400/80">
+            <p className="mt-1 text-[11px] opacity-75">
               참고 · 1년차 세후 월 실수령{' '}
               {formatKRWShort(firstYear.netIncome / 12)}원 · 월 자동이체{' '}
               {formatKRWShort(firstYear.contribution / 12)}원
@@ -118,7 +111,7 @@ export function SummaryCards({
         </div>
       )}
 
-      <div className="col-span-2">
+      <div className="col-span-2 lg:row-span-2">
         <StatTile
           label={`${years}년 후 (${finalYear}년) 예상 순자산`}
           value={`${formatKRWShort(summary.finalNetWorth)}원`}
@@ -165,19 +158,19 @@ export function SummaryCards({
       />
 
       {summary.pensionMaturities && summary.pensionMaturities.length > 0 && (
-        <div className="col-span-2 lg:col-span-4 rounded-2xl border border-white/60 bg-white/70 p-4 shadow-glass backdrop-blur-xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/65 dark:shadow-glass-dark dark:ring-white/5">
-          <p className="text-xs font-bold text-brand-800 dark:text-brand-300 flex items-center gap-1.5">
-            <span>🎯</span> 연금저축 · ISA 만기 요약
+        <div className="glass col-span-2 rounded-3xl p-4 sm:p-5 lg:col-span-4">
+          <p className="flex items-center gap-1.5 text-[13px] font-bold text-ink-900 dark:text-white">
+            <span aria-hidden="true">🎯</span> 연금저축 · ISA 만기 요약
           </p>
-          <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {summary.pensionMaturities.map((item) => (
               <div
                 key={item.assetId}
-                className="rounded-xl border border-white/80 bg-white/70 p-3 shadow-xs backdrop-blur-md transition-all hover:border-brand-200 dark:border-white/10 dark:bg-slate-800/60 dark:hover:border-slate-700"
+                className="glass-tile rounded-2xl p-3.5"
               >
-                <div className="flex items-center justify-between text-xs font-semibold text-ink-900 dark:text-slate-100">
-                  <span className="truncate pr-2">{item.assetName}</span>
-                  <span className="shrink-0 rounded-full border border-brand-200/60 bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:border-brand-800/60 dark:bg-brand-950/80 dark:text-brand-300">
+                <div className="flex items-center justify-between gap-2 text-[13px] font-semibold text-ink-900 dark:text-slate-100">
+                  <span className="truncate">{item.assetName}</span>
+                  <span className="shrink-0 rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:bg-brand-400/15 dark:text-brand-300">
                     {item.maturityYearIndex}년 차 ({item.maturityCalendarYear}년
                     {item.maturityAge !== null ? `, 만 ${item.maturityAge}세` : ''})
                   </span>

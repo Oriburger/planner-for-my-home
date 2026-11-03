@@ -130,7 +130,7 @@ export function HousingSection() {
             </Field>
           </div>
 
-          <p className="mt-2 text-[11px] leading-relaxed text-ink-400">
+          <p className="mt-2 px-0.5 text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
             2년차 이후 시작하는 계약의 보증금은 해당 연차에 여유자금에서
             빠져나가 묶인 자산으로 이동합니다. 1년차 계약의 보증금은 이미
             &lsquo;현재 보유 자산&rsquo;에 입력된 것으로 봅니다.

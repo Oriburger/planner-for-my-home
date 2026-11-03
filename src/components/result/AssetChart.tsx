@@ -14,15 +14,16 @@ import type { SimulationResult } from '@/types/planner';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { formatAxis } from '@/utils/format';
 import { ChartTooltip } from './ChartTooltip';
-import { CHART, axisTick } from './chartTheme';
+import { axisTick, useChartTheme } from './chartTheme';
 
 interface AssetChartProps {
   rows: SimulationResult['rows'];
   start: { year: number; totalAssets: number; netWorth: number };
 }
 
-/** 연도별 자산 변화 — 총자산 / 순자산 / 대출 잔액 (Liquid Glass) */
+/** 연도별 자산 변화 — 총자산 / 순자산 / 대출 잔액 */
 export function AssetChart({ rows, start }: AssetChartProps) {
+  const CHART = useChartTheme();
   const data = useMemo(
     () => [
       {
@@ -43,9 +44,9 @@ export function AssetChart({ rows, start }: AssetChartProps) {
 
   return (
     <Card>
-      <CardHeader title="연도별 자산 변화 추이" />
-      <div className="px-1 py-4 pr-3 sm:px-2 sm:pr-5">
-        <ResponsiveContainer width="100%" height={320}>
+      <CardHeader title="연도별 자산 변화" description="총자산 · 순자산 · 대출 잔액" icon="📈" />
+      <div className="px-1 pb-3 pt-2 pr-3 sm:px-2 sm:pr-5">
+        <ResponsiveContainer width="100%" height={300}>
           <ComposedChart
             data={data}
             margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
@@ -65,13 +66,13 @@ export function AssetChart({ rows, start }: AssetChartProps) {
             />
             <XAxis
               dataKey="label"
-              tick={axisTick}
+              tick={axisTick(CHART)}
               tickLine={false}
               axisLine={{ stroke: CHART.axis }}
               minTickGap={16}
             />
             <YAxis
-              tick={axisTick}
+              tick={axisTick(CHART)}
               tickLine={false}
               axisLine={false}
               width={52}

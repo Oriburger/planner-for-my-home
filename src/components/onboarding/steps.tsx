@@ -4,6 +4,8 @@ import {
   Field,
   MoneyInput,
   PercentInput,
+  PresetGroup,
+  RangeInput,
   SegmentedControl,
   Select,
 } from '@/components/ui/Fields';
@@ -22,7 +24,7 @@ interface StepProps {
 /** 여러 칸의 합계를 보여주는 꼬리표 */
 function TotalHint({ label, amount }: { label: string; amount: number }) {
   return (
-    <p className="rounded-xl bg-brand-50 px-3 py-2.5 text-xs text-brand-800 dark:bg-blue-950/40 dark:text-blue-200">
+    <p className="callout-info">
       {label}{' '}
       <strong className="font-semibold tabular-nums">
         {formatKRWShort(amount)}원
@@ -35,7 +37,7 @@ function TotalHint({ label, amount }: { label: string; amount: number }) {
 /* 1. 기간 · 기본 가정                                                  */
 /* ------------------------------------------------------------------ */
 
-const YEAR_PRESETS = [5, 10, 20, 30];
+const YEAR_PRESETS = [5, 10, 20, 30] as const;
 
 export function PeriodStep({ draft, patch }: StepProps) {
   const { settings } = draft;
@@ -44,45 +46,36 @@ export function PeriodStep({ draft, patch }: StepProps) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <div className="mb-2 flex items-end justify-between">
-          <span className="text-xs font-medium text-ink-600 dark:text-slate-300">
+      <div className="glass-tile rounded-2xl px-4 pb-3 pt-3.5">
+        <div className="flex items-end justify-between">
+          <span className="text-xs font-semibold text-ink-500 dark:text-slate-400">
             몇 년 뒤까지 볼까요?
           </span>
-          <span className="text-2xl font-bold tabular-nums text-brand-700 dark:text-blue-300">
+          <span className="text-[28px] font-bold leading-none tracking-tight tabular-nums text-ink-900 dark:text-white">
             {settings.years}
-            <span className="ml-0.5 text-sm font-semibold text-ink-500 dark:text-slate-400">
+            <span className="ml-0.5 text-sm font-semibold text-ink-400 dark:text-slate-400">
               년
             </span>
           </span>
         </div>
 
-        <input
-          type="range"
-          min={1}
-          max={40}
-          step={1}
-          value={settings.years}
-          onChange={(e) => set({ years: Number(e.target.value) })}
-          aria-label="시뮬레이션 기간(년)"
-          className="h-2 w-full cursor-pointer appearance-none rounded-full bg-ink-200 accent-brand-600 dark:bg-slate-700"
-        />
+        <div className="mt-2">
+          <RangeInput
+            value={settings.years}
+            onChange={(years) => set({ years })}
+            min={1}
+            max={40}
+            label="시뮬레이션 기간(년)"
+          />
+        </div>
 
-        <div className="mt-2 flex gap-1.5">
-          {YEAR_PRESETS.map((y) => (
-            <button
-              key={y}
-              type="button"
-              onClick={() => set({ years: y })}
-              className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition ${
-                settings.years === y
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-ink-100 text-ink-600 hover:bg-ink-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
-              }`}
-            >
-              {y}년
-            </button>
-          ))}
+        <div className="mt-2">
+          <PresetGroup
+            value={settings.years as (typeof YEAR_PRESETS)[number]}
+            onChange={(years) => set({ years })}
+            options={YEAR_PRESETS}
+            format={(y) => `${y}년`}
+          />
         </div>
       </div>
 
@@ -147,7 +140,7 @@ export function AssetStep({ draft, patch }: StepProps) {
       </div>
 
       <TotalHint label="지금까지 모은 돈" amount={total} />
-      <p className="text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
+      <p className="px-0.5 text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
         전·월세 보증금은 다음 &lsquo;주거&rsquo; 단계에서 한 번만 입력하면
         자동으로 자산에 잡힙니다.
       </p>
@@ -188,7 +181,7 @@ export function IncomeStep({ draft, patch }: StepProps) {
         />
       </Field>
 
-      <p className="text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
+      <p className="px-0.5 text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
         세금과 4대보험은 연봉 구간에 맞춰 자동으로 빼고 계산합니다. 공제율을
         직접 넣고 싶으면 나중에 대시보드에서 바꿀 수 있어요.
       </p>
@@ -215,7 +208,7 @@ export function HousingStep({ draft, patch }: StepProps) {
   return (
     <div className="space-y-3">
       <div>
-        <span className="mb-1 block text-xs font-medium text-ink-600 dark:text-slate-300">
+        <span className="mb-1.5 block px-0.5 text-xs font-semibold text-ink-600 dark:text-slate-300">
           거주 형태
         </span>
         <SegmentedControl
@@ -352,7 +345,7 @@ export function ExpenseStep({ draft, patch }: StepProps) {
       </div>
 
       <TotalHint label="월 고정 지출 합계" amount={total} />
-      <p className="text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
+      <p className="px-0.5 text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
         주거비는 앞 단계에서 따로 넣었으니 여기서는 빼고 적어주세요.
       </p>
     </div>

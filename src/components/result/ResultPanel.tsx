@@ -10,7 +10,13 @@ import { YearTable } from './YearTable';
 
 type ActiveTab = 'timeline' | 'charts' | 'table';
 
-/** 우측(모바일에서는 하단) 결과 패널 (Liquid Glass) */
+const TABS: Array<{ key: ActiveTab; icon: string; label: string; short: string }> = [
+  { key: 'timeline', icon: '🗺️', label: '라이프 타임라인', short: '타임라인' },
+  { key: 'charts', icon: '📊', label: '자산 · 현금흐름 차트', short: '차트' },
+  { key: 'table', icon: '📋', label: '연도별 상세 데이터', short: '상세표' },
+];
+
+/** 우측(모바일에서는 하단) 결과 패널 */
 export function ResultPanel() {
   const storeData = usePlannerStore((s) => ({
     settings: s.settings,
@@ -41,49 +47,34 @@ export function ResultPanel() {
         onSelectYear={handleSelectYear}
       />
 
-      {/* 2. 뷰 전환 Liquid Glass Segmented Control */}
-      <div className="flex flex-col gap-2 border-b border-white/40 pb-2 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex rounded-2xl border border-white/70 bg-white/60 p-1 shadow-glass-sm backdrop-blur-xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/60 dark:ring-white/5">
-          <button
-            type="button"
-            onClick={() => setActiveTab('timeline')}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
-              activeTab === 'timeline'
-                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
-                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
+      {/* 2. 뷰 전환 세그먼트 컨트롤 */}
+      <div className="sticky top-[4.75rem] z-20 -mx-1 px-1 sm:static sm:mx-0 sm:px-0">
+        <div className="flex items-center gap-3">
+          <div
+            role="tablist"
+            aria-label="결과 보기 방식"
+            className="glass glass-strong flex flex-1 gap-0.5 rounded-2xl p-1 sm:flex-none"
           >
-            <span>🗺️</span> 라이프 타임라인
-          </button>
+            {TABS.map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className="segmented-item min-h-[2.5rem] px-3 text-[13px] sm:px-4"
+              >
+                <span aria-hidden="true">{tab.icon}</span>
+                <span className="sm:hidden">{tab.short}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+              </button>
+            ))}
+          </div>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('charts')}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
-              activeTab === 'charts'
-                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
-                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
-          >
-            <span>📊</span> 자산 & 현금흐름 차트
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('table')}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
-              activeTab === 'table'
-                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
-                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
-          >
-            <span>📋</span> 연도별 상세 데이터
-          </button>
+          <span className="ml-auto hidden text-xs font-medium text-ink-500 dark:text-slate-400 sm:block">
+            총 {rows.length}개년 시뮬레이션
+          </span>
         </div>
-
-        <span className="text-xs font-medium text-ink-500 dark:text-slate-400">
-          총 {rows.length}개년 시뮬레이션
-        </span>
       </div>
 
       {/* 3. 활성화된 탭 내용 */}
@@ -107,10 +98,8 @@ export function ResultPanel() {
       {activeTab === 'table' && <YearTable rows={rows} />}
 
       {/* 4. 종합 재무 분석 카드 (누적 저축액, 수익률, 적자 전환 여부) */}
-      <div className="pt-2">
-        <h4 className="mb-2.5 px-1 text-xs font-bold text-ink-500 dark:text-slate-400">
-          종합 재무 성향 및 위험도 분석
-        </h4>
+      <div className="pt-3">
+        <h3 className="eyebrow mb-3 px-1">종합 재무 분석</h3>
         <SummaryCards
           summary={summary}
           years={storeData.settings.years}
@@ -119,7 +108,7 @@ export function ResultPanel() {
         />
       </div>
 
-      <p className="px-1 pb-2 text-[11px] text-ink-400 dark:text-slate-500">
+      <p className="px-1 pb-2 text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
         * 가정값 기반 추정치이며 실제 시장 수익률 및 세법 개정에 따라 차이가 발생할 수 있습니다.
       </p>
     </div>

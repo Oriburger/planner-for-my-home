@@ -4,11 +4,13 @@ import {
   CountInput,
   Field,
   PercentInput,
+  PresetGroup,
+  RangeInput,
   SegmentedControl,
   Toggle,
 } from '@/components/ui/Fields';
 
-const PRESETS = [5, 10, 20, 30];
+const PRESETS = [5, 10, 20, 30] as const;
 
 /** 시뮬레이션 기간 + 전역 가정치 */
 export function PeriodSection() {
@@ -21,46 +23,38 @@ export function PeriodSection() {
       <CardHeader
         title="시뮬레이션 기간"
         description="1년 단위로 최대 40년까지 조절할 수 있어요."
+        icon="⏳"
       />
 
-      <div className="space-y-4 px-4 py-4 sm:px-5">
-        <div>
-          <div className="mb-2 flex items-end justify-between">
-            <span className="text-xs font-medium text-ink-600 dark:text-slate-300">기간</span>
-            <span className="text-2xl font-bold tabular-nums text-brand-700 dark:text-brand-400">
+      <div className="space-y-4 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+        <div className="glass-tile rounded-2xl px-4 pb-3 pt-3.5">
+          <div className="flex items-end justify-between">
+            <span className="text-xs font-semibold text-ink-500 dark:text-slate-400">기간</span>
+            <span className="text-[28px] font-bold leading-none tracking-tight tabular-nums text-ink-900 dark:text-white">
               {settings.years}
-              <span className="ml-0.5 text-sm font-semibold text-ink-500 dark:text-slate-400">
+              <span className="ml-0.5 text-sm font-semibold text-ink-400 dark:text-slate-400">
                 년
               </span>
             </span>
           </div>
 
-          <input
-            type="range"
-            min={1}
-            max={40}
-            step={1}
-            value={settings.years}
-            onChange={(e) => setYears(Number(e.target.value))}
-            aria-label="시뮬레이션 기간(년)"
-            className="h-2 w-full cursor-pointer appearance-none rounded-full bg-ink-200 accent-brand-600 dark:bg-slate-800 dark:accent-brand-500"
-          />
+          <div className="mt-2">
+            <RangeInput
+              value={settings.years}
+              onChange={setYears}
+              min={1}
+              max={40}
+              label="시뮬레이션 기간(년)"
+            />
+          </div>
 
-          <div className="mt-2 flex gap-1.5">
-            {PRESETS.map((y) => (
-              <button
-                key={y}
-                type="button"
-                onClick={() => setYears(y)}
-                className={`flex-1 rounded-lg px-2 py-1.5 text-xs font-medium transition ${
-                  settings.years === y
-                    ? 'bg-brand-600 text-white shadow-sm dark:bg-brand-600 dark:text-white'
-                    : 'bg-ink-100 text-ink-600 hover:bg-ink-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
-                }`}
-              >
-                {y}년
-              </button>
-            ))}
+          <div className="mt-2">
+            <PresetGroup
+              value={settings.years as (typeof PRESETS)[number]}
+              onChange={setYears}
+              options={PRESETS}
+              format={(y) => `${y}년`}
+            />
           </div>
         </div>
 
@@ -109,7 +103,7 @@ export function PeriodSection() {
         </div>
 
         <div>
-          <span className="mb-1 block text-xs font-medium text-ink-600 dark:text-slate-300">
+          <span className="mb-1.5 block px-0.5 text-xs font-semibold text-ink-600 dark:text-slate-300">
             세금 · 4대보험 계산 방식
           </span>
           <SegmentedControl

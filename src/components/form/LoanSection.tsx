@@ -139,7 +139,7 @@ export function LoanSection() {
               </Field>
 
               {loan.startYear > 1 && (
-                <p className="col-span-2 rounded-lg bg-brand-50/80 px-2.5 py-1.5 text-[11px] font-medium text-brand-700">
+                <p className="callout-info col-span-2 text-[11px] font-medium">
                   💡 시뮬레이션 {loan.startYear}년 차({settings.startYear + loan.startYear - 1}년)부터 실행되는 미래 대출입니다.
                 </p>
               )}
@@ -184,7 +184,7 @@ export function LoanSection() {
               </Field>
             </div>
 
-            <p className="mt-2 rounded-lg bg-brand-50 px-2.5 py-2 text-[11px] text-brand-800">
+            <p className="callout-info mt-3">
               {graceYears > 0
                 ? `거치 기간(첫 ${graceYears}년) 월 이자`
                 : loan.repaymentType === 'equalPrincipal'

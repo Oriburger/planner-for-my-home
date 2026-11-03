@@ -18,57 +18,56 @@ export function DashboardLayout() {
     if (!onboarded) setWizardOpen(true);
   }, [onboarded]);
 
+  const isMobilePreview = viewMode === 'mobile';
+
+  const gridClass = isMobilePreview
+    ? 'flex flex-col gap-4'
+    : viewMode === 'pc'
+      ? 'grid grid-cols-[380px_minmax(0,1fr)] items-start gap-6'
+      : 'grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] lg:gap-6';
+
+  const inputColumnClass = isMobilePreview
+    ? 'w-full'
+    : viewMode === 'pc'
+      ? 'thin-scrollbar sticky top-[5.75rem] -mx-3 max-h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain px-3 pb-4'
+      : 'lg:thin-scrollbar lg:sticky lg:top-[5.75rem] lg:-mx-3 lg:max-h-[calc(100dvh-6.75rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-3 lg:pb-4';
+
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-slate-100/70 text-ink-900 transition-colors duration-300 dark:bg-[#0B0F19] dark:text-slate-100">
-      {/* Liquid Glass Background Aurora Orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-[10%] top-[-5%] h-[500px] w-[500px] rounded-full bg-gradient-to-br from-blue-400/25 to-indigo-500/20 blur-[130px] dark:from-blue-600/15 dark:to-indigo-700/15 animate-float-slow" />
-        <div className="absolute right-[-5%] top-[15%] h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-sky-400/20 to-teal-400/15 blur-[140px] dark:from-sky-500/10 dark:to-emerald-600/10 animate-float-reverse" />
-        <div className="absolute bottom-[-10%] left-[25%] h-[550px] w-[550px] rounded-full bg-gradient-to-tr from-violet-400/20 to-pink-400/15 blur-[130px] dark:from-violet-600/10 dark:to-purple-800/10 animate-pulse-glow" />
-      </div>
+    <div className="relative flex min-h-screen min-h-[100dvh] flex-col overflow-x-clip text-ink-900 dark:text-slate-100">
+      <div className="app-backdrop" aria-hidden="true" />
 
       <AppHeader onOpenWizard={() => setWizardOpen(true)} />
 
       <main
-        className={`w-full flex-1 px-4 py-4 sm:px-6 sm:py-6 transition-all duration-300 ${
-          viewMode === 'mobile'
-            ? 'mx-auto my-4 max-w-[420px] rounded-3xl border border-white/60 bg-white/75 p-4 shadow-glass-lg backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/70 dark:shadow-glass-dark'
-            : 'mx-auto max-w-[1440px]'
+        className={`w-full flex-1 pb-32 pt-4 sm:pt-6 lg:pb-10 ${
+          isMobilePreview ? 'px-3 sm:px-6' : 'mx-auto max-w-[1440px] px-3 sm:px-6 lg:px-8'
         }`}
       >
         <div
           className={
-            viewMode === 'mobile'
-              ? 'flex flex-col gap-4'
-              : viewMode === 'pc'
-                ? 'grid grid-cols-[380px_minmax(0,1fr)] items-start gap-6'
-                : 'grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] lg:gap-6'
+            isMobilePreview
+              ? 'mx-auto max-w-[420px] rounded-[36px] border border-white/50 bg-white/20 p-3 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.45)] dark:border-white/10 dark:bg-white/[0.02]'
+              : ''
           }
         >
-          {/* 입력 패널 */}
-          <div
-            className={
-              viewMode === 'mobile'
-                ? 'w-full'
-                : 'lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5.5rem)] lg:overflow-y-auto lg:pr-1 thin-scrollbar'
-            }
-          >
-            <InputPanel />
-          </div>
+          <div className={gridClass}>
+            {/* 입력 패널 */}
+            <div className={inputColumnClass}>
+              <InputPanel />
+            </div>
 
-          {/* 결과 패널 */}
-          <div id="result" className="scroll-mt-20">
-            <ResultPanel />
+            {/* 결과 패널 */}
+            <div id="result" className="min-w-0 scroll-mt-24">
+              <ResultPanel />
+            </div>
           </div>
         </div>
       </main>
 
       <AppFooter />
-      <MobileSummaryBar />
+      {viewMode !== 'pc' && <MobileSummaryBar />}
 
-      {wizardOpen && (
-        <OnboardingModal onClose={() => setWizardOpen(false)} />
-      )}
+      {wizardOpen && <OnboardingModal onClose={() => setWizardOpen(false)} />}
     </div>
   );
 }

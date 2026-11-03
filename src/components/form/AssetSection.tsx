@@ -201,11 +201,7 @@ function ContributionBalanceHint() {
   return (
     <div
       role={short ? 'alert' : undefined}
-      className={`rounded-xl px-3 py-2.5 text-xs ${
-        short
-          ? 'bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300'
-          : 'bg-brand-50 text-brand-800 dark:bg-blue-950/40 dark:text-blue-200'
-      }`}
+      className={short ? 'callout-danger' : 'callout-info'}
     >
       <p>
         1년차 자동이체{' '}

@@ -7,52 +7,63 @@ export function AppHeader({ onOpenWizard }: { onOpenWizard: () => void }) {
   const toggleTheme = useUIStore((s) => s.toggleTheme);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-white/60 bg-white/70 backdrop-blur-2xl transition-colors duration-300 dark:border-white/10 dark:bg-slate-900/65 shadow-glass-sm dark:shadow-glass-dark">
-      <div className="mx-auto flex max-w-[1440px] items-center gap-3.5 px-4 py-3 sm:px-6">
-        {/* Glowing Brand Emblem */}
-        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 p-0.5 shadow-md shadow-blue-500/25 ring-1 ring-white/30">
-          <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-gradient-to-tr from-blue-600 to-indigo-600 text-lg text-white">
-            🏡
-          </div>
+    <header className="sticky top-0 z-30 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:px-8">
+      <div className="glass glass-strong mx-auto flex h-14 max-w-[1440px] items-center gap-3 rounded-2xl pl-2.5 pr-1.5 sm:h-16 sm:gap-4 sm:rounded-[20px] sm:pl-3 sm:pr-2">
+        {/* 브랜드 */}
+        <div
+          aria-hidden="true"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-b from-[#5b9bff] to-indigo-600 text-[17px] shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_6px_14px_-6px_rgba(37,99,235,0.8)] sm:h-10 sm:w-10"
+        >
+          🏡
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h1 className="truncate text-sm font-bold tracking-tight text-ink-900 dark:text-slate-100 sm:text-base">
-              내 집 마련 플래너
-            </h1>
-            <span className="hidden rounded-full bg-brand-500/10 px-2 py-0.5 text-[10px] font-bold text-brand-600 dark:bg-brand-400/10 dark:text-brand-300 sm:inline-block">
-              Liquid Glass Edition
-            </span>
-          </div>
-          <p className="truncate text-[11px] text-ink-500 dark:text-slate-400">
-            지금의 자산과 수입으로 {years}년 후 내 집 마련 시점을 시뮬레이션하세요
+          <h1 className="truncate text-[15px] font-bold tracking-tight text-ink-900 dark:text-white sm:text-base">
+            내 집 마련 플래너
+          </h1>
+          <p className="hidden truncate text-xs text-ink-500 dark:text-slate-400 sm:block">
+            지금의 자산과 수입으로 {years}년 뒤를 미리 그려보세요
           </p>
         </div>
 
-        {/* 액션 버튼 그룹 */}
-        <div className="flex items-center gap-2">
-          <span className="hidden shrink-0 rounded-full border border-white/60 bg-white/60 px-3 py-1 text-xs font-semibold text-brand-700 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60 dark:text-brand-300 sm:block">
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          <span className="chip hidden px-3 py-1 text-xs text-ink-600 dark:text-slate-300 md:inline-flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
             {years}년 시뮬레이션
           </span>
 
           <button
             type="button"
             onClick={onOpenWizard}
-            className="flex items-center gap-1.5 rounded-xl border border-white/60 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink-700 shadow-xs backdrop-blur-md transition-all duration-200 hover:border-brand-300 hover:bg-white hover:text-brand-700 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:border-brand-500 dark:hover:bg-slate-800"
+            className="btn-glass min-h-[2.5rem] px-3 text-[13px]"
           >
-            <span>✨</span>
-            <span className="hidden sm:inline">초기설정 마법사</span>
+            <svg className="h-4 w-4 text-brand-600 dark:text-brand-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M10 1a.75.75 0 01.7.48l1.37 3.6a1.5 1.5 0 00.85.85l3.6 1.37a.75.75 0 010 1.4l-3.6 1.37a1.5 1.5 0 00-.85.85l-1.37 3.6a.75.75 0 01-1.4 0l-1.37-3.6a1.5 1.5 0 00-.85-.85L3.48 8.7a.75.75 0 010-1.4l3.6-1.37a1.5 1.5 0 00.85-.85l1.37-3.6A.75.75 0 0110 1zM15.5 13a.5.5 0 01.47.33l.44 1.26 1.26.44a.5.5 0 010 .94l-1.26.44-.44 1.26a.5.5 0 01-.94 0l-.44-1.26-1.26-.44a.5.5 0 010-.94l1.26-.44.44-1.26A.5.5 0 0115.5 13z" />
+            </svg>
+            <span className="hidden sm:inline">초기 설정 마법사</span>
             <span className="sm:hidden">설정</span>
           </button>
 
           <button
             type="button"
             onClick={toggleTheme}
+            aria-label={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
             title={theme === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-white/60 bg-white/70 text-sm text-ink-600 shadow-xs backdrop-blur-md transition-all duration-200 hover:scale-105 hover:bg-white active:scale-95 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-800"
+            className="btn-icon text-ink-600 dark:text-slate-300"
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? (
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path d="M10 2a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 2zM10 15a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 0110 15zM10 7a3 3 0 100 6 3 3 0 000-6zM15.66 5.4a.75.75 0 00-1.06-1.06l-1.06 1.06a.75.75 0 001.06 1.06l1.06-1.06zM6.46 14.6a.75.75 0 00-1.06-1.06l-1.06 1.06a.75.75 0 101.06 1.06l1.06-1.06zM18 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0118 10zM5 10a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 015 10zM14.6 15.66a.75.75 0 001.06-1.06l-1.06-1.06a.75.75 0 10-1.06 1.06l1.06 1.06zM5.4 6.46a.75.75 0 001.06-1.06L5.4 4.34a.75.75 0 00-1.06 1.06L5.4 6.46z" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path
+                  fillRule="evenodd"
+                  d="M7.46 2.21a.75.75 0 01.1.83 6 6 0 007.4 8.36.75.75 0 01.94.98A7.5 7.5 0 116.63 2.12a.75.75 0 01.83.09z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
           </button>
         </div>
       </div>
