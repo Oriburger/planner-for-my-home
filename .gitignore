@@ -11,3 +11,8 @@ shot.mjs
 
 # TypeScript build info
 tsconfig.tsbuildinfo
+
+# AI Agent & local skills
+.agent/
+.claude/
+__pycache__/
