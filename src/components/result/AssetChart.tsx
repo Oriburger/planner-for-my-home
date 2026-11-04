@@ -105,7 +105,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
               type="monotone"
               dataKey="netWorth"
               name="순자산"
-              stroke="#10B981"
+              stroke="#348d6a"
               strokeWidth={2.5}
               dot={false}
               activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}

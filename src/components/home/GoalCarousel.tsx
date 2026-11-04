@@ -8,8 +8,8 @@ import { formatKRWShort } from '@/utils/format';
 import { Icon } from '@/components/ui/Icon';
 
 const STATUS: Record<GoalProgress['status'], { tone: string }> = {
-  done: { tone: 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400' },
-  onTrack: { tone: 'text-emerald-700 bg-emerald-500/10 dark:text-emerald-400' },
+  done: { tone: 'text-accent-700 bg-accent-500/10 dark:text-accent-400' },
+  onTrack: { tone: 'text-accent-700 bg-accent-500/10 dark:text-accent-400' },
   late: { tone: 'text-amber-700 bg-amber-500/15 dark:text-amber-400' },
   miss: { tone: 'text-rose-700 bg-rose-500/10 dark:text-rose-400' },
   beyond: { tone: 'text-ink-600 bg-ink-900/[0.06] dark:text-slate-400 dark:bg-white/[0.06]' },
@@ -103,7 +103,7 @@ export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
               <div className="relative mt-3 h-1.5 w-full overflow-hidden rounded-full bg-ink-900/[0.08] dark:bg-white/10">
                 <span
                   className={`absolute inset-y-0 left-0 rounded-full transition-[width] duration-700 ${
-                    proj >= 1 ? 'bg-emerald-500/40' : 'bg-ink-900/25 dark:bg-white/30'
+                    proj >= 1 ? 'bg-accent-500/40' : 'bg-ink-900/25 dark:bg-white/30'
                   }`}
                   style={{ width: `${proj * 100}%` }}
                 />

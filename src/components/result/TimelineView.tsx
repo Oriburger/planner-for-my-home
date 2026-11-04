@@ -15,8 +15,8 @@ interface TimelineViewProps {
 
 const BADGE_COLOR_MAP: Record<TimelineEvent['badgeColor'], { badge: string; dot: string }> = {
   emerald: {
-    badge: 'bg-emerald-500/10 text-emerald-700 ring-1 ring-inset ring-emerald-500/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/20',
-    dot: 'bg-emerald-500',
+    badge: 'bg-accent-500/10 text-accent-700 ring-1 ring-inset ring-accent-500/20 dark:bg-accent-400/10 dark:text-accent-300 dark:ring-accent-400/20',
+    dot: 'bg-accent-500',
   },
   blue: {
     badge: 'bg-brand-500/10 text-brand-700 ring-1 ring-inset ring-brand-500/20 dark:bg-brand-400/10 dark:text-brand-300 dark:ring-brand-400/20',
@@ -96,7 +96,7 @@ export function TimelineView({
             </div>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 pl-11 text-[11px] font-medium text-ink-600 dark:text-slate-400 sm:pl-0 sm:pt-2">
-            <Legend dot="bg-emerald-500" label="목표/완납" />
+            <Legend dot="bg-accent-500" label="목표/완납" />
             <Legend dot="bg-brand-500" label="만기/현금화" />
             <Legend dot="bg-violet-500" label="주거 갱신" />
           </div>
@@ -190,7 +190,7 @@ export function TimelineView({
                       selected={isSelected}
                       valueClass={
                         row.annualSavings >= 0
-                          ? 'text-emerald-600 dark:text-emerald-400'
+                          ? 'text-accent-600 dark:text-accent-400'
                           : 'text-rose-600 dark:text-rose-400'
                       }
                     />
@@ -280,7 +280,7 @@ export function TimelineView({
               caption={`실수령 ${formatKRWShort(activeRow.netIncome)}원`}
               valueClass={
                 activeRow.annualSavings >= 0
-                  ? 'text-emerald-600 dark:text-emerald-400'
+                  ? 'text-accent-600 dark:text-accent-400'
                   : 'text-rose-600 dark:text-rose-400'
               }
             />

@@ -8,7 +8,7 @@ type Tone = 'default' | 'good' | 'critical';
 
 const TONE: Record<Tone, string> = {
   default: 'text-ink-900 dark:text-white',
-  good: 'text-emerald-700 dark:text-emerald-400',
+  good: 'text-accent-700 dark:text-accent-400',
   critical: 'text-rose-600 dark:text-rose-400',
 };
 
