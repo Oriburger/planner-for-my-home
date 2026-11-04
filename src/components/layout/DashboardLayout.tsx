@@ -23,13 +23,15 @@ export function DashboardLayout() {
   const gridClass = isMobilePreview
     ? 'flex flex-col gap-4'
     : viewMode === 'pc'
-      ? 'grid grid-cols-[380px_minmax(0,1fr)] items-start gap-6'
+      ? // 'PC' 강제 2단은 2단이 실제로 들어가는 폭(768px+)에서만 적용한다.
+        // 폰에서 저장된 'PC' 설정 때문에 결과 영역이 화면 밖으로 밀려나지 않도록.
+        'grid grid-cols-1 items-start gap-4 md:grid-cols-[minmax(300px,360px)_minmax(0,1fr)] md:gap-5 lg:grid-cols-[380px_minmax(0,1fr)] lg:gap-6'
       : 'grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] lg:gap-6';
 
   const inputColumnClass = isMobilePreview
     ? 'w-full'
     : viewMode === 'pc'
-      ? 'thin-scrollbar sticky top-[5.75rem] -mx-3 max-h-[calc(100dvh-6.75rem)] overflow-y-auto overscroll-contain px-3 pb-4'
+      ? 'md:thin-scrollbar md:sticky md:top-[5.75rem] md:-mx-3 md:max-h-[calc(100dvh-6.75rem)] md:overflow-y-auto md:overscroll-contain md:px-3 md:pb-4'
       : 'lg:thin-scrollbar lg:sticky lg:top-[5.75rem] lg:-mx-3 lg:max-h-[calc(100dvh-6.75rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-3 lg:pb-4';
 
   return (
@@ -40,7 +42,7 @@ export function DashboardLayout() {
       <AppHeader onOpenWizard={() => setWizardOpen(true)} />
 
       <main
-        className={`w-full flex-1 pb-32 pt-4 sm:pt-6 lg:pb-10 ${
+        className={`w-full flex-1 pb-32 pt-4 sm:pt-6 ${viewMode === 'pc' ? 'md:pb-10' : 'lg:pb-10'} ${
           isMobilePreview ? 'px-3 sm:px-6' : 'mx-auto max-w-[1440px] px-3 sm:px-6 lg:px-8'
         }`}
       >
@@ -66,7 +68,7 @@ export function DashboardLayout() {
       </main>
 
       <AppFooter />
-      {viewMode !== 'pc' && <MobileSummaryBar />}
+      <MobileSummaryBar hideFrom={viewMode === 'pc' ? 'md' : 'lg'} />
 
       {wizardOpen && <OnboardingModal onClose={() => setWizardOpen(false)} />}
     </div>

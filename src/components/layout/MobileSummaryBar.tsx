@@ -7,7 +7,7 @@ import { formatKRWShort } from '@/utils/format';
  * 모바일에서 입력 중에도 결과를 계속 볼 수 있게 하는 하단 플로팅 글래스 바.
  * 결과 영역이 화면에 들어오면 버튼이 '입력 수정'으로 바뀌어 위로 돌아갈 수 있다.
  */
-export function MobileSummaryBar() {
+export function MobileSummaryBar({ hideFrom = 'lg' }: { hideFrom?: 'md' | 'lg' }) {
   const years = usePlannerStore((s) => s.settings.years);
   const { summary } = useSimulation();
   const [resultVisible, setResultVisible] = useState(false);
@@ -32,7 +32,11 @@ export function MobileSummaryBar() {
   };
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+    <div
+      className={`pointer-events-none fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] ${
+        hideFrom === 'md' ? 'md:hidden' : 'lg:hidden'
+      }`}
+    >
       <div className="glass glass-strong pointer-events-auto mx-auto flex max-w-md items-center gap-3 rounded-[22px] py-2 pl-4 pr-2">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">
