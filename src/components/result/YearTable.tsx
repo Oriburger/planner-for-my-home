@@ -31,7 +31,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
       <CardHeader
         title="연도별 상세 데이터"
         description="단위: 원 · 가로로 스크롤해 모든 항목을 볼 수 있어요"
-        icon="📋"
+        icon="table"
         action={
           rows.length > 10 ? (
             <button

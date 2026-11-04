@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Icon, type IconName } from './Icon';
 
 interface CardProps {
   children: ReactNode;
@@ -7,23 +8,23 @@ interface CardProps {
 
 /** 기본 유리 패널 */
 export function Card({ children, className = '' }: CardProps) {
-  return <section className={`glass rounded-3xl ${className}`}>{children}</section>;
+  return <section className={`glass rounded-2xl ${className}`}>{children}</section>;
 }
 
 interface CardHeaderProps {
   title: string;
   description?: string;
-  icon?: ReactNode;
+  icon?: IconName;
   action?: ReactNode;
 }
 
 export function CardHeader({ title, description, icon, action }: CardHeaderProps) {
   return (
-    <header className="flex items-start justify-between gap-3 px-4 pb-1 pt-4 sm:px-5 sm:pt-5">
+    <header className="flex items-start justify-between gap-3 px-4 pb-1 pt-4 sm:px-5">
       <div className="flex min-w-0 items-start gap-3">
-        {icon && <IconBadge>{icon}</IconBadge>}
+        {icon && <IconBadge name={icon} />}
         <div className="min-w-0">
-          <h2 className="text-[15px] font-bold tracking-tight text-ink-900 dark:text-slate-50 sm:text-base">
+          <h2 className="text-[15px] font-semibold tracking-tight text-ink-900 dark:text-slate-50">
             {title}
           </h2>
           {description && (
@@ -38,14 +39,11 @@ export function CardHeader({ title, description, icon, action }: CardHeaderProps
   );
 }
 
-/** 섹션 아이콘을 담는 작은 유리 배지 */
-export function IconBadge({ children }: { children: ReactNode }) {
+/** 섹션 아이콘 — 중립 톤의 작은 사각 타일 */
+export function IconBadge({ name }: { name: IconName }) {
   return (
-    <span
-      aria-hidden="true"
-      className="icon-badge flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[17px] leading-none"
-    >
-      {children}
+    <span className="glass-tile flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-600 dark:text-slate-300">
+      <Icon name={name} className="h-4 w-4" />
     </span>
   );
 }

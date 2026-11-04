@@ -160,7 +160,7 @@ export function IncomeSection() {
       summary={`${incomes.length}개 · 세전 연 ${formatKRWShort(
         total,
       )}원 · 세후 월 ${formatKRWShort(rows[0].netIncome / 12)}원`}
-      icon="💰"
+      icon="banknote"
     >
       {incomes.length === 0 && <EmptyState message="수입 항목을 추가해 주세요." />}
 

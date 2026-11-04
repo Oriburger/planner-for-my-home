@@ -33,7 +33,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
 
   return (
     <Card>
-      <CardHeader title="연간 현금흐름" description="실수령액이 어디로 흘러가는지" icon="💸" />
+      <CardHeader title="연간 현금흐름" description="실수령액이 어디로 흘러가는지" icon="flow" />
       <div className="px-1 pb-3 pt-2 pr-3 sm:px-2 sm:pr-5">
         <ResponsiveContainer width="100%" height={260}>
           <BarChart

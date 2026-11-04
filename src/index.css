@@ -3,69 +3,64 @@
 @tailwind utilities;
 
 /* ==================================================================== */
-/* Design tokens                                                         */
+/* Design tokens — 절제된 무채색 유리 + 단색 선택 상태                    */
 /* ==================================================================== */
 
 :root {
-  /* 배경 */
-  --bg-base: #f1f0fb;
+  --bg-base: #eceef2;
 
-  /* 시그니처 오로라 그라디언트 */
-  --aurora: linear-gradient(125deg, #2f7bff 0%, #5b5cf6 38%, #9b4dff 72%, #e64fc4 112%);
-  --aurora-text: linear-gradient(110deg, #2563eb 0%, #6d28d9 55%, #c026d3 100%);
-  --aurora-glow: 0 18px 40px -16px rgba(91, 92, 246, 0.75), 0 6px 18px -8px rgba(230, 79, 196, 0.45);
+  --glass-fill: rgba(255, 255, 255, 0.7);
+  --glass-fill-strong: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-edge: rgba(15, 23, 42, 0.07);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --glass-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px -14px rgba(15, 23, 42, 0.22);
 
-  /* 유리 표면 */
-  --glass-fill-top: rgba(255, 255, 255, 0.72);
-  --glass-fill-bottom: rgba(255, 255, 255, 0.5);
-  --glass-border: rgba(255, 255, 255, 0.7);
-  --glass-highlight: rgba(255, 255, 255, 0.95);
-  --glass-rim: rgba(255, 255, 255, 0.85);
-  --glass-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 14px 36px -14px rgba(30, 41, 90, 0.22);
-  --glass-blur: 22px;
+  --tile-fill: rgba(255, 255, 255, 0.55);
+  --tile-border: rgba(15, 23, 42, 0.06);
+  --tile-hover: rgba(255, 255, 255, 0.85);
 
-  /* 내부(중첩) 타일 */
-  --tile-fill: rgba(255, 255, 255, 0.58);
-  --tile-border: rgba(255, 255, 255, 0.8);
-  --tile-hover: rgba(255, 255, 255, 0.82);
+  --field-fill: rgba(255, 255, 255, 0.7);
+  --field-border: rgba(15, 23, 42, 0.1);
+  --field-focus-fill: #ffffff;
 
-  /* 입력 필드 */
-  --field-fill: rgba(255, 255, 255, 0.66);
-  --field-border: rgba(15, 23, 42, 0.08);
-  --field-focus-fill: rgba(255, 255, 255, 0.95);
+  --hairline: rgba(15, 23, 42, 0.08);
+  --track: rgba(15, 23, 42, 0.07);
+  --thumb: #ffffff;
 
-  /* 구분선 */
-  --hairline: rgba(15, 23, 42, 0.07);
-
-  /* 세그먼트 / 토글 트랙 */
-  --track: rgba(15, 23, 42, 0.06);
-  --thumb: rgba(255, 255, 255, 0.96);
+  /* 선택 상태 (라이트: 잉크 / 다크: 화이트) */
+  --selected-bg: #111827;
+  --selected-fg: #ffffff;
+  --selected-muted: rgba(255, 255, 255, 0.62);
+  --selected-soft: rgba(255, 255, 255, 0.14);
 }
 
 .dark {
-  --bg-base: #05060f;
-  --aurora-text: linear-gradient(110deg, #7cb2ff 0%, #a78bfa 55%, #f0abfc 100%);
-  --aurora-glow: 0 18px 44px -16px rgba(124, 92, 255, 0.85), 0 6px 22px -8px rgba(230, 79, 196, 0.5);
+  --bg-base: #0b0d12;
 
-  --glass-fill-top: rgba(36, 38, 72, 0.55);
-  --glass-fill-bottom: rgba(14, 16, 36, 0.5);
+  --glass-fill: rgba(24, 26, 32, 0.64);
+  --glass-fill-strong: rgba(24, 26, 32, 0.8);
   --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.1);
-  --glass-rim: rgba(196, 181, 253, 0.28);
-  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 18px 44px -16px rgba(0, 0, 0, 0.7);
+  --glass-edge: rgba(0, 0, 0, 0.35);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 36px -16px rgba(0, 0, 0, 0.7);
 
   --tile-fill: rgba(255, 255, 255, 0.04);
   --tile-border: rgba(255, 255, 255, 0.07);
   --tile-hover: rgba(255, 255, 255, 0.08);
 
-  --field-fill: rgba(2, 6, 23, 0.38);
-  --field-border: rgba(255, 255, 255, 0.09);
-  --field-focus-fill: rgba(2, 6, 23, 0.6);
+  --field-fill: rgba(0, 0, 0, 0.25);
+  --field-border: rgba(255, 255, 255, 0.1);
+  --field-focus-fill: rgba(0, 0, 0, 0.4);
 
   --hairline: rgba(255, 255, 255, 0.08);
-
-  --track: rgba(255, 255, 255, 0.07);
+  --track: rgba(255, 255, 255, 0.08);
   --thumb: rgba(255, 255, 255, 0.16);
+
+  --selected-bg: rgba(255, 255, 255, 0.94);
+  --selected-fg: #0b0d12;
+  --selected-muted: rgba(11, 13, 18, 0.58);
+  --selected-soft: rgba(11, 13, 18, 0.1);
 }
 
 /* ==================================================================== */
@@ -76,7 +71,6 @@
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
-    scroll-behavior: smooth;
     background-color: var(--bg-base);
   }
 
@@ -86,12 +80,11 @@
 
   body {
     @apply text-ink-900 antialiased dark:text-slate-100;
-    /* overflow: clip 을 지원하지 않는 구형 삼성 인터넷 등에서도 가로 스크롤을 막는다 */
-    overflow-x: hidden;
-    background-color: var(--bg-base);
+    /* 배경색은 html 이 칠한다 — body 에 칠하면 z-index 음수인 배경화면을 덮어버린다 */
     font-size: 16px;
-    font-feature-settings: 'tnum' 0, 'ss01' 1;
     letter-spacing: -0.01em;
+    /* overflow: clip 미지원 브라우저(구형 삼성 인터넷 등)에서도 가로 스크롤 방지 */
+    overflow-x: hidden;
   }
 
   ::selection {
@@ -103,7 +96,7 @@
     outline-offset: 2px;
   }
 
-  /* 레인지 슬라이더 — 채워진 트랙 + 유리 손잡이 */
+  /* 레인지 슬라이더 */
   input[type='range'] {
     --range-progress: 50%;
     @apply h-6 w-full cursor-pointer appearance-none bg-transparent;
@@ -112,366 +105,236 @@
     outline: none;
   }
   input[type='range']::-webkit-slider-runnable-track {
-    height: 6px;
+    height: 4px;
     border-radius: 999px;
     background: linear-gradient(
       to right,
-      #2f7bff 0%,
-      #9b4dff var(--range-progress),
+      var(--selected-bg) 0%,
+      var(--selected-bg) var(--range-progress),
       var(--track) var(--range-progress)
     );
   }
   input[type='range']::-moz-range-track {
-    height: 6px;
+    height: 4px;
     border-radius: 999px;
     background: var(--track);
   }
   input[type='range']::-moz-range-progress {
-    height: 6px;
+    height: 4px;
     border-radius: 999px;
-    background: linear-gradient(to right, #2f7bff, #9b4dff);
+    background: var(--selected-bg);
   }
   input[type='range']::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    margin-top: -9px;
+    margin-top: -10px;
     height: 24px;
     width: 24px;
     border-radius: 999px;
-    background: linear-gradient(180deg, #ffffff, #f1f5f9);
-    border: 0.5px solid rgba(15, 23, 42, 0.08);
-    box-shadow:
-      0 0 0 0 rgba(59, 130, 246, 0.3),
-      0 2px 6px rgba(15, 23, 42, 0.18),
-      0 6px 14px -4px rgba(37, 99, 235, 0.35);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: #fff;
+    border: 0.5px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2), 0 4px 10px -4px rgba(15, 23, 42, 0.3);
+    transition: transform 0.15s ease;
   }
   input[type='range']::-moz-range-thumb {
     height: 24px;
     width: 24px;
     border-radius: 999px;
-    background: linear-gradient(180deg, #ffffff, #f1f5f9);
-    border: 0.5px solid rgba(15, 23, 42, 0.08);
-    box-shadow:
-      0 2px 6px rgba(15, 23, 42, 0.18),
-      0 6px 14px -4px rgba(37, 99, 235, 0.35);
+    background: #fff;
+    border: 0.5px solid rgba(15, 23, 42, 0.1);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2), 0 4px 10px -4px rgba(15, 23, 42, 0.3);
   }
   input[type='range']:active::-webkit-slider-thumb {
-    transform: scale(1.12);
+    transform: scale(1.08);
   }
   input[type='range']:focus-visible::-webkit-slider-thumb {
-    box-shadow:
-      0 0 0 4px rgba(59, 130, 246, 0.3),
-      0 2px 6px rgba(15, 23, 42, 0.18);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3), 0 1px 3px rgba(15, 23, 42, 0.2);
   }
 }
 
 /* ==================================================================== */
-/* Glass components                                                      */
+/* Components                                                            */
 /* ==================================================================== */
 
 @layer components {
-  /* 배경 — 유리가 굴절시킬 색이 있어야 재질이 보인다 */
-  .app-backdrop {
-    position: fixed;
-    inset: 0;
-    z-index: -10;
-    pointer-events: none;
-    overflow: hidden;
-    background:
-      radial-gradient(55% 45% at 0% 0%, rgba(80, 140, 255, 0.55), transparent 70%),
-      radial-gradient(50% 45% at 100% 0%, rgba(176, 120, 255, 0.5), transparent 70%),
-      radial-gradient(55% 50% at 100% 100%, rgba(255, 140, 200, 0.38), transparent 70%),
-      radial-gradient(50% 45% at 0% 100%, rgba(64, 214, 200, 0.35), transparent 70%),
-      var(--bg-base);
-  }
-  /* 천천히 흐르는 오로라 덩어리 (transform 만 사용해 가볍다) */
-  .app-backdrop::before,
-  .app-backdrop::after {
-    content: '';
-    position: absolute;
-    width: 75vmax;
-    height: 75vmax;
-    border-radius: 999px;
-    will-change: transform;
-  }
-  .app-backdrop::before {
-    left: -20vmax;
-    top: 15%;
-    background: radial-gradient(closest-side, rgba(91, 92, 246, 0.32), transparent);
-    animation: drift-a 28s ease-in-out infinite alternate;
-  }
-  .app-backdrop::after {
-    right: -25vmax;
-    top: -10%;
-    background: radial-gradient(closest-side, rgba(236, 72, 153, 0.22), transparent);
-    animation: drift-b 34s ease-in-out infinite alternate;
-  }
-  /* 미세한 필름 그레인 — 유리 질감을 더 고급스럽게 */
-  .app-grain {
-    position: fixed;
-    inset: 0;
-    z-index: -9;
-    pointer-events: none;
-    opacity: 0.06;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-  .dark .app-grain {
-    opacity: 0.09;
-  }
-  .dark .app-backdrop {
-    background:
-      radial-gradient(55% 45% at 0% 0%, rgba(47, 100, 255, 0.4), transparent 70%),
-      radial-gradient(50% 45% at 100% 0%, rgba(140, 70, 255, 0.38), transparent 70%),
-      radial-gradient(55% 50% at 100% 100%, rgba(220, 50, 170, 0.26), transparent 70%),
-      radial-gradient(50% 45% at 0% 100%, rgba(20, 170, 170, 0.22), transparent 70%),
-      var(--bg-base);
-  }
-  .dark .app-backdrop::before {
-    background: radial-gradient(closest-side, rgba(99, 102, 241, 0.3), transparent);
-  }
-  .dark .app-backdrop::after {
-    background: radial-gradient(closest-side, rgba(217, 70, 239, 0.2), transparent);
-  }
-
-  /* 기본 유리 표면 — 패널/카드 */
+  /* 유리 표면 */
   .glass {
-    position: relative;
-    isolation: isolate;
-    background: linear-gradient(160deg, var(--glass-fill-top), var(--glass-fill-bottom));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(20px) saturate(150%);
     border: 1px solid var(--glass-border);
     box-shadow:
+      0 0 0 0.5px var(--glass-edge),
       inset 0 1px 0 0 var(--glass-highlight),
       var(--glass-shadow);
   }
-  /* 빛을 받는 테두리(specular rim) */
-  .glass::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(
-      155deg,
-      var(--glass-rim) 0%,
-      transparent 32%,
-      transparent 68%,
-      var(--glass-rim) 100%
-    );
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    opacity: 0.7;
-  }
-
-  /* 좌상단에서 비치는 광택 */
-  .glass::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    background:
-      radial-gradient(120% 70% at 0% 0%, rgba(255, 255, 255, 0.45), transparent 45%),
-      radial-gradient(80% 60% at 100% 100%, rgba(168, 85, 247, 0.06), transparent 60%);
-    pointer-events: none;
-  }
-  .dark .glass::after {
-    background:
-      radial-gradient(120% 70% at 0% 0%, rgba(255, 255, 255, 0.07), transparent 45%),
-      radial-gradient(80% 60% at 100% 100%, rgba(168, 85, 247, 0.1), transparent 60%);
-  }
-
-  /* 더 진한 유리 — 헤더, 모달, 하단 바 */
   .glass-strong {
-    --glass-fill-top: rgba(255, 255, 255, 0.8);
-    --glass-fill-bottom: rgba(255, 255, 255, 0.66);
-    --glass-blur: 28px;
+    --glass-fill: var(--glass-fill-strong);
   }
-  .dark .glass-strong {
-    --glass-fill-top: rgba(30, 41, 59, 0.78);
-    --glass-fill-bottom: rgba(15, 23, 42, 0.7);
+  /* 시트·팝오버 — 뒤 내용이 비치지 않을 만큼 불투명 */
+  .glass-solid {
+    --glass-fill: rgba(250, 251, 252, 0.92);
+  }
+  .dark .glass-solid {
+    --glass-fill: rgba(24, 26, 32, 0.92);
   }
 
-  /* 유리 위에 얹는 타일 — backdrop-filter 를 중첩하지 않아 모바일에서도 가볍다 */
+  /* 유리 위의 타일 — backdrop-filter 중첩 없음 */
   .glass-tile {
     background: var(--tile-fill);
     border: 1px solid var(--tile-border);
-    box-shadow: inset 0 1px 0 0 var(--glass-highlight);
   }
   .glass-tile-interactive {
-    @apply glass-tile transition-[background-color,border-color,transform,box-shadow] duration-200;
+    @apply glass-tile transition-[background-color,border-color,transform] duration-200;
   }
   .glass-tile-interactive:hover {
     background: var(--tile-hover);
   }
 
+  /* 선택 상태 */
+  .selected {
+    background: var(--selected-bg);
+    color: var(--selected-fg);
+    border: 1px solid transparent;
+    box-shadow: 0 8px 22px -12px rgba(15, 23, 42, 0.6);
+  }
+
   /* 입력 필드 */
   .glass-field {
-    @apply w-full rounded-xl px-3.5 py-2.5 text-base text-ink-900 tabular-nums transition-[background-color,border-color,box-shadow] duration-200 placeholder:text-ink-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-100 dark:placeholder:text-slate-500 sm:text-sm;
+    @apply w-full rounded-lg px-3 py-2.5 text-base text-ink-900 tabular-nums transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-ink-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-100 dark:placeholder:text-slate-500 sm:text-sm;
     background: var(--field-fill);
     border: 1px solid var(--field-border);
-    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
   }
   .glass-field:hover:not(:disabled):not(:focus) {
-    border-color: rgba(59, 130, 246, 0.35);
+    border-color: rgba(100, 116, 139, 0.4);
   }
   .glass-field:focus {
     background: var(--field-focus-fill);
     border-color: theme('colors.brand.500');
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.16);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   }
 
   /* 버튼 */
   .btn {
-    @apply inline-flex min-h-[2.5rem] select-none items-center justify-center gap-1.5 rounded-xl px-4 text-sm font-semibold transition-all duration-200 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50;
+    @apply inline-flex min-h-[2.5rem] select-none items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-medium transition-all duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn relative overflow-hidden text-white;
-    background: var(--aurora);
-    background-size: 160% 100%;
-    background-position: 0% 50%;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.45),
-      inset 0 -1px 0 rgba(15, 23, 42, 0.18),
-      var(--aurora-glow);
-    transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    @apply btn;
+    background: var(--selected-bg);
+    color: var(--selected-fg);
+    box-shadow: 0 6px 16px -10px rgba(15, 23, 42, 0.7);
   }
   .btn-primary:hover {
-    background-position: 100% 50%;
+    opacity: 0.9;
   }
-
   .btn-glass {
     @apply btn text-ink-700 dark:text-slate-200;
     background: var(--tile-fill);
     border: 1px solid var(--tile-border);
-    box-shadow:
-      inset 0 1px 0 0 var(--glass-highlight),
-      0 1px 2px rgba(15, 23, 42, 0.05);
   }
   .btn-glass:hover {
     background: var(--tile-hover);
   }
   .btn-icon {
-    @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-ink-400 transition-colors duration-150 hover:bg-ink-900/[0.05] hover:text-ink-700 active:scale-95 dark:text-slate-400 dark:hover:bg-white/[0.08] dark:hover:text-slate-100;
+    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-400 transition-colors duration-150 hover:bg-ink-900/[0.05] hover:text-ink-800 active:scale-95 dark:text-slate-500 dark:hover:bg-white/[0.07] dark:hover:text-slate-100;
   }
 
-  /* 세그먼트 컨트롤 — iOS 스타일의 떠 있는 유리 썸 */
+  /* 세그먼트 컨트롤 */
   .segmented {
-    @apply flex rounded-[0.875rem] p-1;
+    @apply flex rounded-[10px] p-[3px];
     background: var(--track);
   }
   .segmented-item {
-    @apply flex min-h-[2.25rem] min-w-0 flex-1 items-center justify-center gap-1.5 break-keep rounded-[0.625rem] px-2 py-1 text-center text-xs font-semibold leading-tight text-ink-500 transition-all duration-200 hover:text-ink-800 dark:text-slate-400 dark:hover:text-slate-100;
+    @apply flex min-h-[2rem] min-w-0 flex-1 items-center justify-center gap-1.5 break-keep rounded-[7px] px-2 py-1 text-center text-xs font-medium leading-tight text-ink-500 transition-all duration-150 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-100;
   }
   .segmented-item[aria-pressed='true'],
   .segmented-item[aria-selected='true'] {
     @apply text-ink-900 dark:text-white;
     background: var(--thumb);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.6),
-      0 1px 2px rgba(15, 23, 42, 0.08),
-      0 4px 12px -4px rgba(15, 23, 42, 0.16);
-  }
-  .dark .segmented-item[aria-pressed='true'],
-  .dark .segmented-item[aria-selected='true'] {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.12),
-      0 4px 12px -4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.1), 0 2px 6px -2px rgba(15, 23, 42, 0.12);
   }
 
-  /* 칩 / 배지 */
+  /* 스위치 */
+  .switch {
+    @apply relative h-[26px] w-[44px] shrink-0 rounded-full transition-colors duration-200;
+    background: var(--track);
+    box-shadow: inset 0 0 0 1px var(--tile-border);
+  }
+  .switch[aria-checked='true'] {
+    background: var(--selected-bg);
+    box-shadow: none;
+  }
+  .switch-knob {
+    @apply absolute left-[3px] top-[3px] h-5 w-5 rounded-full bg-white shadow-[0_1px_3px_rgba(15,23,42,0.3)] transition-transform duration-200;
+  }
+  .switch[aria-checked='true'] .switch-knob {
+    transform: translateX(18px);
+    background: var(--selected-fg);
+  }
+
   .chip {
-    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-semibold;
+    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-0.5 text-[11px] font-medium;
     background: var(--tile-fill);
     border: 1px solid var(--tile-border);
   }
 
-  /* 안내 박스 */
   .callout {
-    @apply rounded-xl border px-3.5 py-3 text-xs leading-relaxed;
+    @apply rounded-lg border px-3 py-2.5 text-xs leading-relaxed;
   }
   .callout-info {
-    @apply callout border-brand-500/15 bg-brand-500/[0.07] text-brand-900 dark:border-brand-400/20 dark:bg-brand-400/10 dark:text-blue-100;
+    @apply callout border-ink-900/[0.07] bg-ink-900/[0.03] text-ink-700 dark:border-white/[0.07] dark:bg-white/[0.04] dark:text-slate-200;
   }
   .callout-danger {
-    @apply callout border-rose-500/20 bg-rose-500/[0.07] text-rose-900 dark:border-rose-400/25 dark:bg-rose-500/10 dark:text-rose-200;
+    @apply callout border-rose-500/25 bg-rose-500/[0.06] text-rose-800 dark:border-rose-400/25 dark:bg-rose-500/10 dark:text-rose-200;
   }
   .callout-muted {
-    @apply callout border-ink-900/[0.06] bg-ink-900/[0.03] text-ink-600 dark:border-white/[0.06] dark:bg-white/[0.03] dark:text-slate-300;
+    @apply callout border-ink-900/[0.06] bg-transparent text-ink-500 dark:border-white/[0.06] dark:text-slate-400;
   }
 
-  /* 섹션 라벨 */
   .eyebrow {
-    @apply text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-400 dark:text-slate-500;
+    @apply text-[11px] font-medium uppercase tracking-[0.06em] text-ink-400 dark:text-slate-500;
   }
 
   .hairline {
     border-color: var(--hairline);
   }
 
-  /* 오로라 채움 — 선택된 카드, 히어로, 배지 */
-  .bg-aurora {
-    background: var(--aurora);
+  /* ---------------------------------------------------------------- */
+  /* Dock                                                              */
+  /* ---------------------------------------------------------------- */
+  .dock-tile {
+    @apply relative flex items-center justify-center rounded-[14px] text-ink-700 dark:text-slate-200;
+    background: var(--tile-fill);
+    border: 1px solid var(--tile-border);
+    transition:
+      width 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+      height 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background-color 0.15s ease;
   }
-  .aurora-card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    color: #fff;
-    background: var(--aurora);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.4),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-      var(--aurora-glow);
+  .dock-tile:hover {
+    background: var(--tile-hover);
   }
-  /* 유리 반사광 */
-  .aurora-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(90% 60% at 10% 0%, rgba(255, 255, 255, 0.38), transparent 55%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 50%);
-    pointer-events: none;
-  }
-  /* 지나가는 하이라이트 */
-  .aurora-shimmer::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.28) 50%, transparent 65%);
-    transform: translateX(-100%);
-    animation: shimmer 6s ease-in-out infinite;
-    pointer-events: none;
-  }
-  .text-aurora {
-    background: var(--aurora-text);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  /* 아이콘 배지 — 오로라 테두리 */
-  .icon-badge {
-    position: relative;
-    background:
-      linear-gradient(var(--tile-fill), var(--tile-fill)) padding-box,
-      linear-gradient(135deg, rgba(47, 123, 255, 0.45), rgba(155, 77, 255, 0.35), rgba(230, 79, 196, 0.4)) border-box;
-    border: 1px solid transparent;
-    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 6px 16px -10px rgba(91, 92, 246, 0.6);
+  .dock-tile[data-active='true'] {
+    background: var(--selected-bg);
+    color: var(--selected-fg);
+    border-color: transparent;
   }
 }
 
 @layer utilities {
+  .text-selected {
+    color: var(--selected-fg);
+  }
+  .text-selected-muted {
+    color: var(--selected-muted);
+  }
+  .bg-selected-soft {
+    background: var(--selected-soft);
+  }
+  .border-selected-soft {
+    border-color: var(--selected-soft);
+  }
+
   .thin-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: rgba(100, 116, 139, 0.35) transparent;
@@ -493,43 +356,11 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
-
-  .pb-safe {
-    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  }
-}
-
-@keyframes drift-a {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  100% {
-    transform: translate(35vw, 20vh) scale(1.2);
-  }
-}
-
-@keyframes drift-b {
-  0% {
-    transform: translate(0, 0) scale(1.1);
-  }
-  100% {
-    transform: translate(-30vw, 45vh) scale(0.9);
-  }
-}
-
-@keyframes shimmer {
-  0%,
-  60% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
 }
 
 @keyframes sheet-up {
   from {
-    transform: translateY(24px);
+    transform: translateY(16px);
     opacity: 0;
   }
   to {
@@ -547,29 +378,39 @@
   }
 }
 
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-sheet-up {
-  animation: sheet-up 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 .animate-fade-in {
   animation: fade-in 0.2s ease-out both;
 }
+.animate-view-in {
+  animation: view-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
 
-/* backdrop-filter 를 지원하지 않는 환경에서는 불투명도를 높여 가독성을 지킨다 */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass {
-    --glass-fill-top: rgba(255, 255, 255, 0.94);
-    --glass-fill-bottom: rgba(255, 255, 255, 0.9);
+  :root {
+    --glass-fill: rgba(255, 255, 255, 0.94);
+    --glass-fill-strong: rgba(255, 255, 255, 0.97);
   }
-  .dark .glass {
-    --glass-fill-top: rgba(30, 41, 59, 0.96);
-    --glass-fill-bottom: rgba(15, 23, 42, 0.94);
+  .dark {
+    --glass-fill: rgba(24, 26, 32, 0.95);
+    --glass-fill-strong: rgba(24, 26, 32, 0.97);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
   *,
   *::before,
   *::after {

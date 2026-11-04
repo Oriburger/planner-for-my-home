@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { SimulationResult } from '@/types/planner';
 import { IconBadge } from '@/components/ui/Card';
+import { Icon } from '@/components/ui/Icon';
 import { formatKRWShort } from '@/utils/format';
 import {
   extractAssetMilestones,
@@ -33,12 +34,12 @@ export function MilestoneHorizonSummary({
   return (
     <div className="space-y-3">
       {/* 1. 핵심 시점별 순자산 & 가용 자금 */}
-      <section className="glass rounded-3xl p-4 sm:p-5">
+      <section className="glass rounded-2xl p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-start gap-3">
-            <IconBadge>🎯</IconBadge>
+            <IconBadge name="target" />
             <div className="min-w-0">
-              <h2 className="text-[15px] font-bold tracking-tight text-ink-900 dark:text-white sm:text-base">
+              <h2 className="text-[15px] font-semibold tracking-tight text-ink-900 dark:text-white sm:text-base">
                 언제 얼마나 모일까?
               </h2>
               <p className="mt-0.5 text-xs leading-relaxed text-ink-500 dark:text-slate-400">
@@ -66,15 +67,15 @@ export function MilestoneHorizonSummary({
                 onClick={() => onSelectYear(item.yearIndex)}
                 className={`group relative flex min-w-0 flex-col rounded-2xl p-3 text-left transition-all duration-300 sm:p-3.5 ${
                   isSelected
-                    ? 'aurora-card'
+                    ? 'selected'
                     : 'glass-tile-interactive hover:-translate-y-0.5'
                 }`}
               >
                 <div className="flex items-start justify-between gap-1.5">
                   <div className="min-w-0">
                     <p
-                      className={`truncate text-[13px] font-bold ${
-                        isSelected ? 'text-white' : 'text-ink-800 dark:text-slate-100'
+                      className={`truncate text-[13px] font-semibold ${
+                        isSelected ? 'text-selected' : 'text-ink-800 dark:text-slate-100'
                       }`}
                     >
                       {title}
@@ -82,7 +83,7 @@ export function MilestoneHorizonSummary({
                     {subtitle && (
                       <p
                         className={`truncate text-[11px] ${
-                          isSelected ? 'text-white/75' : 'text-ink-400 dark:text-slate-500'
+                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-500'
                         }`}
                       >
                         {subtitle}
@@ -92,7 +93,7 @@ export function MilestoneHorizonSummary({
                   <span
                     className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold tabular-nums ${
                       isSelected
-                        ? 'bg-white/20 text-white'
+                        ? 'bg-selected-soft text-selected'
                         : 'bg-ink-900/[0.05] text-ink-500 dark:bg-white/[0.06] dark:text-slate-400'
                     }`}
                   >
@@ -103,20 +104,20 @@ export function MilestoneHorizonSummary({
 
                 <p
                   className={`mt-3 text-[11px] font-medium ${
-                    isSelected ? 'text-white/75' : 'text-ink-500 dark:text-slate-400'
+                    isSelected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-400'
                   }`}
                 >
                   예상 순자산
                 </p>
                 <p
-                  className={`text-lg font-bold leading-tight tracking-tight tabular-nums sm:text-xl ${
-                    isSelected ? 'text-white' : 'text-ink-900 dark:text-white'
+                  className={`text-lg font-semibold leading-tight tracking-tight tabular-nums sm:text-xl ${
+                    isSelected ? 'text-selected' : 'text-ink-900 dark:text-white'
                   }`}
                 >
                   {formatKRWShort(item.netWorth)}
                   <span
                     className={`ml-0.5 text-xs font-medium ${
-                      isSelected ? 'text-white/70' : 'text-ink-400'
+                      isSelected ? 'text-selected-muted' : 'text-ink-400'
                     }`}
                   >
                     원
@@ -125,7 +126,7 @@ export function MilestoneHorizonSummary({
 
                 <div
                   className={`mt-3 space-y-1 border-t pt-2 text-[11px] ${
-                    isSelected ? 'border-white/20' : 'hairline'
+                    isSelected ? 'border-selected-soft' : 'hairline'
                   }`}
                 >
                   <Row
@@ -153,10 +154,10 @@ export function MilestoneHorizonSummary({
 
       {/* 2. 순자산 마일스톤 달성 시점 */}
       {milestones.length > 0 && (
-        <section className="glass rounded-3xl px-4 py-3.5 sm:px-5">
+        <section className="glass rounded-2xl px-4 py-3.5 sm:px-5">
           <div className="flex items-center justify-between gap-2">
-            <p className="flex items-center gap-1.5 text-[13px] font-bold text-ink-900 dark:text-white">
-              <span aria-hidden="true">🚀</span> 순자산 마일스톤
+            <p className="flex items-center gap-1.5 text-[13px] font-semibold text-ink-900 dark:text-white">
+              <Icon name="flag" className="h-4 w-4 text-ink-500 dark:text-slate-400" /> 순자산 마일스톤
             </p>
             <span className="text-[11px] font-medium text-ink-400 dark:text-slate-500">
               목표 도달 시점
@@ -174,14 +175,14 @@ export function MilestoneHorizonSummary({
                   onClick={() => onSelectYear(m.reachedYearIndex)}
                   className={`inline-flex shrink-0 items-center gap-2 rounded-full py-1.5 pl-3 pr-3.5 text-xs transition-all duration-200 ${
                     isSelected
-                      ? 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_8px_18px_-8px_rgba(5,150,105,0.8)]'
+                      ? 'selected'
                       : 'glass-tile-interactive text-ink-700 dark:text-slate-200'
                   }`}
                 >
-                  <span className="font-bold">{m.targetLabel}</span>
+                  <span className="font-semibold">{m.targetLabel}</span>
                   <span
                     className={`tabular-nums ${
-                      isSelected ? 'text-emerald-50' : 'text-emerald-600 dark:text-emerald-400'
+                      isSelected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-400'
                     }`}
                   >
                     {m.reachedCalendarYear}년 · {m.reachedYearIndex}년차
@@ -215,7 +216,7 @@ function Row({
   tone?: 'brand' | 'good';
 }) {
   const valueClass = selected
-    ? 'text-white'
+    ? 'text-selected'
     : tone === 'brand'
       ? 'text-brand-700 dark:text-brand-300'
       : tone === 'good'
@@ -223,10 +224,10 @@ function Row({
         : 'text-ink-600 dark:text-slate-300';
   return (
     <div className="flex items-center justify-between gap-2">
-      <span className={selected ? 'text-white/70' : 'text-ink-500 dark:text-slate-400'}>
+      <span className={selected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-400'}>
         {label}
       </span>
-      <span className={`truncate font-bold tabular-nums ${valueClass}`}>{value}</span>
+      <span className={`truncate font-semibold tabular-nums ${valueClass}`}>{value}</span>
     </div>
   );
 }

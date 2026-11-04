@@ -44,7 +44,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
 
   return (
     <Card>
-      <CardHeader title="연도별 자산 변화" description="총자산 · 순자산 · 대출 잔액" icon="📈" />
+      <CardHeader title="연도별 자산 변화" description="총자산 · 순자산 · 대출 잔액" icon="trend" />
       <div className="px-1 pb-3 pt-2 pr-3 sm:px-2 sm:pr-5">
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart

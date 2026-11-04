@@ -37,7 +37,7 @@ export function ExpenseSection() {
     <Accordion
       title="월 고정 지출"
       summary={`${expenses.length}개 · 월 ${formatKRWShort(monthlyTotal)}원`}
-      icon="🧾"
+      icon="receipt"
     >
       {expenses.length === 0 && (
         <EmptyState message="식비·교통비 등 고정 지출을 추가해 주세요." />

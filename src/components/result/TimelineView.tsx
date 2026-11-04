@@ -82,13 +82,13 @@ export function TimelineView({
 
   return (
     <div className="space-y-3">
-      <section className="glass rounded-3xl py-4 sm:py-5">
+      <section className="glass rounded-2xl py-4 sm:py-5">
         {/* 헤더 */}
         <div className="flex flex-col gap-2 px-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
           <div className="flex min-w-0 items-start gap-3">
-            <IconBadge>🗺️</IconBadge>
+            <IconBadge name="timeline" />
             <div className="min-w-0">
-              <h3 className="text-[15px] font-bold tracking-tight text-ink-900 dark:text-white sm:text-base">
+              <h3 className="text-[15px] font-semibold tracking-tight text-ink-900 dark:text-white sm:text-base">
                 라이프 &amp; 머니 타임라인
               </h3>
               <p className="mt-0.5 text-xs leading-relaxed text-ink-500 dark:text-slate-400">
@@ -122,7 +122,7 @@ export function TimelineView({
                   onClick={() => onSelectYear(row.index)}
                   className={`relative flex w-[188px] shrink-0 snap-start flex-col rounded-2xl p-3.5 text-left transition-all duration-300 sm:w-[208px] ${
                     isSelected
-                      ? 'aurora-card'
+                      ? 'selected'
                       : 'glass-tile-interactive'
                   }`}
                 >
@@ -130,15 +130,15 @@ export function TimelineView({
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0">
                       <span
-                        className={`text-[15px] font-bold tracking-tight ${
-                          isSelected ? 'text-white' : 'text-ink-900 dark:text-white'
+                        className={`text-[15px] font-semibold tracking-tight ${
+                          isSelected ? 'text-selected' : 'text-ink-900 dark:text-white'
                         }`}
                       >
                         {row.year}
                       </span>
                       <span
                         className={`ml-1.5 text-[11px] font-medium ${
-                          isSelected ? 'text-white/75' : 'text-ink-400 dark:text-slate-500'
+                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-500'
                         }`}
                       >
                         {row.index}년차{row.age !== null ? ` · ${row.age}세` : ''}
@@ -150,7 +150,7 @@ export function TimelineView({
                           <span
                             key={e.id}
                             className={`h-1.5 w-1.5 rounded-full ${
-                              isSelected ? 'bg-white' : BADGE_COLOR_MAP[e.badgeColor].dot
+                              isSelected ? 'bg-current' : BADGE_COLOR_MAP[e.badgeColor].dot
                             }`}
                           />
                         ))}
@@ -161,23 +161,23 @@ export function TimelineView({
                   {/* 핵심 지표 */}
                   <p
                     className={`mt-3 text-[11px] font-medium ${
-                      isSelected ? 'text-white/75' : 'text-ink-500 dark:text-slate-400'
+                      isSelected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-400'
                     }`}
                   >
                     순자산
                   </p>
                   <p
-                    className={`text-lg font-bold leading-tight tracking-tight tabular-nums ${
-                      isSelected ? 'text-white' : 'text-ink-900 dark:text-white'
+                    className={`text-lg font-semibold leading-tight tracking-tight tabular-nums ${
+                      isSelected ? 'text-selected' : 'text-ink-900 dark:text-white'
                     }`}
                   >
                     {formatKRWShort(row.netWorth)}
-                    <span className={`ml-0.5 text-xs font-medium ${isSelected ? 'text-white/70' : 'text-ink-400'}`}>
+                    <span className={`ml-0.5 text-xs font-medium ${isSelected ? 'text-selected-muted' : 'text-ink-400'}`}>
                       원
                     </span>
                   </p>
 
-                  <div className={`mt-2.5 space-y-1 text-[11px] ${isSelected ? 'text-white/80' : ''}`}>
+                  <div className={`mt-2.5 space-y-1 text-[11px] ${isSelected ? 'text-selected-muted' : ''}`}>
                     <MiniRow
                       label="가용 현금"
                       value={`${formatKRWShort(row.liquidAssets)}원`}
@@ -199,13 +199,13 @@ export function TimelineView({
                   {/* 이벤트 */}
                   <div
                     className={`mt-3 min-h-[3.25rem] space-y-1 border-t pt-2.5 ${
-                      isSelected ? 'border-white/20' : 'hairline'
+                      isSelected ? 'border-selected-soft' : 'hairline'
                     }`}
                   >
                     {yearEvents.length === 0 ? (
                       <p
                         className={`text-[11px] ${
-                          isSelected ? 'text-white/70' : 'text-ink-400 dark:text-slate-500'
+                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-500'
                         }`}
                       >
                         정기 저축 · 복리 운용
@@ -215,18 +215,18 @@ export function TimelineView({
                         <p
                           key={e.id}
                           className={`truncate rounded-md px-1.5 py-0.5 text-[11px] font-medium ${
-                            isSelected ? 'bg-white/15 text-white' : BADGE_COLOR_MAP[e.badgeColor].badge
+                            isSelected ? 'bg-selected-soft text-selected' : BADGE_COLOR_MAP[e.badgeColor].badge
                           }`}
                           title={`${e.title}: ${e.description}`}
                         >
-                          <span className="font-bold">{e.badge}</span> · {e.title}
+                          <span className="font-semibold">{e.badge}</span> · {e.title}
                         </p>
                       ))
                     )}
                     {yearEvents.length > 2 && (
                       <p
                         className={`text-[10px] font-semibold ${
-                          isSelected ? 'text-white/75' : 'text-ink-400 dark:text-slate-500'
+                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-500'
                         }`}
                       >
                         외 {yearEvents.length - 2}개
@@ -242,13 +242,13 @@ export function TimelineView({
 
       {/* 선택된 연도 상세 */}
       {activeRow && (
-        <section className="glass rounded-3xl p-4 sm:p-5">
+        <section className="glass rounded-2xl p-4 sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
-              <span className="bg-aurora inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
+              <span className="chip text-ink-600 dark:text-slate-300">
                 {activeRow.index}년차
               </span>
-              <h4 className="mt-1.5 text-base font-bold tracking-tight text-ink-900 dark:text-white sm:text-lg">
+              <h4 className="mt-1.5 text-base font-semibold tracking-tight text-ink-900 dark:text-white sm:text-lg">
                 {activeRow.year}년 자산 브리핑
                 {activeRow.age !== null && (
                   <span className="ml-1.5 text-sm font-medium text-ink-400 dark:text-slate-500">
@@ -263,7 +263,7 @@ export function TimelineView({
 
             <div className="sm:text-right">
               <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">예상 순자산</p>
-              <p className="text-aurora text-2xl font-bold leading-tight tracking-tight tabular-nums sm:text-[28px]">
+              <p className="text-2xl font-semibold text-ink-900 dark:text-white leading-tight tracking-tight tabular-nums sm:text-[28px]">
                 {formatKRWShort(activeRow.netWorth)}원
               </p>
             </div>
@@ -310,14 +310,14 @@ export function TimelineView({
                 {activeEvents.map((e) => (
                   <li key={e.id} className="glass-tile flex items-start gap-3 rounded-2xl p-3">
                     <span
-                      className={`mt-px shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold ${
+                      className={`mt-px shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold ${
                         BADGE_COLOR_MAP[e.badgeColor].badge
                       }`}
                     >
                       {e.badge}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-bold text-ink-900 dark:text-white">{e.title}</p>
+                      <p className="text-[13px] font-semibold text-ink-900 dark:text-white">{e.title}</p>
                       <p className="mt-0.5 text-xs leading-relaxed text-ink-500 dark:text-slate-400">
                         {e.description}
                       </p>
@@ -355,8 +355,8 @@ function MiniRow({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-2">
-      <span className={selected ? 'text-white/70' : 'text-ink-500 dark:text-slate-400'}>{label}</span>
-      <span className={`truncate font-bold tabular-nums ${selected ? 'text-white' : valueClass}`}>
+      <span className={selected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-400'}>{label}</span>
+      <span className={`truncate font-semibold tabular-nums ${selected ? 'text-selected' : valueClass}`}>
         {value}
       </span>
     </div>
@@ -377,7 +377,7 @@ function Metric({
   return (
     <div className="glass-tile min-w-0 rounded-2xl p-3 sm:p-3.5">
       <p className="truncate text-[11px] font-medium text-ink-500 dark:text-slate-400">{label}</p>
-      <p className={`mt-1 truncate text-base font-bold tracking-tight tabular-nums sm:text-lg ${valueClass}`}>
+      <p className={`mt-1 truncate text-base font-semibold tracking-tight tabular-nums sm:text-lg ${valueClass}`}>
         {value}
       </p>
       <p className="mt-0.5 truncate text-[10px] text-ink-400 dark:text-slate-500 sm:text-[11px]">

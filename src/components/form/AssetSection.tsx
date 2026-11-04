@@ -43,7 +43,7 @@ export function AssetSection() {
     <Accordion
       title="현재 보유 자산"
       summary={`${assets.length}개 · 총 ${formatKRWShort(total)}원`}
-      icon="🏦"
+      icon="wallet"
       defaultOpen
     >
       {assets.length === 0 && (

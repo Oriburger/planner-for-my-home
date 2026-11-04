@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { usePlannerStore } from '@/store/plannerStore';
+import { Icon } from '@/components/ui/Icon';
 import { formatKRWShort } from '@/utils/format';
 import { runSimulation } from '@/utils/simulation';
 import {
@@ -130,7 +131,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
         if (e.target === e.currentTarget) skipAll();
       }}
     >
-      <div className="glass glass-strong animate-sheet-up flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[28px] sm:max-h-[min(860px,92dvh)] sm:rounded-[28px]">
+      <div className="glass glass-solid animate-sheet-up flex max-h-[92vh] max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl sm:max-h-[min(860px,92dvh)] sm:rounded-2xl">
         {/* 모바일 시트 손잡이 */}
         <div className="flex justify-center pt-2 sm:hidden" aria-hidden="true">
           <span className="h-1 w-9 rounded-full bg-ink-900/15 dark:bg-white/20" />
@@ -140,12 +141,12 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
         <header className="px-5 pb-4 pt-3 sm:px-6 sm:pt-6">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="eyebrow text-brand-600 dark:text-brand-400">
+              <p className="eyebrow">
                 초기 설정 · {stepIndex + 1} / {STEPS.length}
               </p>
               <h2
                 id="onboarding-title"
-                className="mt-1 text-xl font-bold tracking-tight text-ink-900 dark:text-white"
+                className="mt-1 text-xl font-semibold tracking-tight text-ink-900 dark:text-white"
               >
                 {step.title}
               </h2>
@@ -158,9 +159,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
               aria-label="설정 창 닫기"
               className="btn-icon -mr-2 -mt-1"
             >
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-              </svg>
+              <Icon name="close" className="h-[18px] w-[18px]" />
             </button>
           </div>
 
@@ -171,7 +170,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
                 key={s.key}
                 className={`h-1 flex-1 rounded-full transition-all duration-500 ${
                   i <= stepIndex
-                    ? 'bg-aurora'
+                    ? 'bg-ink-900 dark:bg-white'
                     : 'bg-ink-900/[0.08] dark:bg-white/10'
                 }`}
               />
@@ -187,13 +186,13 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
           <step.Body draft={draft} patch={patch} />
 
           {isLast && preview && (
-            <div className="icon-badge mt-4 rounded-2xl p-4">
+            <div className="glass-tile mt-4 rounded-xl p-4">
               <p className="text-xs font-semibold text-ink-500 dark:text-slate-400">
                 {draft.settings.years}년 후 예상 순자산
               </p>
-              <p className="text-aurora mt-1 text-[28px] font-bold leading-tight tracking-tight tabular-nums">
+              <p className="mt-1 text-[28px] font-semibold leading-tight text-ink-900 dark:text-white tracking-tight tabular-nums">
                 {formatKRWShort(preview.finalNetWorth)}
-                <span className="ml-0.5 text-base font-semibold">원</span>
+                <span className="ml-0.5 text-base font-medium text-ink-400">원</span>
               </p>
               <p className="mt-1 text-[11px] text-ink-500 dark:text-slate-400">
                 완료를 누르면 대시보드에서 자세히 볼 수 있어요.
@@ -220,7 +219,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
               onClick={() => (isLast ? finish() : setStepIndex((i) => i + 1))}
               className="btn-primary min-h-[3rem] flex-1 text-[15px]"
             >
-              {isLast ? '완료하고 결과 보기' : '다음'}
+              {isLast ? '완료' : '다음'}
             </button>
           </div>
 

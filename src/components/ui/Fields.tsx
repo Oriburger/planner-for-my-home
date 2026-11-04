@@ -23,7 +23,7 @@ export function Field({
   return (
     <label className={`block ${className}`} htmlFor={htmlFor}>
       <span className="mb-1.5 flex items-baseline justify-between gap-2 px-0.5">
-        <span className="min-w-0 break-keep text-xs font-semibold text-ink-600 dark:text-slate-300">{label}</span>
+        <span className="min-w-0 break-keep text-xs font-medium text-ink-600 dark:text-slate-300">{label}</span>
         {hint && (
           <span className="min-w-0 shrink truncate text-[11px] text-ink-400 dark:text-slate-500 max-[359px]:hidden">{hint}</span>
         )}
@@ -321,9 +321,9 @@ export function Toggle({
 }) {
   const id = useId();
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-ink-900/[0.06] bg-white/40 px-3.5 py-3 dark:border-white/[0.07] dark:bg-white/[0.03]">
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-ink-900/[0.06] px-3 py-2.5 dark:border-white/[0.07]">
       <label htmlFor={id} className="min-w-0 cursor-pointer">
-        <span className="block text-[13px] font-semibold text-ink-800 dark:text-slate-100">
+        <span className="block text-[13px] font-medium text-ink-800 dark:text-slate-100">
           {label}
         </span>
         {description && (
@@ -338,17 +338,9 @@ export function Toggle({
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative h-[30px] w-[50px] shrink-0 rounded-full transition-colors duration-300 ${
-          checked
-            ? 'bg-aurora shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_6px_14px_-6px_rgba(91,92,246,0.7)]'
-            : 'bg-ink-900/[0.12] dark:bg-white/[0.14]'
-        }`}
+        className="switch"
       >
-        <span
-          className={`absolute top-[3px] h-6 w-6 rounded-full bg-white shadow-[0_2px_6px_rgba(15,23,42,0.25),0_0_0_0.5px_rgba(15,23,42,0.06)] transition-all duration-300 ease-[cubic-bezier(0.3,1.4,0.5,1)] ${
-            checked ? 'left-[23px]' : 'left-[3px]'
-          }`}
-        />
+        <span className="switch-knob" />
       </button>
     </div>
   );

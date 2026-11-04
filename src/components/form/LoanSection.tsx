@@ -33,7 +33,7 @@ export function LoanSection() {
     <Accordion
       title="대출"
       summary={`${loans.length}건 · 잔액 ${formatKRWShort(totalPrincipal)}원`}
-      icon="🏛️"
+      icon="landmark"
     >
       {loans.length === 0 && <EmptyState message="대출이 없다면 비워두세요." />}
 
@@ -140,7 +140,7 @@ export function LoanSection() {
 
               {loan.startYear > 1 && (
                 <p className="callout-info col-span-2 text-[11px] font-medium">
-                  💡 시뮬레이션 {loan.startYear}년 차({settings.startYear + loan.startYear - 1}년)부터 실행되는 미래 대출입니다.
+                  시뮬레이션 {loan.startYear}년 차({settings.startYear + loan.startYear - 1}년)부터 실행되는 미래 대출입니다.
                 </p>
               )}
 

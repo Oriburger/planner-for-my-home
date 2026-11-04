@@ -32,7 +32,7 @@ export function HousingSection() {
     <Accordion
       title="거주 비용"
       summary={`${housings.length}개 계약 · 월 ${formatKRWShort(monthly)}원`}
-      icon="🏠"
+      icon="home"
     >
       {housings.length === 0 && (
         <EmptyState message="전세·월세·자가 등 주거 계약을 추가해 주세요." />
