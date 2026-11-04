@@ -1,7 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { useSimulation } from '@/hooks/useSimulation';
 import { useSelectedYear } from '@/hooks/useSelectedYear';
-import { useDragScroll } from '@/hooks/useDragScroll';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useUIStore } from '@/store/uiStore';
 import { analyzeGoals, goalForYear, type GoalProgress } from '@/utils/goals';
@@ -39,7 +38,6 @@ export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
   const selectYear = useUIStore((s) => s.selectYear);
   const selected = useSelectedYear(rows);
   const trackRef = useRef<HTMLDivElement>(null);
-  useDragScroll(trackRef);
 
   const progress = useMemo(
     () => analyzeGoals(goals, rows, start.netWorth),
@@ -70,7 +68,7 @@ export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
         key={progress.map((p) => p.goal.id).join('|')}
         ref={trackRef}
         data-no-swipe
-        className="no-scrollbar mt-3 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto overscroll-x-contain px-4 pb-1 pt-1 data-[dragging=true]:cursor-grabbing data-[dragging=true]:snap-none sm:scroll-px-5 sm:px-5 lg:cursor-grab"
+        className="no-scrollbar mt-3 flex snap-x snap-mandatory scroll-px-4 gap-2.5 overflow-x-auto overscroll-x-contain px-4 pb-1 pt-1 sm:scroll-px-5 sm:px-5 lg:grid lg:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] lg:overflow-visible"
       >
         {progress.map((p) => {
           const isActive = active?.goal.id === p.goal.id;
@@ -82,7 +80,7 @@ export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
               type="button"
               aria-pressed={isActive}
               onClick={() => selectYear(Math.min(lastIndex, p.goal.yearIndex))}
-              className={`glass-tile lift flex w-[208px] shrink-0 snap-start flex-col rounded-xl p-3.5 text-left ${
+              className={`glass-tile lift flex w-[208px] shrink-0 snap-start flex-col rounded-xl p-3.5 text-left lg:w-auto ${
                 isActive ? 'ring-2 ring-ink-900 dark:ring-white' : ''
               }`}
             >
@@ -125,7 +123,7 @@ export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
         <button
           type="button"
           onClick={onEdit}
-          className="lift flex w-[140px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-ink-900/20 text-xs font-medium text-ink-600 hover:border-ink-900/40 dark:border-white/20 dark:text-slate-400"
+          className="lift flex min-h-[8.5rem] w-[140px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed lg:w-auto border-ink-900/20 text-xs font-medium text-ink-600 hover:border-ink-900/40 dark:border-white/20 dark:text-slate-400"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink-900/[0.06] dark:bg-white/[0.08]">
             <Icon name="plus" className="h-4 w-4" />

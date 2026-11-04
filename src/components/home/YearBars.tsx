@@ -141,7 +141,7 @@ export function YearBars({
                 key={p.index}
                 className={`relative flex flex-1 flex-col-reverse overflow-hidden rounded-t-[4px] ${
                   hover === p.index && !isSel ? 'brightness-95 dark:brightness-125' : ''
-                } ${isSel ? 'shadow-[0_6px_16px_-6px_rgba(15,23,42,0.55)]' : ''}`}
+                }`}
                 style={{
                   height: mounted ? `${h}%` : '0%',
                   transition: 'height 0.7s cubic-bezier(0.2,0.8,0.2,1)',

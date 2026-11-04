@@ -11,7 +11,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
-  TextArea,
+  MemoField,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -123,13 +123,7 @@ export function ExpenseSection() {
               </Field>
             )}
 
-            <Field label="메모" className="col-span-2">
-              <TextArea
-                value={expense.memo ?? ''}
-                onChange={(memo) => updateExpense(expense.id, { memo })}
-                placeholder="선택 입력"
-              />
-            </Field>
+            <MemoField value={expense.memo ?? ''} onChange={(memo) => updateExpense(expense.id, { memo })} />
           </div>
         </ItemCard>
       ))}

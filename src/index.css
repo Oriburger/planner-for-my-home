@@ -579,3 +579,11 @@
 .animate-float-up {
   animation: float-up 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
+
+/* 데스크톱 입력 패널 — 스크롤 영역 끝을 부드럽게 흐린다 */
+@media (min-width: 1024px) {
+  .aside-fade {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+  }
+}

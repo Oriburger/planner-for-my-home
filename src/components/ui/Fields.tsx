@@ -1,6 +1,7 @@
 import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { fromMan, toMan } from '@/utils/format';
 import { InfoTip } from './InfoTip';
+import { Icon } from './Icon';
 
 /* ------------------------------------------------------------------ */
 /* 라벨 래퍼                                                           */
@@ -251,17 +252,20 @@ export function TextArea({
   placeholder,
   id,
   rows = 2,
+  autoFocus,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   id?: string;
   rows?: number;
+  autoFocus?: boolean;
 }) {
   return (
     <textarea
       id={id}
       rows={rows}
+      autoFocus={autoFocus}
       className={`${inputClass} resize-none`}
       value={value}
       placeholder={placeholder}
@@ -436,5 +440,37 @@ export function PresetGroup<T extends number | string>({
         </button>
       ))}
     </div>
+  );
+}
+
+/** 메모 — 비어 있으면 '+ 메모' 버튼만 보여 입력 화면을 짧게 유지한다 */
+export function MemoField({
+  value,
+  onChange,
+  className = 'col-span-2',
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  if (!value && !open) {
+    return (
+      <div className={className}>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="-ml-1 inline-flex min-h-[2rem] items-center gap-1 rounded-md px-1.5 text-xs font-medium text-ink-500 transition-colors hover:bg-ink-900/[0.04] hover:text-ink-900 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
+        >
+          <Icon name="plus" className="h-3.5 w-3.5" />
+          메모
+        </button>
+      </div>
+    );
+  }
+  return (
+    <Field label="메모" className={className}>
+      <TextArea value={value} onChange={onChange} placeholder="선택 입력" autoFocus={open && !value} />
+    </Field>
   );
 }

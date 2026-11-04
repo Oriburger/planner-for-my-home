@@ -92,7 +92,7 @@ export function DashboardLayout() {
           }`}
         >
           {showAside && (
-            <aside className="thin-scrollbar hidden lg:sticky lg:top-[5.25rem] lg:-mx-3 lg:block lg:max-h-[calc(100dvh-11.5rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-3 lg:pb-4">
+            <aside className="aside-fade thin-scrollbar hidden lg:sticky lg:top-[5.25rem] lg:-mx-3 lg:block lg:max-h-[calc(100dvh-11.5rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-3 lg:pb-4">
               <InputPanel />
             </aside>
           )}

@@ -50,7 +50,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
             <tr className="hairline border-y text-ink-600 dark:text-slate-400">
               <th
                 scope="col"
-                className="sticky left-0 z-10 bg-[#f3f6fb] px-4 py-3 text-left font-semibold dark:bg-[#141c2d] sm:px-5"
+                className="sticky left-0 z-10 bg-[#f9fafb] px-4 py-3 text-left font-semibold shadow-[1px_0_0_var(--hairline)] dark:bg-[#1b1d23] sm:px-5"
               >
                 연도
               </th>
@@ -74,7 +74,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
               >
                 <th
                   scope="row"
-                  className="sticky left-0 z-10 whitespace-nowrap bg-[#f3f6fb] px-4 py-2.5 text-left font-bold text-ink-800 dark:bg-[#141c2d] dark:text-slate-200 sm:px-5"
+                  className="sticky left-0 z-10 whitespace-nowrap bg-[#f9fafb] px-4 py-2.5 text-left font-semibold text-ink-800 shadow-[1px_0_0_var(--hairline)] dark:bg-[#1b1d23] dark:text-slate-200 sm:px-5"
                 >
                   {row.year}
                   <span className="ml-1 text-[11px] font-normal text-ink-500 dark:text-slate-500">
@@ -96,7 +96,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
                             : 'text-ink-800 dark:text-slate-200'
                       }`}
                     >
-                      {col.tone === 'negative' && value > 0 ? '-' : ''}
+                      {col.tone === 'negative' && Math.round(value) > 0 ? '-' : ''}
                       {formatKRWShort(value)}
                     </td>
                   );

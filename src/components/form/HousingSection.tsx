@@ -9,7 +9,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
-  TextArea,
+  MemoField,
   TextInput,
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
@@ -122,13 +122,7 @@ export function HousingSection() {
               />
             </Field>
 
-            <Field label="메모" className="col-span-2">
-              <TextArea
-                value={housing.memo ?? ''}
-                onChange={(memo) => updateHousing(housing.id, { memo })}
-                placeholder="선택 입력"
-              />
-            </Field>
+            <MemoField value={housing.memo ?? ''} onChange={(memo) => updateHousing(housing.id, { memo })} />
           </div>
 
           <p className="mt-2 flex items-center gap-1 px-0.5 text-[11px] text-ink-500 dark:text-slate-500">

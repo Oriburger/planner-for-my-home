@@ -93,7 +93,7 @@ export function ViewContent({ view, onEditGoals }: { view: AppView; onEditGoals:
     case 'plan':
       return (
         <>
-          <div className="lg:hidden">
+          <div className="mx-auto max-w-2xl lg:hidden">
             <InputPanel />
           </div>
           <div className="hidden lg:block">

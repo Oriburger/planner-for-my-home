@@ -91,6 +91,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
             />
 
             <Area
+              animationDuration={650}
               type="monotone"
               dataKey="totalAssets"
               name="총자산"
@@ -100,6 +101,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
               activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}
             />
             <Line
+              animationDuration={650}
               type="monotone"
               dataKey="netWorth"
               name="순자산"
@@ -109,6 +111,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
               activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}
             />
             <Line
+              animationDuration={650}
               type="monotone"
               dataKey="loanBalance"
               name="대출 잔액"

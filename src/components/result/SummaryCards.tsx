@@ -18,8 +18,11 @@ function Kpi({
   format,
   tone = 'default',
   sub,
+  tag,
 }: {
   label: string;
+  /** 기준 시점 꼬리표 (예: ~2027) */
+  tag?: string;
   value: number;
   format: (v: number) => string;
   tone?: Tone;
@@ -29,7 +32,14 @@ function Kpi({
   const v = useAnimatedNumber(value);
   return (
     <div className="glass spotlight lift min-w-0 rounded-2xl px-4 py-3.5">
-      <p className="truncate text-xs font-medium text-ink-600 dark:text-slate-400">{label}</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="truncate text-xs font-medium text-ink-600 dark:text-slate-400">{label}</p>
+        {tag && (
+          <span className="shrink-0 rounded bg-ink-900/[0.06] px-1.5 py-px text-[10px] font-medium tabular-nums text-ink-600 dark:bg-white/[0.08] dark:text-slate-400">
+            {tag}
+          </span>
+        )}
+      </div>
       <p className={`mt-1 truncate text-lg font-semibold tracking-tight tabular-nums sm:text-xl ${TONE[tone]}`}>
         {format(v)}
       </p>
@@ -57,7 +67,7 @@ export function SummaryCards({
   point: YearPoint;
   years: number;
 }) {
-  const at = point.index === 0 ? '지금' : `${point.year}년`;
+  const tag = point.index === 0 ? '지금' : `~${point.year}`;
   const shortfallYear = summary.firstContributionShortfallYear;
   const won = (v: number) => `${formatKRWShort(v)}원`;
 
@@ -74,23 +84,26 @@ export function SummaryCards({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2.5 xl:grid-cols-4">
         <Kpi
-          label={`누적 저축 · ${at}까지`}
+          label="누적 저축"
+          tag={tag}
           value={point.savingsCum}
           format={won}
           tone={point.savingsCum >= 0 ? 'default' : 'critical'}
-          sub={`${years}년 전체 ${won(summary.totalSaved)}`}
+          sub={`${years}년 합계 ${formatKRWShort(summary.totalSaved)}`}
         />
         <Kpi
-          label={`운용 수익 · ${at}까지`}
+          label="운용 수익"
+          tag={tag}
           value={point.grown}
           format={won}
           tone="good"
-          sub={`${years}년 전체 ${won(summary.totalReturn)}`}
+          sub={`${years}년 합계 ${formatKRWShort(summary.totalReturn)}`}
         />
         <Kpi
-          label={`저축률 · ${at}`}
+          label="저축률"
+          tag={point.index === 0 ? '첫 해' : `${point.year}`}
           value={point.savingsRate ?? summary.savingsRate}
           format={(v) => `${v.toFixed(1)}%`}
           sub={`첫 해 ${summary.savingsRate.toFixed(1)}%`}

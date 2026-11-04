@@ -244,30 +244,25 @@ export function TimelineView({
       {/* 선택된 연도 상세 */}
       {activeRow && (
         <section className="glass rounded-2xl p-4 sm:p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          {/* 한 줄 머리: 연도 · 나이 | 순자산 */}
+          <div className="flex items-end justify-between gap-3">
             <div className="min-w-0">
-              <span className="chip text-ink-600 dark:text-slate-300">
-                {activeRow.index}년차
-              </span>
-              <h4 className="mt-1.5 text-base font-semibold tracking-tight text-ink-900 dark:text-white sm:text-lg">
+              <p className="text-xs font-medium text-ink-500 dark:text-slate-400">
+                {activeRow.index}년차{activeRow.age !== null && ` · ${activeRow.age}세`}
+              </p>
+              <h4 className="mt-0.5 text-lg font-semibold tracking-tight text-ink-900 dark:text-white">
                 {activeRow.year}년
-                {activeRow.age !== null && (
-                  <span className="ml-1.5 text-sm font-medium text-ink-500 dark:text-slate-500">
-                    만 {activeRow.age}세
-                  </span>
-                )}
               </h4>
             </div>
-
-            <div className="sm:text-right">
-              <p className="text-[11px] font-medium text-ink-600 dark:text-slate-400">예상 순자산</p>
-              <p className="text-2xl font-semibold text-ink-900 dark:text-white leading-tight tracking-tight tabular-nums sm:text-[28px]">
+            <div className="min-w-0 text-right">
+              <p className="text-xs font-medium text-ink-500 dark:text-slate-400">순자산</p>
+              <p className="mt-0.5 truncate text-xl font-semibold leading-tight tracking-tight tabular-nums text-ink-900 dark:text-white sm:text-[26px]">
                 {formatKRWShort(activeRow.netWorth)}원
               </p>
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-2 min-[340px]:grid-cols-2 sm:gap-3 lg:grid-cols-4">
+          <div className="mt-4 grid grid-cols-1 gap-2 min-[340px]:grid-cols-2 sm:gap-3 md:grid-cols-4">
             <Metric
               label="즉시 가용 현금"
               value={`${formatKRWShort(activeRow.liquidAssets)}원`}

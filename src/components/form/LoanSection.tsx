@@ -8,7 +8,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
-  TextArea,
+  MemoField,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -175,13 +175,7 @@ export function LoanSection() {
                 )}
               </div>
 
-              <Field label="메모" className="col-span-2">
-                <TextArea
-                  value={loan.memo ?? ''}
-                  onChange={(memo) => updateLoan(loan.id, { memo })}
-                  placeholder="선택 입력"
-                />
-              </Field>
+              <MemoField value={loan.memo ?? ''} onChange={(memo) => updateLoan(loan.id, { memo })} />
             </div>
 
             <p className="callout-info mt-3">

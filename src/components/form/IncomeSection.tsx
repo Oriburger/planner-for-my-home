@@ -9,7 +9,7 @@ import {
   PercentInput,
   SegmentedControl,
   Select,
-  TextArea,
+  MemoField,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -271,13 +271,7 @@ export function IncomeSection() {
               />
             </Field>
 
-            <Field label="메모" className="col-span-2">
-              <TextArea
-                value={income.memo ?? ''}
-                onChange={(memo) => updateIncome(income.id, { memo })}
-                placeholder="선택 입력"
-              />
-            </Field>
+            <MemoField value={income.memo ?? ''} onChange={(memo) => updateIncome(income.id, { memo })} />
 
             <div className="col-span-2">
               <Toggle

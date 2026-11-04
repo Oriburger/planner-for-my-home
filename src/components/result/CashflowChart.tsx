@@ -69,6 +69,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
 
             {/* stroke 를 표면색으로 주어 스택 세그먼트 사이 2px 간격을 만든다 */}
             <Bar
+              animationDuration={650}
               dataKey="livingExpense"
               name="생활비"
               stackId="flow"
@@ -77,6 +78,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
               strokeWidth={2}
             />
             <Bar
+              animationDuration={650}
               dataKey="housingCost"
               name="주거비"
               stackId="flow"
@@ -85,6 +87,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
               strokeWidth={2}
             />
             <Bar
+              animationDuration={650}
               dataKey="loanPayment"
               name="대출 상환"
               stackId="flow"
@@ -93,6 +96,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
               strokeWidth={2}
             />
             <Bar
+              animationDuration={650}
               dataKey="annualSavings"
               name="저축"
               stackId="flow"
