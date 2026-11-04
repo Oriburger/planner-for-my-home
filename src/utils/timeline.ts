@@ -202,7 +202,8 @@ export function extractTimelineEvents(
   for (const loan of data.loans) {
     // 거치 종료
     if (loan.graceYears && loan.graceYears > 0) {
-      const graceEndIndex = loan.startYear + loan.graceYears;
+      // 거치는 (startYear + grace - 1)년차의 끝에 끝나고 다음 해부터 원금 상환
+      const graceEndIndex = loan.startYear + loan.graceYears - 1;
       const targetRow = rows.find((r) => r.index === graceEndIndex);
       if (targetRow) {
         events.push({
@@ -240,8 +241,8 @@ export function extractTimelineEvents(
   // 4. 주거 이벤트 (전세 2년 갱신 주기 알림 등)
   for (const housing of data.housings) {
     if (housing.type === 'jeonse') {
-      // 2년 주기 전세 갱신 시점 표시 (startYear + 2, startYear + 4 ...)
-      for (let y = housing.startYear + 2; y <= data.settings.years; y += 2) {
+      // h년차에 시작한 계약은 (h-1)년 후에 시작 → 2년 뒤인 (h+1)년차 끝에 갱신
+      for (let y = housing.startYear + 1; y <= data.settings.years; y += 2) {
         const row = rows.find((r) => r.index === y);
         if (row && (housing.endYear === null || y <= housing.endYear)) {
           events.push({

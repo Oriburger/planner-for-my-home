@@ -272,7 +272,8 @@ export function runSimulation(data: PlannerData, baseYear = currentYear()): Simu
       if (a.monthlyContribution <= 0) return false;
       if (yearIndex < (a.startYear ?? 1)) return false;
       const matIndex = getAssetMaturityYearIndex(a, ageNow);
-      if (matIndex !== null && yearIndex >= matIndex) return false;
+      // 만기는 matIndex 년차의 '끝' — 그 해까지는 납입하고 다음 해부터 멈춘다
+      if (matIndex !== null && yearIndex > matIndex) return false;
       return true;
     });
 

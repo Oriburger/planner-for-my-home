@@ -113,7 +113,7 @@ export function AssetSection() {
 
               {hasMaturity && (
                 <>
-                  <Field label="만기/수령 연차" hint="비우면 미설정">
+                  <Field label="만기 시점" hint="비우면 미설정">
                     <CountInput
                       value={asset.maturityYear ?? 0}
                       onChange={(v) =>
@@ -121,6 +121,7 @@ export function AssetSection() {
                       }
                       min={0}
                       max={40}
+                      suffix="년 후"
                       blankOnZero
                       placeholder="만기 없음"
                     />

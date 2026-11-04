@@ -206,3 +206,18 @@ describe('timeline utilities', () => {
     expect(loanEvent).toBeDefined();
   });
 });
+
+describe('이벤트 시점 (N년차의 끝 = N년 후)', () => {
+  it('거치 2년 대출은 2년 후에 거치 종료, 지금 시작한 전세는 2년 후에 갱신', () => {
+    const data = {
+      ...mockData,
+      loans: [{ ...mockData.loans[0], id: 'g', startYear: 1, graceYears: 2, termYears: 8 }],
+      housings: [
+        { id: 'h', type: 'jeonse', name: '전세', deposit: 0, monthlyRent: 0, maintenanceFee: 0, growthRate: 0, startYear: 1, endYear: null },
+      ],
+    } as unknown as typeof mockData;
+    const events = extractTimelineEvents(data, mockRows, mockSummary);
+    expect(events.find((e) => e.id === 'loan-grace-g')?.yearIndex).toBe(2);
+    expect(events.filter((e) => e.category === 'housing').map((e) => e.yearIndex)[0]).toBe(2);
+  });
+});

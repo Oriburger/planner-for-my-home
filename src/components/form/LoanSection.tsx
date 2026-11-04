@@ -94,7 +94,7 @@ export function LoanSection() {
                 />
               </Field>
 
-              <Field label="종료 연차" hint={`총 ${loan.termYears}년`}>
+              <Field label="완납 시점" hint={`총 ${loan.termYears}년`}>
                 <CountInput
                   value={loan.startYear + loan.termYears - 1}
                   onChange={(endYear) =>
@@ -104,6 +104,7 @@ export function LoanSection() {
                   }
                   min={loan.startYear}
                   max={40}
+                  suffix="년 후"
                 />
               </Field>
 

@@ -62,3 +62,17 @@ describe('저장 데이터 마이그레이션', () => {
     expect(future.asOfYear).toBe(new Date().getFullYear());
   });
 });
+
+describe('만기·거치·갱신 경계 (N년차의 끝 = N년 후)', () => {
+  it('만기 3년 후인 적금은 3년차까지 납입하고 4년차부터 멈춘다', () => {
+    const data: PlannerData = {
+      ...base,
+      loans: [],
+      assets: [
+        { id: 's', type: 'savings', name: '적금', amount: 0, annualReturnRate: 0, liquid: false, monthlyContribution: 10 * 만, maturityYear: 3, startYear: 1 },
+      ],
+    };
+    const { rows } = runSimulation(data, 2026);
+    expect(rows.map((r) => r.contribution)).toEqual([120 * 만, 120 * 만, 120 * 만, 0, 0]);
+  });
+});
