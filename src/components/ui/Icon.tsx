@@ -73,6 +73,9 @@ const PATHS = {
   chevronDown: <path d="m6 9 6 6 6-6" />,
   chevronRight: <path d="m9 6 6 6-6 6" />,
   plus: <path d="M12 5v14M5 12h14" />,
+  minus: <path d="M5 12h14" />,
+  play: <path d="M8 5.5v13l10.5-6.5L8 5.5Z" />,
+  pause: <path d="M8.5 5.5v13M15.5 5.5v13" />,
   copy: (
     <>
       <rect x="8.5" y="8.5" width="11" height="11" rx="2" />

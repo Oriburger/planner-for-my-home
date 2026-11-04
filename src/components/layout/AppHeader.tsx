@@ -3,6 +3,7 @@ import { usePlannerStore } from '@/store/plannerStore';
 import { useUIStore, VIEW_LABEL } from '@/store/uiStore';
 import { Icon } from '@/components/ui/Icon';
 import { formatKRWShort } from '@/utils/format';
+import { HorizonControl } from './HorizonControl';
 
 export function AppHeader() {
   const years = usePlannerStore((s) => s.settings.years);
@@ -12,7 +13,7 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-30 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:px-8">
-      <div className="glass glass-strong mx-auto flex h-14 max-w-[1440px] items-center gap-3 rounded-2xl pl-2.5 pr-3 sm:pl-3 sm:pr-4">
+      <div className="glass glass-strong mx-auto flex h-14 max-w-[1440px] items-center gap-2 rounded-2xl pl-2.5 pr-3 sm:gap-3 sm:pl-3 sm:pr-4">
         <button
           type="button"
           onClick={() => setView('overview')}
@@ -33,14 +34,16 @@ export function AppHeader() {
           </span>
         </div>
 
+        <HorizonControl />
+
         <button
           type="button"
           onClick={() => setView('overview')}
-          className="min-w-0 text-right"
+          className="hidden min-w-0 text-right min-[360px]:block"
           aria-label={`${years}년 후 예상 순자산 ${formatKRWShort(summary.finalNetWorth)}원`}
         >
           <span className="block text-[10px] font-medium text-ink-500 dark:text-slate-500 sm:text-[11px]">
-            {years}년 후 순자산
+            최종 순자산
           </span>
           <span className="block truncate text-sm font-semibold tabular-nums tracking-tight text-ink-900 dark:text-white sm:text-[15px]">
             {formatKRWShort(summary.finalNetWorth)}원

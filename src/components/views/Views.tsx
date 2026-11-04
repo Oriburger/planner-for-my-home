@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { buildYearPoints } from '@/utils/accumulation';
 import { useSimulation } from '@/hooks/useSimulation';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useUIStore, type AppView } from '@/store/uiStore';
@@ -21,12 +23,16 @@ function Disclaimer() {
 }
 
 export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
-  const { rows, summary } = useSimulation();
+  const { rows, summary, start } = useSimulation();
+  const years = usePlannerStore((s) => s.settings.years);
+  const selected = useSelectedYear(rows);
+  const points = useMemo(() => buildYearPoints(rows, start), [rows, start]);
+  const point = points.find((p) => p.index === selected) ?? points[points.length - 1];
   return (
     <div className="space-y-3">
       <HomeHero onAddGoal={onEditGoals} />
+      <SummaryCards summary={summary} firstYear={rows[0]} point={point} years={years} />
       <GoalCarousel onEdit={onEditGoals} />
-      <SummaryCards summary={summary} firstYear={rows[0]} />
       <Disclaimer />
     </div>
   );

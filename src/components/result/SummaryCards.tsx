@@ -2,6 +2,7 @@ import type { SimulationResult } from '@/types/planner';
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber';
 import { Icon } from '@/components/ui/Icon';
 import { formatKRWShort } from '@/utils/format';
+import type { YearPoint } from '@/utils/accumulation';
 
 type Tone = 'default' | 'good' | 'critical';
 
@@ -16,11 +17,14 @@ function Kpi({
   value,
   format,
   tone = 'default',
+  sub,
 }: {
   label: string;
   value: number;
   format: (v: number) => string;
   tone?: Tone;
+  /** 비교 기준 (예: 전체 기간 합계) */
+  sub?: string;
 }) {
   const v = useAnimatedNumber(value);
   return (
@@ -29,18 +33,31 @@ function Kpi({
       <p className={`mt-1 truncate text-lg font-semibold tracking-tight tabular-nums sm:text-xl ${TONE[tone]}`}>
         {format(v)}
       </p>
+      {sub && (
+        <p className="mt-0.5 truncate text-[11px] font-medium tabular-nums text-ink-500 dark:text-slate-500">
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
 
-/** 핵심 지표 4개 — 숫자만 간결하게 */
+/**
+ * 핵심 지표 — 홈에서 고른 연도 기준 값을 크게, 전체 기간 값을 함께 보여준다.
+ */
 export function SummaryCards({
   summary,
   firstYear,
+  point,
+  years,
 }: {
   summary: SimulationResult['summary'];
   firstYear: SimulationResult['rows'][number];
+  /** 선택한 연도의 누적값 */
+  point: YearPoint;
+  years: number;
 }) {
+  const at = point.index === 0 ? '지금' : `${point.year}년`;
   const shortfallYear = summary.firstContributionShortfallYear;
   const won = (v: number) => `${formatKRWShort(v)}원`;
 
@@ -59,18 +76,31 @@ export function SummaryCards({
 
       <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
         <Kpi
-          label="누적 저축"
-          value={summary.totalSaved}
+          label={`누적 저축 · ${at}까지`}
+          value={point.savingsCum}
           format={won}
-          tone={summary.totalSaved >= 0 ? 'default' : 'critical'}
+          tone={point.savingsCum >= 0 ? 'default' : 'critical'}
+          sub={`${years}년 전체 ${won(summary.totalSaved)}`}
         />
-        <Kpi label="운용 수익" value={summary.totalReturn} format={won} tone="good" />
-        <Kpi label="첫 해 저축률" value={summary.savingsRate} format={(v) => `${v.toFixed(1)}%`} />
+        <Kpi
+          label={`운용 수익 · ${at}까지`}
+          value={point.grown}
+          format={won}
+          tone="good"
+          sub={`${years}년 전체 ${won(summary.totalReturn)}`}
+        />
+        <Kpi
+          label={`저축률 · ${at}`}
+          value={point.savingsRate ?? summary.savingsRate}
+          format={(v) => `${v.toFixed(1)}%`}
+          sub={`첫 해 ${summary.savingsRate.toFixed(1)}%`}
+        />
         <Kpi
           label="적자 전환"
           value={summary.firstNegativeYear ?? 0}
           format={(v) => (summary.firstNegativeYear === null ? '없음' : `${Math.round(v)}년차`)}
           tone={summary.firstNegativeYear === null ? 'good' : 'critical'}
+          sub={`${years}년 동안`}
         />
       </div>
     </div>

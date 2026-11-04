@@ -4,8 +4,6 @@ import {
   Field,
   MoneyInput,
   PercentInput,
-  PresetGroup,
-  RangeInput,
   SegmentedControl,
   Select,
 } from '@/components/ui/Fields';
@@ -37,7 +35,6 @@ function TotalHint({ label, amount }: { label: string; amount: number }) {
 /* 1. 기간 · 기본 가정                                                  */
 /* ------------------------------------------------------------------ */
 
-const YEAR_PRESETS = [5, 10, 20, 30] as const;
 
 export function PeriodStep({ draft, patch }: StepProps) {
   const { settings } = draft;
@@ -46,39 +43,6 @@ export function PeriodStep({ draft, patch }: StepProps) {
 
   return (
     <div className="space-y-4">
-      <div className="glass-tile rounded-2xl px-4 pb-3 pt-3.5">
-        <div className="flex items-end justify-between">
-          <span className="text-xs font-semibold text-ink-600 dark:text-slate-400">
-            몇 년 뒤까지 볼까요?
-          </span>
-          <span className="text-[28px] font-semibold leading-none text-ink-900 dark:text-white tracking-tight tabular-nums">
-            {settings.years}
-            <span className="ml-0.5 text-sm font-semibold">
-              년
-            </span>
-          </span>
-        </div>
-
-        <div className="mt-2">
-          <RangeInput
-            value={settings.years}
-            onChange={(years) => set({ years })}
-            min={1}
-            max={40}
-            label="시뮬레이션 기간(년)"
-          />
-        </div>
-
-        <div className="mt-2">
-          <PresetGroup
-            value={settings.years as (typeof YEAR_PRESETS)[number]}
-            onChange={(years) => set({ years })}
-            options={YEAR_PRESETS}
-            format={(y) => `${y}년`}
-          />
-        </div>
-      </div>
-
       <div className="grid grid-cols-2 gap-3">
         <Field label="시작 연도">
           <CountInput

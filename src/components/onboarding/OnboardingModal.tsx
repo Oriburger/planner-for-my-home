@@ -20,8 +20,8 @@ import {
 const STEPS = [
   {
     key: 'period',
-    title: '얼마나 내다볼까요?',
-    description: '시뮬레이션 기간과 기본 가정을 정합니다.',
+    title: '기본 정보',
+    description: '시작 연도와 나이를 알려주세요.',
     Body: PeriodStep,
   },
   {
@@ -188,7 +188,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
           {isLast && preview && (
             <div className="glass-tile mt-4 rounded-xl p-4">
               <p className="text-xs font-semibold text-ink-600 dark:text-slate-400">
-                {draft.settings.years}년 후 예상 순자산
+                {draft.settings.years}년 후 예상 순자산 · 기간은 화면 위에서 바꿀 수 있어요
               </p>
               <p className="mt-1 text-[28px] font-semibold leading-tight text-ink-900 dark:text-white tracking-tight tabular-nums">
                 {formatKRWShort(preview.finalNetWorth)}
