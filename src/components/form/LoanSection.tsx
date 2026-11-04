@@ -13,6 +13,7 @@ import {
   Toggle,
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
+import { currentYear } from '@/utils/time';
 import { monthlyEqualPayment } from '@/utils/loan';
 
 const TYPE_OPTIONS = (
@@ -21,7 +22,6 @@ const TYPE_OPTIONS = (
 
 export function LoanSection() {
   const loans = usePlannerStore((s) => s.loans);
-  const settings = usePlannerStore((s) => s.settings);
   const addLoan = usePlannerStore((s) => s.addLoan);
   const updateLoan = usePlannerStore((s) => s.updateLoan);
   const removeItem = usePlannerStore((s) => s.removeItem);
@@ -125,8 +125,8 @@ export function LoanSection() {
                 label="대출 실행/상환 시작 연차"
                 hint={
                   loan.startYear > 1
-                    ? `미래 대출 (${settings.startYear + loan.startYear - 1}년)`
-                    : '1년차부터 시작'
+                    ? `${currentYear() + loan.startYear - 1}년부터`
+                    : '지금부터'
                 }
                 className="col-span-2"
               >
@@ -140,7 +140,7 @@ export function LoanSection() {
 
               {loan.startYear > 1 && (
                 <p className="callout-info col-span-2 text-[11px] font-medium">
-                  시뮬레이션 {loan.startYear}년 차({settings.startYear + loan.startYear - 1}년)부터 실행되는 미래 대출입니다.
+                  {loan.startYear - 1}년 후({currentYear() + loan.startYear - 1}년)부터 실행되는 미래 대출이에요.
                 </p>
               )}
 

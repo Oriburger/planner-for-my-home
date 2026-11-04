@@ -34,7 +34,6 @@ function statusLabel(p: GoalProgress) {
 export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
   const { rows, start } = useSimulation();
   const goals = usePlannerStore((s) => s.goals);
-  const startYear = usePlannerStore((s) => s.settings.startYear);
   const selectYear = useUIStore((s) => s.selectYear);
   const selected = useSelectedYear(rows);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -96,7 +95,7 @@ export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
                 {formatKRWShort(p.goal.amount)}
               </p>
               <p className="text-[11px] font-medium tabular-nums text-ink-500 dark:text-slate-400">
-                {startYear + p.goal.yearIndex - 1}년 · {p.goal.yearIndex}년차
+                {start.year + p.goal.yearIndex}년 · {p.goal.yearIndex}년 후
               </p>
 
               {/* 지금(진한) → 목표 연도 예상(연한) */}

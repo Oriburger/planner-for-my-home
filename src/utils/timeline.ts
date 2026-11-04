@@ -4,6 +4,7 @@ import type {
   YearResult,
 } from '@/types/planner';
 import { formatKRWShort } from './format';
+import { initialSnapshot } from './simulation';
 
 const 만 = 10_000;
 const 억 = 100_000_000;
@@ -95,7 +96,7 @@ export function extractAssetMilestones(
  */
 export function extractHorizonSnapshots(
   rows: YearResult[],
-  start: { totalAssets: number; netWorth: number; year: number },
+  start: { totalAssets: number; netWorth: number; year: number; age?: number | null },
 ): HorizonSnapshot[] {
   if (rows.length === 0) return [];
 
@@ -105,8 +106,8 @@ export function extractHorizonSnapshots(
   snapshots.push({
     yearIndex: 0,
     calendarYear: start.year,
-    age: rows[0]?.age ? rows[0].age - 1 : null,
-    label: '현재',
+    age: start.age ?? null,
+    label: '지금',
     netWorth: start.netWorth,
     liquidAssets: 0,
     totalAssets: start.totalAssets,
@@ -160,7 +161,8 @@ export function extractTimelineEvents(
   const events: TimelineEvent[] = [];
 
   // 1. 순자산 마일스톤 이벤트
-  const milestones = extractAssetMilestones(rows, rows[0].totalAssets - rows[0].loanBalance);
+  // 기준은 '지금' 순자산 — 1년차 중에 넘는 마일스톤도 잡는다
+  const milestones = extractAssetMilestones(rows, initialSnapshot(data).netWorth);
   for (const m of milestones) {
     events.push({
       id: `milestone-${m.target}`,

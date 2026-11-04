@@ -10,7 +10,7 @@ const 만 = 10_000;
 const 억 = 100_000_000;
 
 const mockSettings = {
-  startYear: 2026,
+  asOfYear: 2026,
   years: 10,
   inflationRate: 2,
   taxMode: 'flatRate' as const,
@@ -182,14 +182,14 @@ describe('timeline utilities', () => {
     expect(m200m?.reachedCalendarYear).toBe(2030);
   });
 
-  it('주요 시점 스냅샷(현재, 3년 후, 5년 후 등)을 구성한다', () => {
+  it('주요 시점 스냅샷(지금, 3년 후, 5년 후 등)을 구성한다', () => {
     const snapshots = extractHorizonSnapshots(mockRows, {
       totalAssets: 6000 * 만,
       netWorth: 6000 * 만,
       year: 2026,
     });
     expect(snapshots.length).toBeGreaterThanOrEqual(2);
-    expect(snapshots[0].label).toContain('현재');
+    expect(snapshots[0].label).toContain('지금');
   });
 
   it('연도별 타임라인 이벤트를 통합 추출한다 (만기, 주거 갱신, 대출 완납 등)', () => {

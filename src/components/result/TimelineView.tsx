@@ -141,7 +141,7 @@ export function TimelineView({
                           isSelected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-500'
                         }`}
                       >
-                        {row.index}년차{row.age !== null ? ` · ${row.age}세` : ''}
+                        {row.index}년 후{row.age !== null ? ` · ${row.age}세` : ''}
                       </span>
                     </div>
                     {yearEvents.length > 0 && (
@@ -248,7 +248,7 @@ export function TimelineView({
           <div className="flex items-end justify-between gap-3">
             <div className="min-w-0">
               <p className="text-xs font-medium text-ink-500 dark:text-slate-400">
-                {activeRow.index}년차{activeRow.age !== null && ` · ${activeRow.age}세`}
+                {activeRow.index}년 후{activeRow.age !== null && ` · ${activeRow.age}세`}
               </p>
               <h4 className="mt-0.5 text-lg font-semibold tracking-tight text-ink-900 dark:text-white">
                 {activeRow.year}년

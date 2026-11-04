@@ -1,3 +1,4 @@
+import { currentYear } from '@/utils/time';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type {
@@ -21,6 +22,16 @@ const uid = (): ID =>
     ? crypto.randomUUID()
     : `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
+/** 예전 저장 형식(startYear)을 asOfYear 로 바꾸고 빠진 값을 채운다 */
+export function normalizeSettings(
+  raw: Partial<SimulationSettings> & { startYear?: number },
+): SimulationSettings {
+  const { startYear, ...rest } = raw;
+  const now = currentYear();
+  const asOf = rest.asOfYear ?? startYear ?? now;
+  return { ...DEFAULT_SETTINGS, ...rest, asOfYear: Math.min(asOf, now) };
+}
+
 const 만 = 10_000;
 const 억 = 100_000_000;
 
@@ -29,7 +40,7 @@ const 억 = 100_000_000;
 /* ------------------------------------------------------------------ */
 
 export const DEFAULT_SETTINGS: SimulationSettings = {
-  startYear: new Date().getFullYear(),
+  asOfYear: currentYear(),
   years: 10,
   inflationRate: 2.5,
   taxMode: 'simplified',
@@ -346,7 +357,14 @@ export const usePlannerStore = create<PlannerStore>()(
         set({ ...createSampleData(), goals: createSampleGoals(), onboarded: true }),
 
       updateSettings: (patch) =>
-        set((state) => ({ settings: { ...state.settings, ...patch } })),
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            ...patch,
+            // 나이를 고치면 그 값은 '올해 기준'이 된다
+            ...('currentAge' in patch ? { asOfYear: currentYear() } : {}),
+          },
+        })),
 
       setYears: (years) =>
         set((state) => ({
@@ -405,7 +423,7 @@ export const usePlannerStore = create<PlannerStore>()(
           expenses: [],
         }),
 
-      importData: (data) => set({ ...data }),
+      importData: (data) => set({ ...data, settings: normalizeSettings(data.settings) }),
 
       addGoal: (goal) =>
         set((s) => {
@@ -426,7 +444,24 @@ export const usePlannerStore = create<PlannerStore>()(
     }),
     {
       name: 'planner-for-my-home:v1',
-      version: 1,
+      version: 2,
+      /**
+       * v1 → v2: 사용자 지정 '시작 연도(startYear)'를 없애고 '지금 = 올해'로 통일.
+       * 예전 startYear 는 입력 시점(asOfYear)으로 옮겨 현재 나이 보정에 쓴다.
+       */
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as Partial<PlannerStore>;
+        if (p.settings) p.settings = normalizeSettings(p.settings);
+        return p as PlannerStore;
+      },
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<PlannerStore>;
+        return {
+          ...current,
+          ...p,
+          settings: normalizeSettings({ ...current.settings, ...(p.settings ?? {}) }),
+        };
+      },
       partialize: (state) => ({
         onboarded: state.onboarded,
         settings: state.settings,

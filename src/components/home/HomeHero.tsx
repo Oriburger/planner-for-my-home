@@ -22,7 +22,7 @@ export function HomeHero({ onAddGoal }: { onAddGoal: () => void }) {
   const points = useMemo(() => buildYearPoints(rows, start), [rows, start]);
   const last = points[points.length - 1];
   const current = points.find((p) => p.index === selected) ?? last;
-  const age = selected > 0 ? rows.find((r) => r.index === selected)?.age ?? null : null;
+  const age = selected > 0 ? rows.find((r) => r.index === selected)?.age ?? null : start.age;
 
   const progress = useMemo(
     () => analyzeGoals(goals, rows, start.netWorth),

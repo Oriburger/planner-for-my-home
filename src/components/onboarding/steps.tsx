@@ -8,6 +8,7 @@ import {
   Select,
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
+import { currentYear } from '@/utils/time';
 import {
   ASSET_PRESETS,
   EXPENSE_PRESETS,
@@ -43,28 +44,17 @@ export function PeriodStep({ draft, patch }: StepProps) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="시작 연도">
-          <CountInput
-            value={settings.startYear}
-            onChange={(startYear) => set({ startYear })}
-            min={2000}
-            max={2100}
-            suffix="년"
-          />
-        </Field>
-        <Field label="현재 나이" hint="선택">
-          <CountInput
-            value={settings.currentAge ?? 0}
-            onChange={(v) => set({ currentAge: v === 0 ? null : v })}
-            min={0}
-            max={100}
-            suffix="세"
-            blankOnZero
-            placeholder="미입력"
-          />
-        </Field>
-      </div>
+      <Field label="현재 나이" hint={`${currentYear()}년 기준 · 선택`}>
+        <CountInput
+          value={settings.currentAge ?? 0}
+          onChange={(v) => set({ currentAge: v === 0 ? null : v })}
+          min={0}
+          max={100}
+          suffix="세"
+          blankOnZero
+          placeholder="미입력"
+        />
+      </Field>
 
       <Field label="물가 상승률" hint="지출이 매년 오르는 정도">
         <PercentInput

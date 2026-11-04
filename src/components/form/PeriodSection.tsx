@@ -1,4 +1,5 @@
 import { usePlannerStore } from '@/store/plannerStore';
+import { currentYear, effectiveAge } from '@/utils/time';
 import { Card, CardHeader } from '@/components/ui/Card';
 import {
   CountInput,
@@ -22,30 +23,17 @@ export function PeriodSection() {
       />
 
       <div className="space-y-4 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="시작 연도">
-            <CountInput
-              value={settings.startYear}
-              onChange={(v) => updateSettings({ startYear: v })}
-              min={2000}
-              max={2100}
-              suffix="년"
-            />
-          </Field>
-          <Field label="현재 나이" hint="선택">
-            <CountInput
-              value={settings.currentAge ?? 0}
-              onChange={(v) =>
-                updateSettings({ currentAge: v === 0 ? null : v })
-              }
-              min={0}
-              max={100}
-              suffix="세"
-              blankOnZero
-              placeholder="미입력"
-            />
-          </Field>
-        </div>
+        <Field label="현재 나이" hint={`${currentYear()}년 기준`}>
+          <CountInput
+            value={effectiveAge(settings) ?? 0}
+            onChange={(v) => updateSettings({ currentAge: v === 0 ? null : v })}
+            min={0}
+            max={100}
+            suffix="세"
+            blankOnZero
+            placeholder="미입력"
+          />
+        </Field>
 
         <div className="grid grid-cols-2 gap-3">
           <Field label="물가 상승률" hint="지출 기본값">

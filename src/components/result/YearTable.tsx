@@ -78,7 +78,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
                 >
                   {row.year}
                   <span className="ml-1 text-[11px] font-normal text-ink-500 dark:text-slate-500">
-                    {row.age !== null ? `${row.age}세` : `${row.index}년차`}
+                    {row.age !== null ? `${row.age}세` : `${row.index}년 후`}
                   </span>
                 </th>
 

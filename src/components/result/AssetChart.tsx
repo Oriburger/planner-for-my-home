@@ -27,7 +27,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
   const data = useMemo(
     () => [
       {
-        label: '현재',
+        label: '지금',
         totalAssets: start.totalAssets,
         netWorth: start.netWorth,
         loanBalance: start.totalAssets - start.netWorth,
