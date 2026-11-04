@@ -2,8 +2,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { useSimulation } from '@/hooks/useSimulation';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useUIStore, type AppView } from '@/store/uiStore';
-import type { SimulationResult } from '@/types/planner';
-import { MilestoneHorizonSummary } from '@/components/result/MilestoneHorizonSummary';
+import { useSelectedYear } from '@/hooks/useSelectedYear';
+import { HomeHero } from '@/components/home/HomeHero';
+import { GoalCarousel } from '@/components/home/GoalCarousel';
 import { SummaryCards } from '@/components/result/SummaryCards';
 import { TimelineView } from '@/components/result/TimelineView';
 import { AssetChart } from '@/components/result/AssetChart';
@@ -11,49 +12,21 @@ import { CashflowChart } from '@/components/result/CashflowChart';
 import { YearTable } from '@/components/result/YearTable';
 import { InputPanel } from '@/components/form/InputPanel';
 
-/** 선택 연차가 없을 때 보여줄 기본 연차 (5년차 → 3년차 → 1년차) */
-function useSelectedYear(rows: SimulationResult['rows']) {
-  const selected = useUIStore((s) => s.selectedYearIndex);
-  if (selected !== null && (selected === 0 || rows.some((r) => r.index === selected))) {
-    return selected;
-  }
-  return rows.length >= 5 ? 5 : rows.length >= 3 ? 3 : 1;
-}
-
 function Disclaimer() {
   return (
-    <p className="glass rounded-xl px-3.5 py-2.5 text-[11px] leading-relaxed text-ink-500 dark:text-slate-400">
-      가정값 기반 추정치이며 실제 시장 수익률 및 세법 개정에 따라 차이가 발생할 수 있습니다.
+    <p className="glass rounded-xl px-3.5 py-2.5 text-[11px] leading-relaxed text-ink-600 dark:text-slate-400">
+      가정값 기반 추정치예요. 실제 수익률·세법에 따라 달라질 수 있어요.
     </p>
   );
 }
 
-export function OverviewView() {
-  const { rows, summary, start } = useSimulation();
-  const years = usePlannerStore((s) => s.settings.years);
-  const selectYear = useUIStore((s) => s.selectYear);
-  const setView = useUIStore((s) => s.setView);
-  const selectedYearIndex = useSelectedYear(rows);
-
+export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
+  const { rows, summary } = useSimulation();
   return (
     <div className="space-y-3">
-      <SummaryCards
-        summary={summary}
-        years={years}
-        finalYear={rows[rows.length - 1].year}
-        firstYear={rows[0]}
-        trend={[start.netWorth, ...rows.map((r) => r.netWorth)]}
-      />
-      <MilestoneHorizonSummary
-        rows={rows}
-        start={start}
-        selectedYearIndex={selectedYearIndex}
-        onSelectYear={(y) => {
-          selectYear(y);
-          setView('timeline');
-        }}
-      />
-      <AssetChart rows={rows} start={start} />
+      <HomeHero onAddGoal={onEditGoals} />
+      <GoalCarousel onEdit={onEditGoals} />
+      <SummaryCards summary={summary} firstYear={rows[0]} />
       <Disclaimer />
     </div>
   );
@@ -109,7 +82,7 @@ export function TableView() {
  * 현재 화면 렌더링.
  * 'plan'(입력)은 모바일 전용 화면 — 데스크톱에서는 입력이 좌측 패널에 있으므로 개요를 보여준다.
  */
-export function ViewContent({ view }: { view: AppView }) {
+export function ViewContent({ view, onEditGoals }: { view: AppView; onEditGoals: () => void }) {
   switch (view) {
     case 'plan':
       return (
@@ -118,7 +91,7 @@ export function ViewContent({ view }: { view: AppView }) {
             <InputPanel />
           </div>
           <div className="hidden lg:block">
-            <OverviewView />
+            <OverviewView onEditGoals={onEditGoals} />
           </div>
         </>
       );
@@ -129,6 +102,6 @@ export function ViewContent({ view }: { view: AppView }) {
     case 'table':
       return <TableView />;
     default:
-      return <OverviewView />;
+      return <OverviewView onEditGoals={onEditGoals} />;
   }
 }

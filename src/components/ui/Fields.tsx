@@ -1,5 +1,6 @@
 import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { fromMan, toMan } from '@/utils/format';
+import { InfoTip } from './InfoTip';
 
 /* ------------------------------------------------------------------ */
 /* 라벨 래퍼                                                           */
@@ -24,9 +25,15 @@ export function Field({
     <label className={`block ${className}`} htmlFor={htmlFor}>
       <span className="mb-1.5 flex items-baseline justify-between gap-2 px-0.5">
         <span className="min-w-0 break-keep text-xs font-medium text-ink-600 dark:text-slate-300">{label}</span>
-        {hint && (
-          <span className="min-w-0 shrink truncate text-[11px] text-ink-400 dark:text-slate-500 max-[359px]:hidden">{hint}</span>
-        )}
+        {/* 짧은 힌트는 그대로, 긴 설명은 ⓘ 뒤로 */}
+        {hint &&
+          (hint.length <= 6 ? (
+            <span className="min-w-0 shrink truncate text-[11px] text-ink-500 dark:text-slate-500">
+              {hint}
+            </span>
+          ) : (
+            <InfoTip text={hint} label={`${label} 설명`} />
+          ))}
       </span>
       {children}
     </label>
@@ -109,7 +116,7 @@ function NumericInput({
         }}
       />
       {suffix && (
-        <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-ink-400 dark:text-slate-500">
+        <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-ink-500 dark:text-slate-500">
           {suffix}
         </span>
       )}
@@ -293,7 +300,7 @@ export function Select<T extends string>({
       </select>
 
       <svg
-        className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-400 dark:text-slate-500"
+        className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-500 dark:text-slate-500"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"
@@ -322,16 +329,15 @@ export function Toggle({
   const id = useId();
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-ink-900/[0.06] px-3 py-2.5 dark:border-white/[0.07]">
-      <label htmlFor={id} className="min-w-0 cursor-pointer">
-        <span className="block text-[13px] font-medium text-ink-800 dark:text-slate-100">
+      <span className="flex min-w-0 items-center gap-1.5">
+        <label
+          htmlFor={id}
+          className="min-w-0 cursor-pointer text-[13px] font-medium text-ink-800 dark:text-slate-100"
+        >
           {label}
-        </span>
-        {description && (
-          <span className="mt-0.5 block text-[11px] leading-relaxed text-ink-500 dark:text-slate-400">
-            {description}
-          </span>
-        )}
-      </label>
+        </label>
+        {description && <InfoTip text={description} label={`${label} 설명`} />}
+      </span>
       <button
         id={id}
         type="button"

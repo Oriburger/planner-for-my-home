@@ -345,3 +345,17 @@ export interface PlannerData {
   loans: LoanItem[];
   expenses: ExpenseItem[];
 }
+
+/* ------------------------------------------------------------------ */
+/* 연도별 목표                                                          */
+/* ------------------------------------------------------------------ */
+
+/** 특정 연차까지 모으고 싶은 순자산 목표 */
+export interface GoalItem {
+  id: ID;
+  name: string;
+  /** 목표 연차 (1 = 1년차 말) */
+  yearIndex: number;
+  /** 목표 순자산 (원) */
+  amount: number;
+}

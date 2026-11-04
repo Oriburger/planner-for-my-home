@@ -4,9 +4,10 @@ import { usePlannerStore } from '@/store/plannerStore';
 import { useUIStore, type AppView } from '@/store/uiStore';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { formatKRWShort } from '@/utils/format';
+import { haptic } from '@/utils/feedback';
 
 const NAV: Array<{ view: AppView; icon: IconName; label: string }> = [
-  { view: 'overview', icon: 'grid', label: '개요' },
+  { view: 'overview', icon: 'home', label: '홈' },
   { view: 'timeline', icon: 'timeline', label: '타임라인' },
   { view: 'charts', icon: 'chart', label: '차트' },
   { view: 'table', icon: 'table', label: '상세표' },
@@ -19,13 +20,14 @@ const RANGE = 120;
 interface DockProps {
   onOpenWizard: () => void;
   onOpenSettings: () => void;
+  onOpenGoals: () => void;
 }
 
 /* ------------------------------------------------------------------ */
 /* 데스크톱 — macOS 스타일 확대 독                                      */
 /* ------------------------------------------------------------------ */
 
-export function DesktopDock({ onOpenWizard, onOpenSettings }: DockProps) {
+export function DesktopDock({ onOpenWizard, onOpenSettings, onOpenGoals }: DockProps) {
   const view = useUIStore((s) => s.view);
   const setView = useUIStore((s) => s.setView);
   const inputPanelOpen = useUIStore((s) => s.inputPanelOpen);
@@ -40,7 +42,7 @@ export function DesktopDock({ onOpenWizard, onOpenSettings }: DockProps) {
       className="fixed bottom-4 left-1/2 z-40 hidden -translate-x-1/2 lg:block"
     >
       <div
-        className="glass glass-strong flex items-end gap-2 rounded-[22px] px-2.5 pb-2.5 pt-2.5"
+        className="glass glass-strong spotlight flex items-end gap-2 rounded-[22px] px-2.5 pb-2.5 pt-2.5"
         onMouseMove={(e) => setMouseX(e.clientX)}
         onMouseLeave={() => setMouseX(null)}
       >
@@ -66,6 +68,9 @@ export function DesktopDock({ onOpenWizard, onOpenSettings }: DockProps) {
           onClick={toggleInputPanel}
         >
           <Icon name="sliders" className="h-5 w-5" />
+        </DockItem>
+        <DockItem mouseX={mouseX} label="목표 편집" onClick={onOpenGoals}>
+          <Icon name="target" className="h-5 w-5" />
         </DockItem>
         <DockItem mouseX={mouseX} label="배경화면" onClick={onOpenSettings}>
           <Icon name="image" className="h-5 w-5" />
@@ -123,7 +128,7 @@ function DockItem({
         aria-label={label}
         aria-pressed={active}
         data-active={active}
-        className="dock-tile"
+        className="dock-tile active:scale-90"
         style={{ width: size, height: size }}
       >
         {children}
@@ -145,7 +150,7 @@ function DockItem({
 /* ------------------------------------------------------------------ */
 
 const MOBILE_NAV: Array<{ view: AppView; icon: IconName; label: string }> = [
-  { view: 'overview', icon: 'grid', label: '개요' },
+  { view: 'overview', icon: 'home', label: '홈' },
   { view: 'plan', icon: 'sliders', label: '입력' },
   { view: 'timeline', icon: 'timeline', label: '타임라인' },
   { view: 'charts', icon: 'chart', label: '차트' },
@@ -170,7 +175,7 @@ export function MobileDock({ onOpenMore }: { onOpenMore: () => void }) {
             onClick={() => setView('overview')}
             className="glass glass-strong animate-sheet-up pointer-events-auto mx-auto mb-2 flex items-center gap-2 rounded-full py-1.5 pl-3.5 pr-2 text-xs"
           >
-            <span className="text-ink-500 dark:text-slate-400">{years}년 후 순자산</span>
+            <span className="text-ink-600 dark:text-slate-400">{years}년 후 순자산</span>
             <span className="font-semibold tabular-nums text-ink-900 dark:text-white">
               {formatKRWShort(summary.finalNetWorth)}원
             </span>
@@ -216,14 +221,17 @@ function MobileDockButton({
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={() => {
+        haptic(5);
+        onClick();
+      }}
       aria-current={active ? 'page' : undefined}
       className={`flex min-w-0 flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-medium transition-colors ${
-        active ? 'text-ink-900 dark:text-white' : 'text-ink-400 dark:text-slate-500'
+        active ? 'text-ink-900 dark:text-white' : 'text-ink-500 dark:text-slate-500'
       }`}
     >
       <span
-        className={`flex h-7 w-11 items-center justify-center rounded-full transition-all duration-200 ${
+        className={`flex h-7 w-11 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${
           active ? 'bg-ink-900 text-white dark:bg-white dark:text-ink-900' : ''
         }`}
       >

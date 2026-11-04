@@ -106,8 +106,7 @@ export function ExpenseSection() {
                     inflationRate: useDefault ? null : inflationRate,
                   })
                 }
-                label="전역 물가상승률 따르기"
-                description={`현재 ${inflationRate}% 적용 중`}
+                label={`기본 물가상승률 따르기 (${inflationRate}%)`}
               />
             </div>
 

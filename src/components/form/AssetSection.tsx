@@ -204,7 +204,7 @@ function ContributionBalanceHint() {
       className={short ? 'callout-danger' : 'callout-info'}
     >
       <p>
-        1년차 자동이체{' '}
+        연 자동이체{' '}
         <strong className="font-semibold tabular-nums">
           {formatKRWShort(first.contribution)}원
         </strong>{' '}
@@ -215,9 +215,7 @@ function ContributionBalanceHint() {
       </p>
       {short && (
         <p className="mt-1 leading-relaxed">
-          {shortfallYear}년차에 여유자금이 최대{' '}
-          {formatKRWShort(summary.maxContributionShortfall)}원 모자랍니다.
-          자동이체 금액을 줄여주세요.
+          {shortfallYear}년차부터 최대 {formatKRWShort(summary.maxContributionShortfall)}원 부족해요.
         </p>
       )}
     </div>

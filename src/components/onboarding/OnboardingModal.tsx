@@ -150,7 +150,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
               >
                 {step.title}
               </h2>
-              <p className="mt-0.5 text-[13px] text-ink-500 dark:text-slate-400">{step.description}</p>
+              <p className="mt-0.5 text-[13px] text-ink-600 dark:text-slate-400">{step.description}</p>
             </div>
 
             <button
@@ -187,14 +187,14 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
 
           {isLast && preview && (
             <div className="glass-tile mt-4 rounded-xl p-4">
-              <p className="text-xs font-semibold text-ink-500 dark:text-slate-400">
+              <p className="text-xs font-semibold text-ink-600 dark:text-slate-400">
                 {draft.settings.years}년 후 예상 순자산
               </p>
               <p className="mt-1 text-[28px] font-semibold leading-tight text-ink-900 dark:text-white tracking-tight tabular-nums">
                 {formatKRWShort(preview.finalNetWorth)}
-                <span className="ml-0.5 text-base font-medium text-ink-400">원</span>
+                <span className="ml-0.5 text-base font-medium text-ink-500">원</span>
               </p>
-              <p className="mt-1 text-[11px] text-ink-500 dark:text-slate-400">
+              <p className="mt-1 text-[11px] text-ink-600 dark:text-slate-400">
                 완료를 누르면 대시보드에서 자세히 볼 수 있어요.
               </p>
             </div>
@@ -230,7 +230,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
                 loadSample();
                 onClose();
               }}
-              className="py-1 text-xs font-medium text-ink-500 underline-offset-4 transition hover:text-ink-800 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
+              className="py-1 text-xs font-medium text-ink-600 underline-offset-4 transition hover:text-ink-800 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
             >
               예시 데이터로 둘러보기
             </button>
@@ -239,7 +239,7 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
               <button
                 type="button"
                 onClick={skipAll}
-                className="py-1 text-xs font-medium text-ink-500 underline-offset-4 transition hover:text-ink-800 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
+                className="py-1 text-xs font-medium text-ink-600 underline-offset-4 transition hover:text-ink-800 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
               >
                 나중에 하기
               </button>

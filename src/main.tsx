@@ -1,5 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+// Pretendard 를 번들에 포함 (CDN 차단·지연과 무관하게 항상 같은 글꼴)
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 import App from './App';
 import './index.css';
 

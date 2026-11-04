@@ -23,7 +23,7 @@ export function Accordion({
   const panelId = useId();
 
   return (
-    <div className="glass overflow-hidden rounded-2xl">
+    <div className="glass spotlight overflow-hidden rounded-2xl">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -38,7 +38,7 @@ export function Accordion({
             {title}
           </span>
           {summary && (
-            <span className="mt-0.5 block truncate text-xs text-ink-500 dark:text-slate-400">
+            <span className="mt-0.5 block truncate text-xs text-ink-600 dark:text-slate-400">
               {summary}
             </span>
           )}
@@ -46,7 +46,7 @@ export function Accordion({
 
         <Icon
           name="chevronDown"
-          className={`h-4 w-4 shrink-0 text-ink-400 transition-transform duration-200 dark:text-slate-500 ${
+          className={`h-4 w-4 shrink-0 text-ink-500 transition-transform duration-200 dark:text-slate-500 ${
             open ? 'rotate-180' : ''
           }`}
         />

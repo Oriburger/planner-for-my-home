@@ -30,7 +30,6 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
     <Card>
       <CardHeader
         title="연도별 상세 데이터"
-        description="단위: 원 · 가로로 스크롤해 모든 항목을 볼 수 있어요"
         icon="table"
         action={
           rows.length > 10 ? (
@@ -48,7 +47,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
       <div className="thin-scrollbar mt-3 overflow-x-auto overscroll-x-contain pb-2">
         <table className="w-full min-w-[920px] border-collapse text-right text-xs tabular-nums">
           <thead>
-            <tr className="hairline border-y text-ink-500 dark:text-slate-400">
+            <tr className="hairline border-y text-ink-600 dark:text-slate-400">
               <th
                 scope="col"
                 className="sticky left-0 z-10 bg-[#f3f6fb] px-4 py-3 text-left font-semibold dark:bg-[#141c2d] sm:px-5"
@@ -78,7 +77,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
                   className="sticky left-0 z-10 whitespace-nowrap bg-[#f3f6fb] px-4 py-2.5 text-left font-bold text-ink-800 dark:bg-[#141c2d] dark:text-slate-200 sm:px-5"
                 >
                   {row.year}
-                  <span className="ml-1 text-[11px] font-normal text-ink-400 dark:text-slate-500">
+                  <span className="ml-1 text-[11px] font-normal text-ink-500 dark:text-slate-500">
                     {row.age !== null ? `${row.age}세` : `${row.index}년차`}
                   </span>
                 </th>
@@ -93,7 +92,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
                         value < 0
                           ? 'text-rose-600 dark:text-rose-400'
                           : negative
-                            ? 'text-ink-500 dark:text-slate-400'
+                            ? 'text-ink-600 dark:text-slate-400'
                             : 'text-ink-800 dark:text-slate-200'
                       }`}
                     >

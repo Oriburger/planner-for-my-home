@@ -17,7 +17,7 @@ export interface WallpaperPreset {
 }
 
 const MIST =
-  'radial-gradient(80% 60% at 15% 5%, #dde4ee 0%, transparent 60%), radial-gradient(70% 60% at 95% 95%, #e4e1ea 0%, transparent 60%), linear-gradient(160deg, #f2f4f7 0%, #e3e7ed 100%)';
+  'radial-gradient(80% 60% at 15% 5%, #d5deea 0%, transparent 60%), radial-gradient(70% 60% at 95% 95%, #ddd9e6 0%, transparent 60%), linear-gradient(160deg, #e9edf2 0%, #d8dde5 100%)';
 const GRAPHITE =
   'radial-gradient(70% 60% at 15% 0%, #343a46 0%, transparent 60%), radial-gradient(60% 60% at 100% 100%, #262a33 0%, transparent 60%), linear-gradient(160deg, #1a1d24 0%, #0d0f13 100%)';
 
@@ -56,7 +56,7 @@ export const WALLPAPERS: WallpaperPreset[] = [
   {
     id: 'plain',
     label: '단색',
-    background: (theme) => (theme === 'dark' ? '#0b0d12' : '#eceef2'),
+    background: (theme) => (theme === 'dark' ? '#0b0d12' : '#e4e7ec'),
   },
 ];
 

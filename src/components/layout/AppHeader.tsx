@@ -16,7 +16,7 @@ export function AppHeader() {
         <button
           type="button"
           onClick={() => setView('overview')}
-          aria-label="개요로 이동"
+          aria-label="홈으로 이동"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-ink-900 text-white dark:bg-white dark:text-ink-900"
         >
           <Icon name="home" className="h-[18px] w-[18px]" strokeWidth={2} />
@@ -28,7 +28,7 @@ export function AppHeader() {
             <span className="min-[400px]:hidden">{VIEW_LABEL[view]}</span>
           </h1>
           <span className="hidden text-sm text-ink-300 dark:text-slate-600 min-[400px]:inline">/</span>
-          <span className="hidden truncate text-sm text-ink-500 dark:text-slate-400 min-[400px]:inline">
+          <span className="hidden truncate text-sm text-ink-600 dark:text-slate-400 min-[400px]:inline">
             {VIEW_LABEL[view]}
           </span>
         </div>
@@ -39,7 +39,7 @@ export function AppHeader() {
           className="min-w-0 text-right"
           aria-label={`${years}년 후 예상 순자산 ${formatKRWShort(summary.finalNetWorth)}원`}
         >
-          <span className="block text-[10px] font-medium text-ink-400 dark:text-slate-500 sm:text-[11px]">
+          <span className="block text-[10px] font-medium text-ink-500 dark:text-slate-500 sm:text-[11px]">
             {years}년 후 순자산
           </span>
           <span className="block truncate text-sm font-semibold tabular-nums tracking-tight text-ink-900 dark:text-white sm:text-[15px]">

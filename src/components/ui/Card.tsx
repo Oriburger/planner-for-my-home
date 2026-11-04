@@ -8,7 +8,7 @@ interface CardProps {
 
 /** 기본 유리 패널 */
 export function Card({ children, className = '' }: CardProps) {
-  return <section className={`glass rounded-2xl ${className}`}>{children}</section>;
+  return <section className={`glass spotlight rounded-2xl ${className}`}>{children}</section>;
 }
 
 interface CardHeaderProps {
@@ -28,7 +28,7 @@ export function CardHeader({ title, description, icon, action }: CardHeaderProps
             {title}
           </h2>
           {description && (
-            <p className="mt-0.5 text-xs leading-relaxed text-ink-500 dark:text-slate-400">
+            <p className="mt-0.5 text-xs leading-relaxed text-ink-600 dark:text-slate-400">
               {description}
             </p>
           )}

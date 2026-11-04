@@ -1,6 +1,7 @@
 import { usePlannerStore } from '@/store/plannerStore';
 import { HOUSING_TYPE_LABEL, type HousingType } from '@/types/planner';
 import { Accordion } from '@/components/ui/Accordion';
+import { InfoTip } from '@/components/ui/InfoTip';
 import { AddItemButton, EmptyState, ItemCard } from '@/components/ui/ItemCard';
 import {
   CountInput,
@@ -130,10 +131,9 @@ export function HousingSection() {
             </Field>
           </div>
 
-          <p className="mt-2 px-0.5 text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
-            2년차 이후 시작하는 계약의 보증금은 해당 연차에 여유자금에서
-            빠져나가 묶인 자산으로 이동합니다. 1년차 계약의 보증금은 이미
-            &lsquo;현재 보유 자산&rsquo;에 입력된 것으로 봅니다.
+          <p className="mt-2 flex items-center gap-1 px-0.5 text-[11px] text-ink-500 dark:text-slate-500">
+            보증금 처리 방식
+            <InfoTip text="2년차 이후 계약의 보증금은 그 해 여유자금에서 빠져 묶인 자산이 됩니다. 1년차 계약 보증금은 '현재 보유 자산'에 이미 있다고 봅니다." />
           </p>
         </ItemCard>
       ))}

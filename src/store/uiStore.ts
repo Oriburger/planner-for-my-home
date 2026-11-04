@@ -10,7 +10,7 @@ export type ThemeMode = 'light' | 'dark';
 export type AppView = 'overview' | 'plan' | 'timeline' | 'charts' | 'table';
 
 export const VIEW_LABEL: Record<AppView, string> = {
-  overview: '개요',
+  overview: '홈',
   plan: '입력',
   timeline: '타임라인',
   charts: '차트',

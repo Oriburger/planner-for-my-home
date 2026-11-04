@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { Sheet } from '@/components/ui/Sheet';
 import { useUIStore } from '@/store/uiStore';
 import { Icon } from '@/components/ui/Icon';
 import { WALLPAPERS, fileToWallpaperDataUrl } from '@/utils/wallpaper';
@@ -24,16 +25,6 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (!open) return;
-    setError(null);
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   const onPickFile = async (file: File | undefined) => {
     if (!file) return;
     setBusy(true);
@@ -52,27 +43,7 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-slate-950/20 lg:bg-transparent"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
-      role="dialog"
-      aria-modal="true"
-      aria-label={mode === 'more' ? '더보기' : '배경화면'}
-    >
-      <div className="glass glass-solid animate-sheet-up fixed inset-x-0 bottom-0 max-h-[85vh] max-h-[85dvh] overflow-y-auto rounded-t-2xl px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-2 lg:inset-x-auto lg:bottom-[6.5rem] lg:left-1/2 lg:w-[440px] lg:-translate-x-1/2 lg:rounded-2xl lg:p-5">
-        <div className="flex justify-center pb-2 lg:hidden" aria-hidden="true">
-          <span className="h-1 w-9 rounded-full bg-ink-900/15 dark:bg-white/20" />
-        </div>
-
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[15px] font-semibold tracking-tight text-ink-900 dark:text-white">
-            {mode === 'more' ? '더보기' : '배경화면'}
-          </h2>
-          <button type="button" onClick={onClose} aria-label="닫기" className="btn-icon -mr-1.5">
-            <Icon name="close" className="h-[18px] w-[18px]" />
-          </button>
-        </div>
-
+    <Sheet open={open} title={mode === 'more' ? '더보기' : '배경화면'} onClose={onClose}>
         {mode === 'more' && (
           <div className="mb-5 space-y-1.5">
             <SheetRow
@@ -136,7 +107,7 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={busy}
-            className="flex flex-col items-center gap-1.5 text-[11px] font-medium text-ink-500 dark:text-slate-400"
+            className="flex flex-col items-center gap-1.5 text-[11px] font-medium text-ink-600 dark:text-slate-400"
           >
             <span className="flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-dashed border-ink-900/20 transition-colors hover:border-ink-900/40 hover:bg-ink-900/[0.03] dark:border-white/20 dark:hover:border-white/40">
               <Icon name="upload" className="h-[18px] w-[18px]" />
@@ -159,13 +130,12 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
           <button
             type="button"
             onClick={() => setCustomWallpaper(null)}
-            className="mt-3 text-xs font-medium text-ink-500 underline-offset-4 hover:text-ink-900 hover:underline dark:text-slate-400 dark:hover:text-white"
+            className="mt-3 text-xs font-medium text-ink-600 underline-offset-4 hover:text-ink-900 hover:underline dark:text-slate-400 dark:hover:text-white"
           >
             내 사진 삭제
           </button>
         )}
-      </div>
-    </div>
+    </Sheet>
   );
 }
 
@@ -223,12 +193,12 @@ function SheetRow({
       onClick={onClick}
       className="glass-tile-interactive flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium text-ink-800 dark:text-slate-100"
     >
-      <Icon name={icon} className="h-[18px] w-[18px] text-ink-500 dark:text-slate-400" />
+      <Icon name={icon} className="h-[18px] w-[18px] text-ink-600 dark:text-slate-400" />
       <span className="flex-1">{label}</span>
       {active ? (
         <Icon name="check" className="h-4 w-4" />
       ) : (
-        <Icon name="chevronRight" className="h-4 w-4 text-ink-400" />
+        <Icon name="chevronRight" className="h-4 w-4 text-ink-500" />
       )}
     </button>
   );

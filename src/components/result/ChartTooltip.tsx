@@ -23,7 +23,7 @@ export function ChartTooltip({
               style={{ backgroundColor: entry.color }}
               aria-hidden="true"
             />
-            <span className="text-ink-500 dark:text-slate-400">{entry.name}</span>
+            <span className="text-ink-600 dark:text-slate-400">{entry.name}</span>
             <span className="ml-auto pl-3 font-semibold tabular-nums text-ink-900 dark:text-slate-100">
               {formatKRWShort(Number(entry.value ?? 0))}원
             </span>

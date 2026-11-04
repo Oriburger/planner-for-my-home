@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type {
   AssetItem,
   ExpenseItem,
+  GoalItem,
   HousingItem,
   ID,
   IncomeItem,
@@ -275,6 +276,14 @@ export const createExpense = (): ExpenseItem => ({
 
 type ListKey = 'assets' | 'incomes' | 'housings' | 'loans' | 'expenses';
 
+function createSampleGoals(): GoalItem[] {
+  return [
+    { id: uid(), name: '종잣돈 2억', yearIndex: 2, amount: 20_000 * 만 },
+    { id: uid(), name: '내 집 계약금', yearIndex: 5, amount: 30_000 * 만 },
+    { id: uid(), name: '대출 없는 집', yearIndex: 10, amount: 55_000 * 만 },
+  ];
+}
+
 interface PlannerActions {
   updateSettings: (patch: Partial<SimulationSettings>) => void;
   setYears: (years: number) => void;
@@ -302,12 +311,18 @@ interface PlannerActions {
   resetAll: () => void;
   clearAll: () => void;
   importData: (data: PlannerData) => void;
+
+  addGoal: (goal?: Partial<GoalItem>) => void;
+  updateGoal: (id: ID, patch: Partial<GoalItem>) => void;
+  removeGoal: (id: ID) => void;
 }
 
 export type PlannerStore = PlannerData &
   PlannerActions & {
     /** 초기 설정 마법사를 이미 마쳤는지 (false 면 첫 방문으로 보고 자동으로 띄운다) */
     onboarded: boolean;
+    /** 연도별 순자산 목표 (계산 입력과 분리 — 결과를 바꾸지 않는다) */
+    goals: GoalItem[];
   };
 
 /** 리스트 항목 부분 수정 헬퍼 */
@@ -324,9 +339,11 @@ export const usePlannerStore = create<PlannerStore>()(
     (set, get) => ({
       ...createEmptyData(),
       onboarded: false,
+      goals: [],
 
       setOnboarded: (value) => set({ onboarded: value }),
-      loadSample: () => set({ ...createSampleData(), onboarded: true }),
+      loadSample: () =>
+        set({ ...createSampleData(), goals: createSampleGoals(), onboarded: true }),
 
       updateSettings: (patch) =>
         set((state) => ({ settings: { ...state.settings, ...patch } })),
@@ -376,7 +393,7 @@ export const usePlannerStore = create<PlannerStore>()(
         }),
 
       /** 전부 비우고 초기 설정 마법사를 다시 띄운다 */
-      resetAll: () => set({ ...createEmptyData(), onboarded: false }),
+      resetAll: () => set({ ...createEmptyData(), goals: [], onboarded: false }),
 
       clearAll: () =>
         set({
@@ -389,6 +406,23 @@ export const usePlannerStore = create<PlannerStore>()(
         }),
 
       importData: (data) => set({ ...data }),
+
+      addGoal: (goal) =>
+        set((s) => {
+          const sorted = [...s.goals].sort((a, b) => a.yearIndex - b.yearIndex);
+          const last = sorted[sorted.length - 1];
+          const yearIndex = Math.min(40, (last?.yearIndex ?? 0) + 3);
+          const next: GoalItem = {
+            id: uid(),
+            name: '새 목표',
+            yearIndex,
+            amount: last ? Math.round((last.amount * 1.3) / (1000 * 만)) * 1000 * 만 : 10_000 * 만,
+            ...goal,
+          };
+          return { goals: [...s.goals, next] };
+        }),
+      updateGoal: (id, patch) => set((s) => ({ goals: patchList(s.goals, id, patch) })),
+      removeGoal: (id) => set((s) => ({ goals: s.goals.filter((g) => g.id !== id) })),
     }),
     {
       name: 'planner-for-my-home:v1',
@@ -401,6 +435,7 @@ export const usePlannerStore = create<PlannerStore>()(
         housings: state.housings,
         loans: state.loans,
         expenses: state.expenses,
+        goals: state.goals,
       }),
     },
   ),

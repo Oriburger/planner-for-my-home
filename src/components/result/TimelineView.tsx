@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { useDragScroll } from '@/hooks/useDragScroll';
 import type { PlannerData, SimulationResult, SimulationSummary } from '@/types/planner';
 import { IconBadge } from '@/components/ui/Card';
 import { formatKRWShort } from '@/utils/format';
@@ -70,6 +71,7 @@ export function TimelineView({
 
   // 선택된 연도 카드가 트랙 밖에 있으면 보이도록 가로로만 스크롤한다
   const trackRef = useRef<HTMLDivElement>(null);
+  useDragScroll(trackRef);
   useEffect(() => {
     const track = trackRef.current;
     if (!track || !activeRow) return;
@@ -89,14 +91,11 @@ export function TimelineView({
             <IconBadge name="timeline" />
             <div className="min-w-0">
               <h3 className="text-[15px] font-semibold tracking-tight text-ink-900 dark:text-white sm:text-base">
-                라이프 &amp; 머니 타임라인
+                타임라인
               </h3>
-              <p className="mt-0.5 text-xs leading-relaxed text-ink-500 dark:text-slate-400">
-                만기 · 주거 갱신 · 대출 완납 · 목표 달성을 시간 순서로 확인하세요.
-              </p>
             </div>
           </div>
-          <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 pl-12 text-[11px] font-medium text-ink-500 dark:text-slate-400 sm:pl-0 sm:pt-1">
+          <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-1 pl-11 text-[11px] font-medium text-ink-600 dark:text-slate-400 sm:pl-0 sm:pt-2">
             <Legend dot="bg-emerald-500" label="목표/완납" />
             <Legend dot="bg-brand-500" label="만기/현금화" />
             <Legend dot="bg-violet-500" label="주거 갱신" />
@@ -106,7 +105,8 @@ export function TimelineView({
         {/* 가로 스크롤 타임라인 트랙 */}
         <div
           ref={trackRef}
-          className="thin-scrollbar mt-4 snap-x snap-mandatory scroll-px-4 overflow-x-auto overscroll-x-contain pb-2 sm:scroll-px-5"
+          data-no-swipe
+          className="thin-scrollbar mt-4 snap-x snap-mandatory data-[dragging=true]:snap-none lg:cursor-grab data-[dragging=true]:cursor-grabbing scroll-px-4 overflow-x-auto overscroll-x-contain pb-2 sm:scroll-px-5"
         >
           <div className="flex w-max gap-2.5 px-4 pb-1 pt-1 sm:gap-3 sm:px-5">
             {rows.map((row) => {
@@ -123,7 +123,7 @@ export function TimelineView({
                   className={`relative flex w-[188px] shrink-0 snap-start flex-col rounded-2xl p-3.5 text-left transition-all duration-300 sm:w-[208px] ${
                     isSelected
                       ? 'selected'
-                      : 'glass-tile-interactive'
+                      : 'glass-tile-interactive lift'
                   }`}
                 >
                   {/* 연도 & 나이 */}
@@ -138,7 +138,7 @@ export function TimelineView({
                       </span>
                       <span
                         className={`ml-1.5 text-[11px] font-medium ${
-                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-500'
+                          isSelected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-500'
                         }`}
                       >
                         {row.index}년차{row.age !== null ? ` · ${row.age}세` : ''}
@@ -161,7 +161,7 @@ export function TimelineView({
                   {/* 핵심 지표 */}
                   <p
                     className={`mt-3 text-[11px] font-medium ${
-                      isSelected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-400'
+                      isSelected ? 'text-selected-muted' : 'text-ink-600 dark:text-slate-400'
                     }`}
                   >
                     순자산
@@ -172,7 +172,7 @@ export function TimelineView({
                     }`}
                   >
                     {formatKRWShort(row.netWorth)}
-                    <span className={`ml-0.5 text-xs font-medium ${isSelected ? 'text-selected-muted' : 'text-ink-400'}`}>
+                    <span className={`ml-0.5 text-xs font-medium ${isSelected ? 'text-selected-muted' : 'text-ink-500'}`}>
                       원
                     </span>
                   </p>
@@ -203,13 +203,14 @@ export function TimelineView({
                     }`}
                   >
                     {yearEvents.length === 0 ? (
-                      <p
-                        className={`text-[11px] ${
-                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-500'
+                      <span
+                        aria-hidden="true"
+                        className={`block text-[11px] ${
+                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-600'
                         }`}
                       >
-                        정기 저축 · 복리 운용
-                      </p>
+                        —
+                      </span>
                     ) : (
                       yearEvents.slice(0, 2).map((e) => (
                         <p
@@ -226,7 +227,7 @@ export function TimelineView({
                     {yearEvents.length > 2 && (
                       <p
                         className={`text-[10px] font-semibold ${
-                          isSelected ? 'text-selected-muted' : 'text-ink-400 dark:text-slate-500'
+                          isSelected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-500'
                         }`}
                       >
                         외 {yearEvents.length - 2}개
@@ -249,20 +250,17 @@ export function TimelineView({
                 {activeRow.index}년차
               </span>
               <h4 className="mt-1.5 text-base font-semibold tracking-tight text-ink-900 dark:text-white sm:text-lg">
-                {activeRow.year}년 자산 브리핑
+                {activeRow.year}년
                 {activeRow.age !== null && (
-                  <span className="ml-1.5 text-sm font-medium text-ink-400 dark:text-slate-500">
+                  <span className="ml-1.5 text-sm font-medium text-ink-500 dark:text-slate-500">
                     만 {activeRow.age}세
                   </span>
                 )}
               </h4>
-              <p className="mt-0.5 text-xs text-ink-500 dark:text-slate-400">
-                그 해에 모인 자산 구성과 주요 금융 이벤트입니다.
-              </p>
             </div>
 
             <div className="sm:text-right">
-              <p className="text-[11px] font-medium text-ink-500 dark:text-slate-400">예상 순자산</p>
+              <p className="text-[11px] font-medium text-ink-600 dark:text-slate-400">예상 순자산</p>
               <p className="text-2xl font-semibold text-ink-900 dark:text-white leading-tight tracking-tight tabular-nums sm:text-[28px]">
                 {formatKRWShort(activeRow.netWorth)}원
               </p>
@@ -300,10 +298,10 @@ export function TimelineView({
           </div>
 
           <div className="mt-5">
-            <h5 className="eyebrow px-0.5">{activeRow.year}년 주요 이벤트</h5>
+            <h5 className="eyebrow px-0.5">이벤트</h5>
             {activeEvents.length === 0 ? (
               <p className="callout-muted mt-2">
-                특별한 만기나 대출 변동 없이 정기 저축과 복리 증식이 이어지는 해입니다.
+                이 해에는 특별한 이벤트가 없어요.
               </p>
             ) : (
               <ul className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
@@ -318,7 +316,7 @@ export function TimelineView({
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-semibold text-ink-900 dark:text-white">{e.title}</p>
-                      <p className="mt-0.5 text-xs leading-relaxed text-ink-500 dark:text-slate-400">
+                      <p className="mt-0.5 text-xs leading-relaxed text-ink-600 dark:text-slate-400">
                         {e.description}
                       </p>
                     </div>
@@ -355,7 +353,7 @@ function MiniRow({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-2">
-      <span className={selected ? 'text-selected-muted' : 'text-ink-500 dark:text-slate-400'}>{label}</span>
+      <span className={selected ? 'text-selected-muted' : 'text-ink-600 dark:text-slate-400'}>{label}</span>
       <span className={`truncate font-semibold tabular-nums ${selected ? 'text-selected' : valueClass}`}>
         {value}
       </span>
@@ -376,11 +374,11 @@ function Metric({
 }) {
   return (
     <div className="glass-tile min-w-0 rounded-2xl p-3 sm:p-3.5">
-      <p className="truncate text-[11px] font-medium text-ink-500 dark:text-slate-400">{label}</p>
+      <p className="truncate text-[11px] font-medium text-ink-600 dark:text-slate-400">{label}</p>
       <p className={`mt-1 truncate text-base font-semibold tracking-tight tabular-nums sm:text-lg ${valueClass}`}>
         {value}
       </p>
-      <p className="mt-0.5 truncate text-[10px] text-ink-400 dark:text-slate-500 sm:text-[11px]">
+      <p className="mt-0.5 truncate text-[10px] text-ink-500 dark:text-slate-500 sm:text-[11px]">
         {caption}
       </p>
     </div>

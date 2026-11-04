@@ -22,14 +22,13 @@ export function PeriodSection() {
     <Card>
       <CardHeader
         title="시뮬레이션 기간"
-        description="1년 단위로 최대 40년까지 조절할 수 있어요."
         icon="clock"
       />
 
       <div className="space-y-4 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
         <div className="glass-tile rounded-2xl px-4 pb-3 pt-3.5">
           <div className="flex items-end justify-between">
-            <span className="text-xs font-semibold text-ink-500 dark:text-slate-400">기간</span>
+            <span className="text-xs font-semibold text-ink-600 dark:text-slate-400">기간</span>
             <span className="text-[28px] font-semibold leading-none text-ink-900 dark:text-white tracking-tight tabular-nums">
               {settings.years}
               <span className="ml-0.5 text-sm font-semibold">

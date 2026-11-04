@@ -77,7 +77,7 @@ export function AddItemButton({
 /** 항목이 하나도 없을 때의 빈 상태 */
 export function EmptyState({ message }: { message: string }) {
   return (
-    <p className="rounded-xl border border-dashed border-ink-900/10 px-3 py-6 text-center text-xs text-ink-400 dark:border-white/10 dark:text-slate-500">
+    <p className="rounded-xl border border-dashed border-ink-900/10 px-3 py-6 text-center text-xs text-ink-500 dark:border-white/10 dark:text-slate-500">
       {message}
     </p>
   );

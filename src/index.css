@@ -9,23 +9,25 @@
 :root {
   --bg-base: #eceef2;
 
-  --glass-fill: rgba(255, 255, 255, 0.7);
-  --glass-fill-strong: rgba(255, 255, 255, 0.82);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-edge: rgba(15, 23, 42, 0.07);
-  --glass-highlight: rgba(255, 255, 255, 0.9);
-  --glass-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px -14px rgba(15, 23, 42, 0.22);
+  /* 라이트: 패널은 더 희고, 테두리·그림자로 윤곽을 분명히 */
+  --glass-fill: rgba(255, 255, 255, 0.78);
+  --glass-fill-strong: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.7);
+  --glass-edge: rgba(15, 23, 42, 0.12);
+  --glass-highlight: rgba(255, 255, 255, 1);
+  --glass-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 12px 30px -14px rgba(15, 23, 42, 0.28);
 
-  --tile-fill: rgba(255, 255, 255, 0.55);
-  --tile-border: rgba(15, 23, 42, 0.06);
-  --tile-hover: rgba(255, 255, 255, 0.85);
+  /* 흰 패널 위 타일은 옅은 회색으로 구분 */
+  --tile-fill: rgba(15, 23, 42, 0.03);
+  --tile-border: rgba(15, 23, 42, 0.09);
+  --tile-hover: rgba(15, 23, 42, 0.06);
 
-  --field-fill: rgba(255, 255, 255, 0.7);
-  --field-border: rgba(15, 23, 42, 0.1);
+  --field-fill: rgba(255, 255, 255, 0.92);
+  --field-border: rgba(15, 23, 42, 0.16);
   --field-focus-fill: #ffffff;
 
-  --hairline: rgba(15, 23, 42, 0.08);
-  --track: rgba(15, 23, 42, 0.07);
+  --hairline: rgba(15, 23, 42, 0.1);
+  --track: rgba(15, 23, 42, 0.08);
   --thumb: #ffffff;
 
   /* 선택 상태 (라이트: 잉크 / 다크: 화이트) */
@@ -191,6 +193,56 @@
     background: var(--tile-hover);
   }
 
+  /* 클릭할 수 있는 카드 — 호버 시 살짝 떠오름 */
+  .lift {
+    transition:
+      transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.2s ease,
+      background-color 0.15s ease;
+  }
+  @media (hover: hover) {
+    .lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px -16px rgba(15, 23, 42, 0.35);
+    }
+  }
+  .lift:active {
+    transform: scale(0.98);
+  }
+
+  /* 포인터를 따라 움직이는 은은한 빛 (PC) */
+  .spotlight {
+    position: relative;
+  }
+  .spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: radial-gradient(
+      320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.55),
+      transparent 60%
+    );
+    mix-blend-mode: soft-light;
+  }
+  .dark .spotlight::after {
+    background: radial-gradient(
+      320px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.08),
+      transparent 60%
+    );
+    mix-blend-mode: normal;
+  }
+  @media (hover: hover) {
+    .spotlight:hover::after {
+      opacity: 1;
+    }
+  }
+
   /* 선택 상태 */
   .selected {
     background: var(--selected-bg);
@@ -201,7 +253,7 @@
 
   /* 입력 필드 */
   .glass-field {
-    @apply w-full rounded-lg px-3 py-2.5 text-base text-ink-900 tabular-nums transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-ink-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-100 dark:placeholder:text-slate-500 sm:text-sm;
+    @apply w-full rounded-lg px-3 py-2.5 text-base text-ink-900 tabular-nums transition-[background-color,border-color,box-shadow] duration-150 placeholder:text-ink-500/70 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:text-slate-100 dark:placeholder:text-slate-500 sm:text-sm;
     background: var(--field-fill);
     border: 1px solid var(--field-border);
   }
@@ -236,7 +288,7 @@
     background: var(--tile-hover);
   }
   .btn-icon {
-    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-400 transition-colors duration-150 hover:bg-ink-900/[0.05] hover:text-ink-800 active:scale-95 dark:text-slate-500 dark:hover:bg-white/[0.07] dark:hover:text-slate-100;
+    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-500 transition-colors duration-150 hover:bg-ink-900/[0.06] hover:text-ink-800 active:scale-95 dark:text-slate-500 dark:hover:bg-white/[0.07] dark:hover:text-slate-100;
   }
 
   /* 세그먼트 컨트롤 */
@@ -245,7 +297,7 @@
     background: var(--track);
   }
   .segmented-item {
-    @apply flex min-h-[2rem] min-w-0 flex-1 items-center justify-center gap-1.5 break-keep rounded-[7px] px-2 py-1 text-center text-xs font-medium leading-tight text-ink-500 transition-all duration-150 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-100;
+    @apply flex min-h-[2rem] min-w-0 flex-1 items-center justify-center gap-1.5 break-keep rounded-[7px] px-2 py-1 text-center text-xs font-medium leading-tight text-ink-600 transition-all duration-150 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-100;
   }
   .segmented-item[aria-pressed='true'],
   .segmented-item[aria-selected='true'] {
@@ -292,7 +344,7 @@
   }
 
   .eyebrow {
-    @apply text-[11px] font-medium uppercase tracking-[0.06em] text-ink-400 dark:text-slate-500;
+    @apply text-[11px] font-medium uppercase tracking-[0.06em] text-ink-500 dark:text-slate-500;
   }
 
   .hairline {
@@ -418,4 +470,77 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* 컨페티 */
+.confetti-layer {
+  position: fixed;
+  z-index: 70;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.confetti-layer i {
+  position: absolute;
+  width: 7px;
+  height: 11px;
+  border-radius: 2px;
+  animation: confetti 1.1s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+}
+@keyframes confetti {
+  0% {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), calc(var(--dy) + 120px)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.animate-pop {
+  animation: pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.animate-from-right {
+  animation: slide-from-right 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.animate-from-left {
+  animation: slide-from-left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
