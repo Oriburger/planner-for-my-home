@@ -118,8 +118,8 @@ export function TaxRefundCard() {
   return (
     <Card>
       <CardHeader
-        title="연말정산 환급 예상"
-        description="1년차 입력값 기준 · 저축과 주거 공제로 덜 내는 세금"
+        title="연말정산 절세 혜택"
+        description="1년차 저축·주거 공제 예상 혜택"
         action={
           <button
             type="button"
@@ -141,27 +141,24 @@ export function TaxRefundCard() {
         {/* 합계 */}
         <div className="rounded-2xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50 to-white p-4 dark:border-emerald-900/60 dark:from-emerald-950/40 dark:to-slate-900/60">
           <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-            올해 돌려받을 것으로 기대되는 세금
+            올해 예상 환급액
           </p>
           <p className="mt-1 break-keep text-2xl font-bold leading-tight text-emerald-700 dark:text-emerald-400 sm:text-3xl">
             {formatKRWShort(result.totalSaving)}원
           </p>
-          <p className="mt-1.5 text-[11px] font-medium text-emerald-900/70 dark:text-emerald-300/80">
-            월 {formatKRWShort(monthlyEquivalent)}원을 더 버는 효과 · 추정
-            과세표준 {formatKRWShort(result.taxableBase)}원 · 한계세율{' '}
-            {result.marginalRate}%
+          <p className="mt-1.5 break-keep text-[11px] font-medium text-emerald-900/70 dark:text-emerald-300/80">
+            월 약 {formatKRWShort(monthlyEquivalent)}원 추가 소득 효과 (과세표준 {formatKRWShort(result.taxableBase)}원 기준)
           </p>
         </div>
 
         {/* 남은 한도 */}
         {result.unusedRoom > 0 && (
           <div className="rounded-xl border border-amber-200/80 bg-amber-50/70 px-3 py-2.5 dark:border-amber-900/50 dark:bg-amber-950/30">
-            <p className="text-[11px] leading-relaxed text-amber-900 dark:text-amber-300">
+            <p className="break-keep text-[11px] leading-relaxed text-amber-900 dark:text-amber-300">
               <strong className="font-bold">
-                한도 {formatKRWShort(result.unusedRoom)}원
+                공제 한도 {formatKRWShort(result.unusedRoom)}원 남음
               </strong>
-              이 남아 있어요. 연금저축·IRP는 연 900만원, 주택청약은 연 300만원까지
-              넣은 만큼 공제됩니다. 자동이체를 늘리면 환급도 같이 늘어납니다.
+              {' '}(연금·IRP 연 900만, 청약 연 300만원 한도 내 추가 공제 가능)
             </p>
           </div>
         )}
@@ -174,8 +171,8 @@ export function TaxRefundCard() {
         </ul>
 
         {settings.applyTaxRefund && (
-          <p className="text-[11px] leading-relaxed text-ink-500 dark:text-slate-400">
-            {settings.years}년 누적 환급 예상{' '}
+          <p className="break-keep text-[11px] leading-relaxed text-ink-500 dark:text-slate-400">
+            {settings.years}년 누적 절세액{' '}
             <strong className="font-semibold tabular-nums text-ink-800 dark:text-slate-200">
               {formatKRWShort(summary.totalTaxRefund)}원
             </strong>
@@ -183,13 +180,14 @@ export function TaxRefundCard() {
           </p>
         )}
 
-        <p className="text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
-          * 2025년 귀속 기준 간이 추정입니다. 부양가족·의료비·기부금·신용카드
-          공제는 사람마다 크게 달라 넣지 않았으므로 실제 환급액은 이보다 클 수
-          있습니다. 연금저축 단독 한도는 연 600만원이고, 여기서는 IRP 합산 한도
-          900만원으로 계산합니다. ISA는 세액공제 대상이 아니라 운용수익
-          비과세·분리과세 혜택이라 이 목록에 없습니다.
-        </p>
+        <details className="text-[11px] text-ink-400 dark:text-slate-500">
+          <summary className="cursor-pointer font-medium hover:text-ink-600 dark:hover:text-slate-400">
+            * 2025년 귀속 세법 기준 간이 추정 (상세 기준 안내 ▾)
+          </summary>
+          <p className="mt-1 pl-2 break-keep leading-relaxed">
+            부양가족·의료비·신용카드 공제 등은 제외된 기본 추정치입니다. 연금저축·IRP 합산 최대 900만원, 청약 최대 300만원, 전세대출(주택임차차입금) 원리금 상환액 40% 공제가 반영됩니다.
+          </p>
+        </details>
       </div>
     </Card>
   );

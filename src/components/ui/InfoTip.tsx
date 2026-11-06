@@ -43,7 +43,7 @@ export function InfoTip({ text, label = '설명 보기' }: { text: string; label
         <span
           id={id}
           role="tooltip"
-          className="animate-fade-in absolute bottom-full left-1/2 z-50 mb-1.5 w-max max-w-[220px] -translate-x-1/2 rounded-lg bg-ink-900 px-2.5 py-1.5 text-[11px] font-normal leading-snug text-white shadow-lg dark:bg-white dark:text-ink-900"
+          className="animate-fade-in break-keep absolute bottom-full left-1/2 z-50 mb-1.5 w-max max-w-[min(260px,calc(100vw-2rem))] -translate-x-1/2 rounded-lg bg-ink-900 px-2.5 py-1.5 text-[11px] font-normal leading-snug text-white shadow-lg dark:bg-white dark:text-ink-900"
         >
           {text}
         </span>

@@ -200,13 +200,13 @@ export function MobileDock({ onOpenMore }: { onOpenMore: () => void }) {
           <button
             type="button"
             onClick={() => setView('overview')}
-            className="glass glass-strong animate-sheet-up pointer-events-auto mx-auto mb-2 flex items-center gap-2 rounded-full py-1.5 pl-3.5 pr-2 text-xs"
+            className="glass glass-strong animate-sheet-up pointer-events-auto mx-auto mb-2 flex items-center gap-2 whitespace-nowrap rounded-full py-1.5 pl-3.5 pr-2 text-xs"
           >
-            <span className="text-ink-600 dark:text-slate-400">{years}년 후 순자산</span>
-            <span className="font-semibold tabular-nums text-ink-900 dark:text-white">
+            <span className="shrink-0 text-ink-600 dark:text-slate-400">{years}년 후 순자산</span>
+            <span className="shrink-0 font-semibold tabular-nums text-ink-900 dark:text-white">
               {formatKRWShort(summary.finalNetWorth)}원
             </span>
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink-900 text-white dark:bg-white dark:text-ink-900">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink-900 text-white dark:bg-white dark:text-ink-900">
               <Icon name="chevronRight" className="h-3.5 w-3.5" strokeWidth={2} />
             </span>
           </button>

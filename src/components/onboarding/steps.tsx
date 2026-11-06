@@ -94,9 +94,8 @@ export function AssetStep({ draft, patch }: StepProps) {
       </div>
 
       <TotalHint label="지금까지 모은 돈" amount={total} />
-      <p className="px-0.5 text-[11px] leading-relaxed text-ink-500 dark:text-slate-500">
-        전·월세 보증금은 다음 &lsquo;주거&rsquo; 단계에서 한 번만 입력하면
-        자동으로 자산에 잡힙니다.
+      <p className="break-keep px-0.5 text-[11px] leading-relaxed text-ink-500 dark:text-slate-500">
+        💡 전·월세 보증금은 다음 &lsquo;주거&rsquo; 단계에서 한 번만 입력하시면 됩니다.
       </p>
     </div>
   );
@@ -135,9 +134,8 @@ export function IncomeStep({ draft, patch }: StepProps) {
         />
       </Field>
 
-      <p className="px-0.5 text-[11px] leading-relaxed text-ink-500 dark:text-slate-500">
-        세금과 4대보험은 연봉 구간에 맞춰 자동으로 빼고 계산합니다. 공제율을
-        직접 넣고 싶으면 나중에 대시보드에서 바꿀 수 있어요.
+      <p className="break-keep px-0.5 text-[11px] leading-relaxed text-ink-500 dark:text-slate-500">
+        💡 세금·4대보험은 연봉 구간에 맞춰 자동 공제 계산됩니다.
       </p>
     </div>
   );
@@ -218,9 +216,9 @@ export function HousingStep({ draft, patch }: StepProps) {
 /* ------------------------------------------------------------------ */
 
 const REPAYMENT_OPTIONS: Array<{ value: RepaymentType; label: string }> = [
-  { value: 'equalPayment', label: '원리금균등 (매달 같은 금액 · 추천)' },
-  { value: 'equalPrincipal', label: '원금균등 (원금 균등 상환 · 초기 부담)' },
-  { value: 'interestOnly', label: '만기일시 (이자만 납부 · 전세대출 흔함)' },
+  { value: 'equalPayment', label: '원리금균등 (매달 일정액 · 추천)' },
+  { value: 'equalPrincipal', label: '원금균등 (초기 부담 큼)' },
+  { value: 'interestOnly', label: '만기일시 (이자만 납부 · 전세대출)' },
 ];
 
 export function LoanStep({ draft, patch }: StepProps) {
@@ -299,8 +297,8 @@ export function ExpenseStep({ draft, patch }: StepProps) {
       </div>
 
       <TotalHint label="월 고정 지출 합계" amount={total} />
-      <p className="px-0.5 text-[11px] leading-relaxed text-ink-500 dark:text-slate-500">
-        주거비는 앞 단계에서 따로 넣었으니 여기서는 빼고 적어주세요.
+      <p className="break-keep px-0.5 text-[11px] leading-relaxed text-ink-500 dark:text-slate-500">
+        💡 주거비(월세/관리비)는 앞 단계에 포함되었으므로 제외하고 적어주세요.
       </p>
     </div>
   );

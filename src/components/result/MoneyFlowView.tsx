@@ -117,7 +117,7 @@ function AccountCard({
           <span className="block text-xs font-extrabold tabular-nums text-ink-900 dark:text-slate-100">
             {formatKRWShort(balance)}원
           </span>
-          <span className="text-[10px] text-ink-400 dark:text-slate-500">현재 실제 잔액</span>
+          <span className="text-[10px] text-ink-400 dark:text-slate-500">현재 잔액</span>
         </div>
       </div>
 
@@ -199,6 +199,7 @@ interface MoneyFlowViewProps {
  */
 export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
   const assets = usePlannerStore((s) => s.assets);
+  const loans = usePlannerStore((s) => s.loans);
 
   // '통장' 부분은 무조건 '현재(지금 / 1년차)' 시점만 본다. (사용자 요청 2 반영)
   const row = rows[0] ?? {
@@ -236,12 +237,21 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
   const drawdown = Math.max(0, -yearFlow);
   const shortfall = Math.max(0, -row.contributionBalance);
 
+  const hasDepositLinkedLoan = loans.some((l) => l.isDepositLinked);
+  const allLoansDepositLinked =
+    loans.length > 0 && loans.every((l) => l.isDepositLinked);
+  const loanHint = allLoansDepositLinked
+    ? '이자만 납부 (원금은 만기 시 보증금에서 상환)'
+    : hasDepositLinkedLoan
+      ? '원금 + 이자 (전세대출은 이자만)'
+      : '원금 + 이자';
+
   const slices: FlowSlice[] = [
     {
       key: 'living',
       label: '생활비',
       monthly: monthly(row.livingExpense),
-      hint: '식비 · 교통 · 통신 등 월 고정 지출',
+      hint: '식비·교통·통신 등 고정 생활비',
     },
     {
       key: 'housing',
@@ -253,13 +263,13 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
       key: 'loan',
       label: '대출 상환',
       monthly: monthly(row.loanPayment),
-      hint: '원금 + 이자',
+      hint: loanHint,
     },
     {
       key: 'contribution',
       label: '자동이체 (저축)',
       monthly: monthly(row.contribution),
-      hint: `${accounts.filter((a) => a.contributing).length}개 계좌로 빠져나감`,
+      hint: `${accounts.filter((a) => a.contributing).length}개 계좌로 이체`,
     },
     {
       key: 'leftover',
@@ -268,7 +278,7 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
       hint:
         drawdown > 0
           ? '현재 남는 돈이 없어요'
-          : '비상금 파킹통장으로 들어가 불어남',
+          : '비상금 파킹통장 자동 적립',
     },
   ];
 
@@ -283,16 +293,11 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
 
   return (
     <div className="space-y-4">
-      {/* 1. 들어오는 돈 (현재 기준) */}
+      {/* 1. 들어오는 돈 */}
       <Card>
         <CardHeader
-          title="현재 월 현금흐름"
-          description="현재 시점 월급 통장에서 고정비·생활비·자동이체로 나가는 돈"
-          action={
-            <span className="rounded-full bg-brand-100 px-2.5 py-0.5 text-[11px] font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-              현재 기준
-            </span>
-          }
+          title="월 현금흐름"
+          description="월 소득에서 지출과 저축으로 배분되는 흐름"
         />
 
         <div className="space-y-4 px-4 py-4 sm:px-5">
@@ -309,7 +314,7 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
                 tone: 'text-rose-600 dark:text-rose-400',
               },
               {
-                label: '연말정산 환급(월 환산)',
+                label: '연말정산 절세(월 환산)',
                 value: monthly(row.taxRefund),
                 tone: 'text-emerald-600 dark:text-emerald-400',
               },
@@ -323,7 +328,7 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
                 key={tile.label}
                 className="glass-tile rounded-2xl p-3"
               >
-                <p className="text-[11px] font-semibold text-ink-500 dark:text-slate-400">
+                <p className="break-keep text-[11px] font-semibold text-ink-500 dark:text-slate-400">
                   {tile.label}
                 </p>
                 <p
@@ -347,7 +352,7 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
           {shortfall > 0 && (
             <p
               role="alert"
-              className="rounded-xl bg-rose-50 px-3 py-2.5 text-[11px] leading-relaxed text-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
+              className="break-keep rounded-xl bg-rose-50 px-3 py-2.5 text-[11px] leading-relaxed text-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
             >
               현재 자동이체와 지출의 합이 소득을 초과하여{' '}
               <strong className="font-bold">
@@ -436,14 +441,14 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
         </div>
       </Card>
 
-      {/* 3. 통장 현황 (현재 실제 잔액) */}
+      {/* 3. 보유 계좌 잔액 */}
       <Card>
         <CardHeader
-          title="통장 현황 (현재 실제 잔액)"
-          description="현재 보유 중인 통장(계좌)별 실제 잔고"
+          title="보유 계좌 잔액"
+          description="계좌별 잔액 및 자동이체 현황"
           action={
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-              현재 시점 (Stock)
+            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              현재 잔액
             </span>
           }
         />

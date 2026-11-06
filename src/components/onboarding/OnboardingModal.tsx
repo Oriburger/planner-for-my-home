@@ -186,16 +186,13 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
           <step.Body draft={draft} patch={patch} />
 
           {isLast && preview && (
-            <div className="glass-tile mt-4 rounded-xl p-4">
+            <div className="glass-tile mt-4 rounded-xl p-4 text-center">
               <p className="text-xs font-semibold text-ink-600 dark:text-slate-400">
-                {draft.settings.years}년 후 예상 순자산 · 기간은 화면 위에서 바꿀 수 있어요
+                {draft.settings.years}년 후 예상 순자산
               </p>
               <p className="mt-1 text-[28px] font-semibold leading-tight text-ink-900 dark:text-white tracking-tight tabular-nums">
                 {formatKRWShort(preview.finalNetWorth)}
                 <span className="ml-0.5 text-base font-medium text-ink-500">원</span>
-              </p>
-              <p className="mt-1 text-[11px] text-ink-600 dark:text-slate-400">
-                완료를 누르면 대시보드에서 자세히 볼 수 있어요.
               </p>
             </div>
           )}

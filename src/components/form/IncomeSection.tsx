@@ -278,7 +278,7 @@ export function IncomeSection() {
                 checked={income.taxable}
                 onChange={(taxable) => updateIncome(income.id, { taxable })}
                 label="세금 · 4대보험 공제 대상"
-                description="끄면 입력한 금액을 전액 실수령으로 계산합니다."
+                description="끄면 전액 실수령으로 계산합니다."
               />
             </div>
           </div>

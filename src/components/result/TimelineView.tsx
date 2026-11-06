@@ -287,7 +287,11 @@ export function TimelineView({
             <Metric
               label="남은 대출"
               value={`${formatKRWShort(activeRow.loanBalance)}원`}
-              caption={`연 상환 ${formatKRWShort(activeRow.loanPayment)}원`}
+              caption={
+                activeRow.depositOffsetPrincipal && activeRow.depositOffsetPrincipal > 0
+                  ? `보증금 ${formatKRWShort(activeRow.depositOffsetPrincipal)}원 상환 완료`
+                  : `연 상환 ${formatKRWShort(activeRow.loanPayment)}원`
+              }
               valueClass="text-rose-600 dark:text-rose-400"
             />
           </div>
@@ -310,8 +314,8 @@ export function TimelineView({
                       {e.badge}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-semibold text-ink-900 dark:text-white">{e.title}</p>
-                      <p className="mt-0.5 text-xs leading-relaxed text-ink-600 dark:text-slate-400">
+                      <p className="break-keep text-[13px] font-semibold text-ink-900 dark:text-white">{e.title}</p>
+                      <p className="mt-0.5 break-keep text-xs leading-relaxed text-ink-600 dark:text-slate-400">
                         {e.description}
                       </p>
                     </div>

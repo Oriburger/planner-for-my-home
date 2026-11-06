@@ -183,7 +183,7 @@ export function BudgetPlanView() {
               className="segmented-item flex items-center justify-center gap-1.5"
             >
               <Icon name="sliders" className="h-4 w-4" />
-              <span>월 지출 · 저축 배분</span>
+              <span>월 지출·저축 배분</span>
             </button>
             <button
               type="button"
@@ -196,7 +196,7 @@ export function BudgetPlanView() {
               className="segmented-item flex items-center justify-center gap-1.5"
             >
               <Icon name="wallet" className="h-4 w-4" />
-              <span>내 통장 현황 (현재 기준)</span>
+              <span>보유 계좌 잔액</span>
             </button>
           </div>
         </div>
@@ -222,7 +222,7 @@ export function BudgetPlanView() {
             className="segmented-item flex items-center justify-center gap-1.5"
           >
             <Icon name="sliders" className="h-4 w-4" />
-            <span>월 지출 · 저축 배분</span>
+            <span>월 지출·저축 배분</span>
           </button>
           <button
             type="button"
@@ -235,7 +235,7 @@ export function BudgetPlanView() {
             className="segmented-item flex items-center justify-center gap-1.5"
           >
             <Icon name="wallet" className="h-4 w-4" />
-            <span>내 통장 현황 (현재 기준)</span>
+            <span>보유 계좌 잔액</span>
           </button>
         </div>
       </div>
@@ -397,14 +397,14 @@ export function BudgetPlanView() {
         </div>
       </Card>
 
-      {/* 2단 멘탈 모델: 파트 1. 월 지출 분기 (소비) */}
+      {/* 2단 멘탈 모델: 1. 필수 및 고정 지출 */}
       <div className="space-y-3.5">
         <div className="flex items-center gap-2 px-1">
           <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400">
             <Icon name="receipt" className="h-3.5 w-3.5" />
           </span>
-          <h3 className="text-xs font-bold text-ink-800 dark:text-slate-200">
-            파트 1. 월 지출 분기 (고정 주거비 · 대출 원리금 · 생활비)
+          <h3 className="break-keep text-xs font-bold text-ink-800 dark:text-slate-200">
+            1. 필수 및 고정 지출 (주거비 · 대출 · 생활비)
           </h3>
         </div>
 
@@ -425,14 +425,14 @@ export function BudgetPlanView() {
             ) : (
               housings.map((h) => (
                 <div key={h.id} className="rounded-xl border border-ink-900/10 bg-white/50 p-3 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/50">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
                       <span className="font-bold text-ink-900 dark:text-slate-100">{h.name}</span>
-                      <p className="mt-0.5 text-[11px] text-ink-500 dark:text-slate-400">
+                      <p className="mt-0.5 break-keep text-[11px] text-ink-500 dark:text-slate-400">
                         보증금 {formatKRWShort(h.deposit)}원 · 월세 {formatKRWShort(h.monthlyRent)}원 · 관리비 {formatKRWShort(h.monthlyMaintenance)}원
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       <span className="font-extrabold text-ink-900 dark:text-slate-100 tabular-nums">
                         월 {formatKRWShort(h.monthlyRent + h.monthlyMaintenance)}원
                       </span>
@@ -487,14 +487,22 @@ export function BudgetPlanView() {
             ) : (
               loans.map((l) => (
                 <div key={l.id} className="rounded-xl border border-ink-900/10 bg-white/50 p-3 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/50">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="font-bold text-ink-900 dark:text-slate-100">{l.name}</span>
-                      <p className="mt-0.5 text-[11px] text-ink-500 dark:text-slate-400">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-ink-900 dark:text-slate-100">{l.name}</span>
+                        {l.isDepositLinked && (
+                          <span className="rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
+                            보증금 상환
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 break-keep text-[11px] text-ink-500 dark:text-slate-400">
                         원금 {formatKRWShort(l.principal)}원 · 연 {l.annualRate}%
+                        {l.isDepositLinked && ' (원금은 만기 시 보증금에서 상환)'}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       <span className="font-extrabold text-rose-600 dark:text-rose-400 tabular-nums">
                         월 {formatKRWShort(loanPaymentMonthly)}원
                       </span>
@@ -558,18 +566,18 @@ export function BudgetPlanView() {
                   key={exp.id}
                   className="rounded-xl border border-ink-900/10 bg-white/60 p-3.5 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60"
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-ink-900 dark:text-slate-100 text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="truncate font-bold text-ink-900 dark:text-slate-100 text-xs">
                         {exp.name}
                       </span>
-                      <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
+                      <span className="shrink-0 rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
                         {EXPENSE_CATEGORY_LABEL[exp.category]}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-orange-100/80 px-2 py-0.5 text-[11px] font-bold text-orange-800 dark:bg-orange-950/80 dark:text-orange-300">
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="whitespace-nowrap rounded-full bg-orange-100/80 px-2 py-0.5 text-[10px] font-bold text-orange-800 dark:bg-orange-950/80 dark:text-orange-300">
                         월급의 {expShare.toFixed(1)}%
                       </span>
                       <span className="font-extrabold tabular-nums text-xs text-ink-900 dark:text-slate-100">
@@ -599,14 +607,14 @@ export function BudgetPlanView() {
         </Card>
       </div>
 
-      {/* 2단 멘탈 모델: 파트 2. 내 통장으로 저축 & 비상금 (자산) */}
+      {/* 2단 멘탈 모델: 2. 저축 및 투자 이체 */}
       <div className="space-y-3.5">
         <div className="flex items-center gap-2 px-1">
           <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
             <Icon name="wallet" className="h-3.5 w-3.5" />
           </span>
-          <h3 className="text-xs font-bold text-ink-800 dark:text-slate-200">
-            파트 2. 내 통장으로 모으는 저축 (현재 계좌 잔고 & 자동이체 맵)
+          <h3 className="break-keep text-xs font-bold text-ink-800 dark:text-slate-200">
+            2. 저축 및 투자 이체 (목적 통장 자동이체 & 비상금)
           </h3>
         </div>
 
@@ -715,17 +723,13 @@ export function BudgetPlanView() {
               </span>
             }
           />
-          <div className="p-4 text-xs text-ink-600 dark:text-slate-400 space-y-2">
-            <p className="leading-relaxed">
-              모든 지출과 자동이체를 집행하고 남은 <strong>{formatKRWShort(Math.max(0, shares.leftover.amount))}원</strong>은
-              매월 유동성 비상금 통장에 자동으로 모이며, 파킹통장 수익률로 안전하게 굴러가며 홈 화면의 순자산을 밀어 올립니다.
-            </p>
-            <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
-              💡 연말정산 환급금(연 약 {formatKRWShort(firstYear ? firstYear.taxRefund : 0)}원)도 매월 쪼개 쓰지 않고 이 파킹통장으로 연 1회 일시 유입됩니다.
+          <div className="p-4 text-xs text-ink-600 dark:text-slate-400 space-y-1.5">
+            <p className="break-keep leading-relaxed">
+              지출과 자동이체 후 남은 <strong>{formatKRWShort(Math.max(0, shares.leftover.amount))}원</strong>은 비상금 통장에 자동 적립되어 복리로 불어납니다.
             </p>
             {shares.status === 'deficit' && (
-              <p className="font-semibold text-rose-600 dark:text-rose-400">
-                ⚠️ 현재 지출과 자동이체 합계가 소득을 초과하여 매달 비상금 잔고가 감소합니다. 지출 또는 자동이체를 조정해 주세요.
+              <p className="break-keep font-semibold text-rose-600 dark:text-rose-400">
+                ⚠️ 월 지출과 자동이체가 소득을 초과하여 매달 비상금이 감소합니다. 지출 또는 자동이체를 조정해 주세요.
               </p>
             )}
           </div>

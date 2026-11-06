@@ -654,6 +654,39 @@ describe('loan', () => {
     expect(year1.payment).toBe(year1.interest);
   });
 
+  it('보증금 연동 대출 상환 시 YearResult.depositOffsetPrincipal에 기록된다', () => {
+    const data = makeData({
+      settings: { ...baseSettings, years: 2 },
+      assets: [
+        {
+          id: 'dep',
+          type: 'rentDeposit',
+          name: '전세보증금',
+          amount: 5000 * 만,
+          annualReturnRate: 0,
+          liquid: false,
+          monthlyContribution: 0,
+        },
+      ],
+      loans: [
+        {
+          id: 'l_link',
+          name: '전세대출',
+          principal: 2000 * 만,
+          annualRate: 4,
+          termYears: 1,
+          repaymentType: 'interestOnly',
+          monthlyPayment: 0,
+          startYear: 1,
+          isDepositLinked: true,
+        },
+      ],
+    });
+
+    const res = runSimulation(data, 2026);
+    expect(res.rows[0].depositOffsetPrincipal).toBe(2000 * 만);
+  });
+
   it('상환 시작 전에는 현금흐름이 없다', () => {
     const loan = {
       id: 'l2',

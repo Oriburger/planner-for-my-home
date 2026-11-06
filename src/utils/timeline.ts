@@ -224,15 +224,18 @@ export function extractTimelineEvents(
     const payoffIndex = loan.startYear + loan.termYears - 1;
     const payoffRow = rows.find((r) => r.index === payoffIndex);
     if (payoffRow && !loan.autoRenew) {
+      const isDeposit = loan.isDepositLinked ?? false;
       events.push({
         id: `loan-payoff-${loan.id}`,
         yearIndex: payoffIndex,
         calendarYear: payoffRow.year,
         age: payoffRow.age,
         category: 'loan',
-        title: `${loan.name} 완납`,
-        description: `대출 원리금 상환이 종료되어 매월 잉여 자금이 증가합니다.`,
-        badge: '대출 완납',
+        title: isDeposit ? `${loan.name} 완납 (보증금 차감 상환)` : `${loan.name} 완납`,
+        description: isDeposit
+          ? `보증금에서 대출 원금 ${formatKRWShort(loan.principal)}원이 자동 차감·상환되었습니다. (내 유동 현금 지출 없음)`
+          : `대출 원리금 상환이 종료되어 매월 잉여 자금이 증가합니다.`,
+        badge: isDeposit ? '보증금 상환' : '대출 완납',
         badgeColor: 'emerald',
       });
     }

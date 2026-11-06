@@ -203,18 +203,21 @@ export function draftToPlannerData(draft: OnboardingDraft): PlannerData {
       ]
     : [];
 
+  const isJeonse = draft.housing.type === 'jeonse';
   const loans =
     draft.loan.principal > 0
       ? [
           {
             id: uid(),
-            name: '대출',
+            name: isJeonse ? '전세자금대출' : '대출',
             principal: draft.loan.principal,
             annualRate: draft.loan.annualRate,
             termYears: draft.loan.termYears,
-            repaymentType: draft.loan.repaymentType,
+            repaymentType: isJeonse ? 'interestOnly' : draft.loan.repaymentType,
             monthlyPayment: 0,
             startYear: 1,
+            isDepositLinked: isJeonse,
+            autoRenew: isJeonse,
           },
         ]
       : [];

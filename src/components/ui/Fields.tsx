@@ -352,7 +352,7 @@ export function Toggle({
       <span className="flex min-w-0 items-center gap-1.5">
         <label
           htmlFor={id}
-          className="min-w-0 cursor-pointer text-[13px] font-medium text-ink-800 dark:text-slate-100"
+          className="min-w-0 break-keep cursor-pointer text-[13px] font-medium text-ink-800 dark:text-slate-100"
         >
           {label}
         </label>
@@ -364,7 +364,7 @@ export function Toggle({
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className="switch"
+        className="switch shrink-0"
       >
         <span className="switch-knob" />
       </button>

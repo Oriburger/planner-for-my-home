@@ -21,20 +21,20 @@ interface CardHeaderProps {
 export function CardHeader({ title, description, icon, action }: CardHeaderProps) {
   return (
     <header className="flex items-start justify-between gap-3 px-4 pb-1 pt-4 sm:px-5">
-      <div className="flex min-w-0 items-start gap-3">
+      <div className="flex min-w-0 flex-1 items-start gap-3">
         {icon && <IconBadge name={icon} />}
-        <div className="min-w-0">
-          <h2 className="text-[15px] font-semibold tracking-tight text-ink-900 dark:text-slate-50">
+        <div className="min-w-0 flex-1">
+          <h2 className="break-keep text-[15px] font-semibold tracking-tight text-ink-900 dark:text-slate-50">
             {title}
           </h2>
           {description && (
-            <p className="mt-0.5 text-xs leading-relaxed text-ink-600 dark:text-slate-400">
+            <p className="mt-0.5 break-keep text-xs leading-relaxed text-ink-600 dark:text-slate-400">
               {description}
             </p>
           )}
         </div>
       </div>
-      {action}
+      {action && <div className="shrink-0">{action}</div>}
     </header>
   );
 }

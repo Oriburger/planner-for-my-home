@@ -68,7 +68,7 @@ export function HorizonControl() {
       </div>
 
       {open && (
-        <div className="glass animate-sheet-up absolute right-0 top-[calc(100%+8px)] z-50 !bg-white dark:!bg-[#1a1c22] w-[min(300px,calc(100vw-1.5rem))] rounded-2xl p-4 max-sm:-right-[4.5rem]">
+        <div className="glass animate-sheet-up absolute right-0 top-[calc(100%+8px)] z-50 !bg-white dark:!bg-[#1a1c22] w-[min(300px,calc(100vw-1.5rem))] rounded-2xl p-4">
           <div className="flex items-end justify-between">
             <span className="text-xs font-medium text-ink-600 dark:text-slate-400">몇 년 뒤까지 볼까요?</span>
             <span className="text-2xl font-semibold leading-none tabular-nums text-ink-900 dark:text-white">

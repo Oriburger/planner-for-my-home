@@ -270,6 +270,8 @@ export interface YearResult {
   loanPayment: number;
   loanInterest: number;
   loanPrincipalPaid: number;
+  /** 보증금에서 차감 상쇄된 전세대출 원금 (유동 현금 지출 없음) */
+  depositOffsetPrincipal?: number;
 
   /** 자산 수익 (복리) */
   investmentReturn: number;

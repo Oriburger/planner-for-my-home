@@ -162,16 +162,22 @@ export function LoanSection() {
                   onChange={(isDepositLinked) =>
                     updateLoan(loan.id, { isDepositLinked })
                   }
-                  label="보증금 상환 연동"
-                  description="만기 시 유동 현금이 아닌 임대보증금 자산에서 차감 상쇄됩니다."
+                  label="보증금으로 대출 자동 상환"
+                  description="전세 만기 시 돌려받는 보증금으로 대출을 갚아요 (내 현금 지출 없음)."
                 />
+
+                {loan.isDepositLinked && (
+                  <p className="rounded-lg bg-emerald-500/10 px-2.5 py-1.5 text-[11px] leading-relaxed text-emerald-800 dark:text-emerald-300">
+                    💡 <strong>보증금 상환 연동 중:</strong> 만기 시 원금은 보증금 반환금에서 상쇄되므로, 내 유동 현금(월급·파킹통장)은 1원도 차감되지 않습니다.
+                  </p>
+                )}
 
                 {loan.repaymentType === 'interestOnly' && (
                   <Toggle
                     checked={loan.autoRenew ?? false}
                     onChange={(autoRenew) => updateLoan(loan.id, { autoRenew })}
-                    label="만기 자동 연장"
-                    description="만기 시 원금을 갚지 않고 이자만 지속 납부합니다."
+                    label="만기 시 원금 상환 없이 연장"
+                    description="만기 시 원금을 갚지 않고 이자만 계속 납부합니다."
                   />
                 )}
               </div>

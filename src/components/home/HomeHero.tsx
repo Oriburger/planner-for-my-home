@@ -186,9 +186,9 @@ export function HomeHero({ onAddGoal }: { onAddGoal: () => void }) {
             >
               <Icon name={playing ? 'pause' : 'play'} className="h-3.5 w-3.5" strokeWidth={2} />
             </span>
-            {playing ? '재생 중' : '시간 흐름 재생'}
+            {playing ? '일시정지' : '흐름 재생'}
           </button>
-          <span className="text-[11px] text-ink-500 dark:text-slate-400">그래프를 끌어 연도 이동</span>
+          <span className="shrink-0 whitespace-nowrap text-[11px] text-ink-500 dark:text-slate-400">그래프를 끌어 연도 이동</span>
         </div>
       </div>
     </section>
@@ -207,13 +207,13 @@ function Layer({
   accent?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2">
-      <dt className="flex items-center gap-1.5 text-ink-500 dark:text-slate-400">
+    <div className="flex items-center justify-between gap-1.5 whitespace-nowrap sm:justify-start sm:gap-2">
+      <dt className="flex shrink-0 items-center gap-1.5 text-ink-500 dark:text-slate-400">
         <span className={`h-2 w-2 rounded-full ring-1 ring-inset ring-ink-900/15 dark:ring-white/15 ${dot}`} aria-hidden="true" />
-        {label}
+        <span className="break-keep">{label}</span>
       </dt>
       <dd
-        className={`font-semibold tabular-nums ${
+        className={`shrink-0 font-semibold tabular-nums ${
           accent ? 'text-accent-700 dark:text-accent-400' : 'text-ink-900 dark:text-white'
         }`}
       >

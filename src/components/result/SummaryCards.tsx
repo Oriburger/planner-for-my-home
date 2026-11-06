@@ -76,9 +76,9 @@ export function SummaryCards({
       {shortfallYear !== null && (
         <div role="alert" className="callout-danger flex items-start gap-2">
           <Icon name="alert" className="mt-px h-4 w-4 shrink-0" />
-          <p>
-            <strong className="font-semibold">{shortfallYear}년차</strong>부터 자동이체가 여유자금보다
-            많아요 (최대 {formatKRWShort(summary.maxContributionShortfall)}원 부족 · 월 이체{' '}
+          <p className="break-keep">
+            <strong className="font-semibold">{shortfallYear}년차</strong>부터 여유자금 부족 발생
+            (최대 -{formatKRWShort(summary.maxContributionShortfall)}원 · 월 이체{' '}
             {formatKRWShort(firstYear.contribution / 12)}원)
           </p>
         </div>

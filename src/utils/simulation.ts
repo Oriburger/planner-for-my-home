@@ -232,6 +232,7 @@ export function runSimulation(data: PlannerData, baseYear = currentYear()): Simu
     let loanPayment = 0;
     let loanInterest = 0;
     let loanPrincipalPaid = 0;
+    let depositOffsetPrincipal = 0;
     /** 주택임차차입금(전세대출) 원리금 상환액 — 보증금 연동 대출로 본다 */
     let rentLoanRepaid = 0;
 
@@ -261,6 +262,7 @@ export function runSimulation(data: PlannerData, baseYear = currentYear()): Simu
 
       // 보증금 연동 원금 상환 발생 시, 비유동 임대보증금 자산에서 차감 상쇄
       if (flow.depositLinkedPrincipalPaid > 0) {
+        depositOffsetPrincipal += flow.depositLinkedPrincipalPaid;
         let toOffset = flow.depositLinkedPrincipalPaid;
         for (const asset of assets) {
           if (asset.type === 'rentDeposit' && toOffset > 0) {
@@ -376,6 +378,7 @@ export function runSimulation(data: PlannerData, baseYear = currentYear()): Simu
       loanPayment,
       loanInterest,
       loanPrincipalPaid,
+      depositOffsetPrincipal,
       investmentReturn,
       contribution,
       taxRefund,

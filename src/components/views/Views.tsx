@@ -19,8 +19,8 @@ import { Icon } from '@/components/ui/Icon';
 
 function Disclaimer() {
   return (
-    <p className="glass rounded-xl px-3.5 py-2.5 text-[11px] leading-relaxed text-ink-600 dark:text-slate-400">
-      가정값 기반 추정치예요. 실제 수익률·세법에 따라 달라질 수 있어요.
+    <p className="glass break-keep rounded-xl px-3.5 py-2 text-center sm:text-left text-[11px] leading-relaxed text-ink-500 dark:text-slate-400">
+      가정치 기반 추정치로 실제 수익률·세법에 따라 달라질 수 있습니다.
     </p>
   );
 }
@@ -51,26 +51,26 @@ export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
       {/* 1. 데이터가 비어있을 때 (온보딩을 건너뛴 유저용 안내) */}
       {isEmpty && (
         <div className="glass glass-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl p-4 border border-brand-300 dark:border-brand-700 bg-brand-50/50 dark:bg-brand-950/30">
-          <div>
-            <p className="text-sm font-bold text-ink-900 dark:text-white">
-              👋 아직 등록된 자산과 수입이 없어요
+          <div className="min-w-0 flex-1">
+            <p className="break-keep text-sm font-bold text-ink-900 dark:text-white">
+              👋 내 자산과 수입을 입력하고 시뮬레이션을 시작해보세요
             </p>
-            <p className="text-xs text-ink-600 dark:text-slate-400 mt-0.5">
-              2030 직장인 예시 데이터를 먼저 둘러보거나, 내 수입부터 바로 입력해 보세요.
+            <p className="break-keep text-xs text-ink-600 dark:text-slate-400 mt-0.5">
+              2030 직장인 예시 데이터를 둘러보거나 직접 입력할 수 있어요.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full sm:w-auto items-center gap-2">
             <button
               type="button"
               onClick={loadSample}
-              className="btn-glass px-3 py-1.5 text-xs font-semibold"
+              className="btn-glass flex-1 sm:flex-initial px-3 py-1.5 text-xs font-semibold"
             >
               예시 데이터 둘러보기
             </button>
             <button
               type="button"
               onClick={() => setView('income')}
-              className="btn-primary px-3 py-1.5 text-xs font-semibold"
+              className="btn-primary flex-1 sm:flex-initial px-3 py-1.5 text-xs font-semibold"
             >
               수입부터 입력하기
             </button>
@@ -81,11 +81,10 @@ export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
       {/* 2. 자산/수입은 있으나 내 집 마련 목표가 없을 때 다음 단계 넛지 */}
       {needsGoal && (
         <div className="glass glass-card flex items-center justify-between gap-3 rounded-2xl p-3.5 border border-accent-400/30 bg-accent-50/40 dark:bg-accent-950/20">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent-500/10 text-accent-700 dark:text-accent-300 font-bold text-sm">🎯</span>
-            <div>
-              <p className="text-xs font-bold text-ink-900 dark:text-white">다음 단계: 내 집 마련 목표 세우기</p>
-              <p className="text-[11px] text-ink-500 dark:text-slate-400">목표 금액과 달성하고 싶은 연도를 정하면 달성 가능성을 계산해 드려요.</p>
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-700 dark:text-accent-300 font-bold text-sm">🎯</span>
+            <div className="min-w-0 flex-1">
+              <p className="break-keep text-xs font-bold text-ink-900 dark:text-white">목표 금액을 설정하면 달성 시점을 분석해 드려요</p>
             </div>
           </div>
           <button
@@ -106,21 +105,18 @@ export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
         onClick={() => setView('budget')}
         className="glass glass-card group flex w-full items-center justify-between gap-3 rounded-2xl p-3.5 text-left transition-all hover:border-brand-400"
       >
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-300">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-300">
             <Icon name="sliders" className="h-4 w-4" />
           </span>
-          <div>
-            <p className="text-xs font-bold text-ink-900 dark:text-slate-100">
-              월 지출 · 저축 계획 현황
-            </p>
-            <p className="text-[11px] text-ink-500 dark:text-slate-400">
-              세후 월 {formatKRWShort(monthlyNet)}원 중 {formatKRWShort(monthlySavings)}원({savingsPct.toFixed(0)}%) 저축 계획 중
+          <div className="min-w-0 flex-1">
+            <p className="break-keep text-xs font-bold text-ink-900 dark:text-slate-100">
+              월 저축 계획: 세후 {formatKRWShort(monthlyNet)}원 중 {formatKRWShort(monthlySavings)}원({savingsPct.toFixed(0)}%) 저축
             </p>
           </div>
         </div>
-        <span className="flex items-center gap-1 text-xs font-semibold text-brand-600 dark:text-brand-400 group-hover:translate-x-0.5 transition-transform">
-          <span>계획 조정</span>
+        <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-brand-600 dark:text-brand-400 group-hover:translate-x-0.5 transition-transform">
+          <span className="whitespace-nowrap">계획 조정</span>
           <Icon name="chevronRight" className="h-3 w-3" />
         </span>
       </button>

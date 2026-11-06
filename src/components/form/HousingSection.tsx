@@ -125,9 +125,15 @@ export function HousingSection() {
             <MemoField value={housing.memo ?? ''} onChange={(memo) => updateHousing(housing.id, { memo })} />
           </div>
 
+          {housing.type === 'jeonse' && (
+            <p className="mt-2 rounded-lg bg-sky-500/10 px-2.5 py-1.5 text-[11px] leading-relaxed text-sky-800 dark:text-sky-300">
+              💡 <strong>전세대출이 있다면:</strong> [대출] 메뉴에서 &apos;보증금으로 대출 자동 상환&apos;을 켜두시면 만기 시 보증금에서 차감 상환됩니다.
+            </p>
+          )}
+
           <p className="mt-2 flex items-center gap-1 px-0.5 text-[11px] text-ink-500 dark:text-slate-500">
-            보증금 처리 방식
-            <InfoTip text="2년차 이후 계약의 보증금은 그 해 여유자금에서 빠져 묶인 자산이 됩니다. 1년차 계약 보증금은 '현재 보유 자산'에 이미 있다고 봅니다." />
+            보증금 반영 방식
+            <InfoTip text="2년차 이후 계약 보증금은 해당 연도 여유자금에서 이동하며, 만기 시 돌려받습니다." />
           </p>
         </ItemCard>
       ))}

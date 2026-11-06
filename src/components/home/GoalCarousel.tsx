@@ -20,13 +20,13 @@ function statusLabel(p: GoalProgress) {
     case 'done':
       return '달성';
     case 'onTrack':
-      return p.yearsDiff !== null && p.yearsDiff < 0 ? `${-p.yearsDiff}년 빨리` : '달성 예상';
+      return p.yearsDiff !== null && p.yearsDiff < 0 ? `${-p.yearsDiff}년 단축` : '달성 예상';
     case 'late':
-      return `${p.yearsDiff}년 늦게`;
+      return `${p.yearsDiff}년 지연`;
     case 'miss':
       return `${formatKRWShort(p.shortfall)} 부족`;
     default:
-      return '기간 밖';
+      return '기간 초과';
   }
 }
 
@@ -49,10 +49,10 @@ export function GoalCarousel({ onEdit }: { onEdit: () => void }) {
   return (
     <section className="glass rounded-2xl py-4">
       <div className="flex items-center justify-between gap-3 px-4 sm:px-5">
-        <div className="flex items-baseline gap-2">
-          <h2 className="text-[15px] font-semibold tracking-tight text-ink-900 dark:text-white">목표</h2>
+        <div className="flex min-w-0 items-baseline gap-2">
+          <h2 className="shrink-0 text-[15px] font-semibold tracking-tight text-ink-900 dark:text-white">목표</h2>
           {progress.length > 0 && (
-            <span className="text-xs font-medium tabular-nums text-ink-500 dark:text-slate-400">
+            <span className="shrink-0 whitespace-nowrap text-xs font-medium tabular-nums text-ink-500 dark:text-slate-400">
               {doneCount}/{progress.length} 달성 예상
             </span>
           )}

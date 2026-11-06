@@ -212,6 +212,18 @@ describe('timeline utilities', () => {
     const loanEvent = events.find((e) => e.category === 'loan' && e.title.includes('완납'));
     expect(loanEvent).toBeDefined();
   });
+
+  it('보증금 연동 대출(isDepositLinked) 완납 시 보증금 차감 상환 문구가 적용된다', () => {
+    const data = {
+      ...mockData,
+      loans: [{ ...mockData.loans[0], id: 'jeonse-loan', isDepositLinked: true, termYears: 2 }],
+    } as unknown as typeof mockData;
+    const events = extractTimelineEvents(data, mockRows, mockSummary);
+    const loanEvent = events.find((e) => e.id === 'loan-payoff-jeonse-loan');
+    expect(loanEvent?.title).toContain('보증금 차감 상환');
+    expect(loanEvent?.description).toContain('보증금에서 대출 원금');
+    expect(loanEvent?.badge).toBe('보증금 상환');
+  });
 });
 
 describe('이벤트 시점 (N년차의 끝 = N년 후)', () => {

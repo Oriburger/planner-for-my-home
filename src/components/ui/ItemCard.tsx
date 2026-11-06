@@ -22,7 +22,7 @@ export function ItemCard({
       <div className="mb-3 flex items-center gap-1">
         <div className="min-w-0 flex-1">{title}</div>
 
-        {badge && <span className="chip ml-1 text-ink-600 dark:text-slate-300">{badge}</span>}
+        {badge && <span className="chip ml-1 shrink-0 whitespace-nowrap text-ink-600 dark:text-slate-300">{badge}</span>}
 
         {onDuplicate && (
           <button

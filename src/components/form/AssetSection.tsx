@@ -153,8 +153,8 @@ export function AssetSection() {
                 <Toggle
                   checked={asset.liquid}
                   onChange={(liquid) => updateAsset(asset.id, { liquid })}
-                  label="유동자산 (즉시 인출 가능)"
-                  description="보증금·연금·청약처럼 묶인 돈이면 꺼주세요."
+                  label="자유 입출금 가능"
+                  description="보증금·연금·청약 등 묶인 돈은 꺼주세요."
                 />
 
                 {!asset.liquid && hasMaturity && (
@@ -163,8 +163,8 @@ export function AssetSection() {
                     onChange={(convertLiquidOnMaturity) =>
                       updateAsset(asset.id, { convertLiquidOnMaturity })
                     }
-                    label="만기 시 유동자산으로 자동 전환"
-                    description="만기 시점에 자동이체가 중단되고 즉시 인출 가능한 현금으로 전환됩니다."
+                    label="만기 시 자유 입출금으로 전환"
+                    description="만기 시 즉시 인출 가능한 현금으로 전환됩니다."
                   />
                 )}
               </div>
