@@ -1,3 +1,4 @@
+import { currentYear, effectiveAge } from '@/utils/time';
 import type {
   AssetItem,
   ExpenseCategory,
@@ -229,7 +230,7 @@ export function draftToPlannerData(draft: OnboardingDraft): PlannerData {
   }));
 
   return {
-    settings: draft.settings,
+    settings: { ...draft.settings, asOfYear: currentYear() },
     assets,
     incomes,
     housings,
@@ -241,7 +242,11 @@ export function draftToPlannerData(draft: OnboardingDraft): PlannerData {
 /** 현재 store 상태를 draft 로 되돌린다 (초기설정을 다시 열 때 값 채우기용) */
 export function plannerDataToDraft(data: PlannerData): OnboardingDraft {
   const draft = createEmptyDraft();
-  draft.settings = { ...data.settings };
+  draft.settings = {
+    ...data.settings,
+    currentAge: effectiveAge(data.settings),
+    asOfYear: currentYear(),
+  };
 
   for (const asset of data.assets) {
     const preset = ASSET_PRESETS.find((p) => p.key === asset.type);

@@ -8,11 +8,12 @@ import {
   MoneyInput,
   PercentInput,
   Select,
-  TextArea,
+  MemoField,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
+import { currentYear } from '@/utils/time';
 import { monthlyEqualPayment } from '@/utils/loan';
 
 const TYPE_OPTIONS = (
@@ -21,7 +22,6 @@ const TYPE_OPTIONS = (
 
 export function LoanSection() {
   const loans = usePlannerStore((s) => s.loans);
-  const settings = usePlannerStore((s) => s.settings);
   const addLoan = usePlannerStore((s) => s.addLoan);
   const updateLoan = usePlannerStore((s) => s.updateLoan);
   const removeItem = usePlannerStore((s) => s.removeItem);
@@ -33,7 +33,7 @@ export function LoanSection() {
     <Accordion
       title="대출"
       summary={`${loans.length}건 · 잔액 ${formatKRWShort(totalPrincipal)}원`}
-      icon="🏛️"
+      icon="landmark"
     >
       {loans.length === 0 && <EmptyState message="대출이 없다면 비워두세요." />}
 
@@ -94,7 +94,7 @@ export function LoanSection() {
                 />
               </Field>
 
-              <Field label="종료 연차" hint={`총 ${loan.termYears}년`}>
+              <Field label="완납 시점" hint={`총 ${loan.termYears}년`}>
                 <CountInput
                   value={loan.startYear + loan.termYears - 1}
                   onChange={(endYear) =>
@@ -104,6 +104,7 @@ export function LoanSection() {
                   }
                   min={loan.startYear}
                   max={40}
+                  suffix="년 후"
                 />
               </Field>
 
@@ -125,8 +126,8 @@ export function LoanSection() {
                 label="대출 실행/상환 시작 연차"
                 hint={
                   loan.startYear > 1
-                    ? `미래 대출 (${settings.startYear + loan.startYear - 1}년)`
-                    : '1년차부터 시작'
+                    ? `${currentYear() + loan.startYear - 1}년부터`
+                    : '지금부터'
                 }
                 className="col-span-2"
               >
@@ -139,8 +140,8 @@ export function LoanSection() {
               </Field>
 
               {loan.startYear > 1 && (
-                <p className="col-span-2 rounded-lg bg-brand-50/80 px-2.5 py-1.5 text-[11px] font-medium text-brand-700">
-                  💡 시뮬레이션 {loan.startYear}년 차({settings.startYear + loan.startYear - 1}년)부터 실행되는 미래 대출입니다.
+                <p className="callout-info col-span-2 text-[11px] font-medium">
+                  {loan.startYear - 1}년 후({currentYear() + loan.startYear - 1}년)부터 실행되는 미래 대출이에요.
                 </p>
               )}
 
@@ -175,16 +176,10 @@ export function LoanSection() {
                 )}
               </div>
 
-              <Field label="메모" className="col-span-2">
-                <TextArea
-                  value={loan.memo ?? ''}
-                  onChange={(memo) => updateLoan(loan.id, { memo })}
-                  placeholder="선택 입력"
-                />
-              </Field>
+              <MemoField value={loan.memo ?? ''} onChange={(memo) => updateLoan(loan.id, { memo })} />
             </div>
 
-            <p className="mt-2 rounded-lg bg-brand-50 px-2.5 py-2 text-[11px] text-brand-800">
+            <p className="callout-info mt-3">
               {graceYears > 0
                 ? `거치 기간(첫 ${graceYears}년) 월 이자`
                 : loan.repaymentType === 'equalPrincipal'

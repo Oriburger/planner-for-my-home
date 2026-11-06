@@ -1,8 +1,10 @@
+import { currentYear } from '@/utils/time';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type {
   AssetItem,
   ExpenseItem,
+  GoalItem,
   HousingItem,
   ID,
   IncomeItem,
@@ -20,6 +22,16 @@ const uid = (): ID =>
     ? crypto.randomUUID()
     : `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
+/** 예전 저장 형식(startYear)을 asOfYear 로 바꾸고 빠진 값을 채운다 */
+export function normalizeSettings(
+  raw: Partial<SimulationSettings> & { startYear?: number },
+): SimulationSettings {
+  const { startYear, ...rest } = raw;
+  const now = currentYear();
+  const asOf = rest.asOfYear ?? startYear ?? now;
+  return { ...DEFAULT_SETTINGS, ...rest, asOfYear: Math.min(asOf, now) };
+}
+
 const 만 = 10_000;
 const 억 = 100_000_000;
 
@@ -28,7 +40,7 @@ const 억 = 100_000_000;
 /* ------------------------------------------------------------------ */
 
 export const DEFAULT_SETTINGS: SimulationSettings = {
-  startYear: new Date().getFullYear(),
+  asOfYear: currentYear(),
   years: 10,
   inflationRate: 2.5,
   taxMode: 'simplified',
@@ -277,6 +289,14 @@ export const createExpense = (): ExpenseItem => ({
 
 type ListKey = 'assets' | 'incomes' | 'housings' | 'loans' | 'expenses';
 
+function createSampleGoals(): GoalItem[] {
+  return [
+    { id: uid(), name: '종잣돈 2억', yearIndex: 2, amount: 20_000 * 만 },
+    { id: uid(), name: '내 집 계약금', yearIndex: 5, amount: 30_000 * 만 },
+    { id: uid(), name: '대출 없는 집', yearIndex: 10, amount: 55_000 * 만 },
+  ];
+}
+
 interface PlannerActions {
   updateSettings: (patch: Partial<SimulationSettings>) => void;
   setYears: (years: number) => void;
@@ -304,12 +324,18 @@ interface PlannerActions {
   resetAll: () => void;
   clearAll: () => void;
   importData: (data: PlannerData) => void;
+
+  addGoal: (goal?: Partial<GoalItem>) => void;
+  updateGoal: (id: ID, patch: Partial<GoalItem>) => void;
+  removeGoal: (id: ID) => void;
 }
 
 export type PlannerStore = PlannerData &
   PlannerActions & {
     /** 초기 설정 마법사를 이미 마쳤는지 (false 면 첫 방문으로 보고 자동으로 띄운다) */
     onboarded: boolean;
+    /** 연도별 순자산 목표 (계산 입력과 분리 — 결과를 바꾸지 않는다) */
+    goals: GoalItem[];
   };
 
 /** 리스트 항목 부분 수정 헬퍼 */
@@ -326,12 +352,21 @@ export const usePlannerStore = create<PlannerStore>()(
     (set, get) => ({
       ...createEmptyData(),
       onboarded: false,
+      goals: [],
 
       setOnboarded: (value) => set({ onboarded: value }),
-      loadSample: () => set({ ...createSampleData(), onboarded: true }),
+      loadSample: () =>
+        set({ ...createSampleData(), goals: createSampleGoals(), onboarded: true }),
 
       updateSettings: (patch) =>
-        set((state) => ({ settings: { ...state.settings, ...patch } })),
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            ...patch,
+            // 나이를 고치면 그 값은 '올해 기준'이 된다
+            ...('currentAge' in patch ? { asOfYear: currentYear() } : {}),
+          },
+        })),
 
       setYears: (years) =>
         set((state) => ({
@@ -378,7 +413,7 @@ export const usePlannerStore = create<PlannerStore>()(
         }),
 
       /** 전부 비우고 초기 설정 마법사를 다시 띄운다 */
-      resetAll: () => set({ ...createEmptyData(), onboarded: false }),
+      resetAll: () => set({ ...createEmptyData(), goals: [], onboarded: false }),
 
       clearAll: () =>
         set({
@@ -390,11 +425,45 @@ export const usePlannerStore = create<PlannerStore>()(
           expenses: [],
         }),
 
-      importData: (data) => set({ ...data }),
+      importData: (data) => set({ ...data, settings: normalizeSettings(data.settings) }),
+
+      addGoal: (goal) =>
+        set((s) => {
+          const sorted = [...s.goals].sort((a, b) => a.yearIndex - b.yearIndex);
+          const last = sorted[sorted.length - 1];
+          const yearIndex = Math.min(40, (last?.yearIndex ?? 0) + 3);
+          const next: GoalItem = {
+            id: uid(),
+            name: '새 목표',
+            yearIndex,
+            amount: last ? Math.round((last.amount * 1.3) / (1000 * 만)) * 1000 * 만 : 10_000 * 만,
+            ...goal,
+          };
+          return { goals: [...s.goals, next] };
+        }),
+      updateGoal: (id, patch) => set((s) => ({ goals: patchList(s.goals, id, patch) })),
+      removeGoal: (id) => set((s) => ({ goals: s.goals.filter((g) => g.id !== id) })),
     }),
     {
       name: 'planner-for-my-home:v1',
-      version: 1,
+      version: 2,
+      /**
+       * v1 → v2: 사용자 지정 '시작 연도(startYear)'를 없애고 '지금 = 올해'로 통일.
+       * 예전 startYear 는 입력 시점(asOfYear)으로 옮겨 현재 나이 보정에 쓴다.
+       */
+      migrate: (persisted) => {
+        const p = (persisted ?? {}) as Partial<PlannerStore>;
+        if (p.settings) p.settings = normalizeSettings(p.settings);
+        return p as PlannerStore;
+      },
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<PlannerStore>;
+        return {
+          ...current,
+          ...p,
+          settings: normalizeSettings({ ...current.settings, ...(p.settings ?? {}) }),
+        };
+      },
       partialize: (state) => ({
         onboarded: state.onboarded,
         settings: state.settings,
@@ -403,6 +472,7 @@ export const usePlannerStore = create<PlannerStore>()(
         housings: state.housings,
         loans: state.loans,
         expenses: state.expenses,
+        goals: state.goals,
       }),
     },
   ),

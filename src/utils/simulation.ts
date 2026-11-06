@@ -1,3 +1,4 @@
+import { ageOf, currentYear, effectiveAge, yearOf } from './time';
 import type {
   AssetItem,
   ExpenseItem,
@@ -116,8 +117,10 @@ export function rentOnlyForYear(item: HousingItem, yearIndex: number): number {
  * 보증금 납입/반환은 "자산 간 이동"이므로 총자산에 중립적으로 처리하고,
  * 유동자산 <-> 비유동자산 사이만 이동시킨다.
  */
-export function runSimulation(data: PlannerData): SimulationResult {
+export function runSimulation(data: PlannerData, baseYear = currentYear()): SimulationResult {
   const { settings, assets, incomes, housings, loans, expenses } = data;
+  /** 올해 기준으로 보정한 현재 나이 */
+  const ageNow = effectiveAge(settings, baseYear);
   const years = Math.max(1, Math.min(40, Math.round(settings.years)));
 
   // ---- 초기 상태 ----------------------------------------------------
@@ -277,7 +280,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
     /* ---- 6. 자동이체 납입 (여유자금 -> 개별 자산) ---- */
     const activeAssetsForContribution = assets.filter((a) =>
-      isContributionActive(a, yearIndex, settings.currentAge),
+      isContributionActive(a, yearIndex, ageNow),
     );
 
     // 자동이체는 "무조건 저축"이다. 여유자금이 모자라도 깎지 않고 전액 집행하며,
@@ -332,7 +335,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
     for (const asset of assets) {
       const balance = assetBalances.get(asset.id) ?? 0;
-      const matIndex = getAssetMaturityYearIndex(asset, settings.currentAge);
+      const matIndex = getAssetMaturityYearIndex(asset, ageNow);
       const isMatured = matIndex !== null && yearIndex >= matIndex;
 
       // 만기가 되었고 유동자산 전환 옵션이 켜져있으면(기본값 true) 유동자산으로 분류
@@ -359,9 +362,8 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
     rows.push({
       index: yearIndex,
-      year: settings.startYear + yearIndex - 1,
-      age:
-        settings.currentAge === null ? null : settings.currentAge + yearIndex - 1,
+      year: yearOf(baseYear, yearIndex),
+      age: ageOf(ageNow, yearIndex),
       grossIncome,
       taxAndInsurance,
       netIncome,
@@ -398,7 +400,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
   // 연금저축/IRP/ISA 만기 요약 생성
   const pensionMaturities: SimulationResult['summary']['pensionMaturities'] = [];
   for (const asset of assets) {
-    const matIndex = getAssetMaturityYearIndex(asset, settings.currentAge);
+    const matIndex = getAssetMaturityYearIndex(asset, ageNow);
     if (matIndex !== null && matIndex >= 1 && matIndex <= years) {
       const yearSnapshot = assetHistoryByYear.get(matIndex);
       const estimatedAmountAtMaturity =
@@ -408,11 +410,9 @@ export function runSimulation(data: PlannerData): SimulationResult {
         assetName: asset.name,
         assetType: asset.type,
         maturityYearIndex: matIndex,
-        maturityCalendarYear: settings.startYear + matIndex - 1,
+        maturityCalendarYear: yearOf(baseYear, matIndex),
         maturityAge:
-          settings.currentAge === null
-            ? null
-            : settings.currentAge + matIndex - 1,
+          ageOf(ageNow, matIndex),
         estimatedAmountAtMaturity,
         convertedToLiquid: asset.convertLiquidOnMaturity ?? true,
       });
@@ -454,7 +454,8 @@ export function isContributionActive(
   if (asset.monthlyContribution <= 0) return false;
   if (yearIndex < (asset.startYear ?? 1)) return false;
   const matIndex = getAssetMaturityYearIndex(asset, currentAge);
-  if (matIndex !== null && yearIndex >= matIndex) return false;
+  // 만기는 matIndex 년차의 '끝' — 그 해까지는 납입하고 다음 해부터 멈춘다
+  if (matIndex !== null && yearIndex > matIndex) return false;
   return true;
 }
 
@@ -467,23 +468,33 @@ export function getAssetMaturityYearIndex(
     return asset.maturityYear;
   }
   if (asset.maturityAge && currentAge && asset.maturityAge > currentAge) {
-    return asset.maturityAge - currentAge + 1;
+    // N년 후 나이 = 현재 나이 + N 이므로, 만기 나이에 닿는 연차는 그 차이
+    return asset.maturityAge - currentAge;
   }
   return null;
 }
 
 /** 시작 시점(0년차) 스냅샷 — 차트의 출발점으로 사용한다 */
-export function initialSnapshot(data: PlannerData): {
+export function initialSnapshot(
+  data: PlannerData,
+  baseYear = currentYear(),
+): {
   year: number;
+  age: number | null;
   totalAssets: number;
   netWorth: number;
 } {
   const totalAssets = data.assets
     .filter((a) => (a.startYear ?? 1) <= 1)
     .reduce((sum, a) => sum + a.amount, 0);
-  const loanBalance = data.loans.reduce((sum, l) => sum + l.principal, 0);
+  // 아직 실행되지 않은 미래 대출은 '지금' 빚이 아니다 (시뮬레이션 초기값과 동일 기준)
+  const loanBalance = data.loans
+    .filter((l) => l.startYear <= 1)
+    .reduce((sum, l) => sum + l.principal, 0);
   return {
-    year: data.settings.startYear - 1,
+    // '지금' = 올해
+    year: baseYear,
+    age: effectiveAge(data.settings, baseYear),
     totalAssets,
     netWorth: totalAssets - loanBalance,
   };

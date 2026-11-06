@@ -10,7 +10,7 @@ const 만 = 10_000;
 const 억 = 100_000_000;
 
 const mockSettings = {
-  startYear: 2026,
+  asOfYear: 2026,
   years: 10,
   inflationRate: 2,
   taxMode: 'flatRate' as const,
@@ -189,14 +189,14 @@ describe('timeline utilities', () => {
     expect(m200m?.reachedCalendarYear).toBe(2030);
   });
 
-  it('주요 시점 스냅샷(현재, 3년 후, 5년 후 등)을 구성한다', () => {
+  it('주요 시점 스냅샷(지금, 3년 후, 5년 후 등)을 구성한다', () => {
     const snapshots = extractHorizonSnapshots(mockRows, {
       totalAssets: 6000 * 만,
       netWorth: 6000 * 만,
       year: 2026,
     });
     expect(snapshots.length).toBeGreaterThanOrEqual(2);
-    expect(snapshots[0].label).toContain('현재');
+    expect(snapshots[0].label).toContain('지금');
   });
 
   it('연도별 타임라인 이벤트를 통합 추출한다 (만기, 주거 갱신, 대출 완납 등)', () => {
@@ -211,5 +211,20 @@ describe('timeline utilities', () => {
     // 대출 완납 이벤트 확인 (termYears 5 -> year index 5)
     const loanEvent = events.find((e) => e.category === 'loan' && e.title.includes('완납'));
     expect(loanEvent).toBeDefined();
+  });
+});
+
+describe('이벤트 시점 (N년차의 끝 = N년 후)', () => {
+  it('거치 2년 대출은 2년 후에 거치 종료, 지금 시작한 전세는 2년 후에 갱신', () => {
+    const data = {
+      ...mockData,
+      loans: [{ ...mockData.loans[0], id: 'g', startYear: 1, graceYears: 2, termYears: 8 }],
+      housings: [
+        { id: 'h', type: 'jeonse', name: '전세', deposit: 0, monthlyRent: 0, maintenanceFee: 0, growthRate: 0, startYear: 1, endYear: null },
+      ],
+    } as unknown as typeof mockData;
+    const events = extractTimelineEvents(data, mockRows, mockSummary);
+    expect(events.find((e) => e.id === 'loan-grace-g')?.yearIndex).toBe(2);
+    expect(events.filter((e) => e.category === 'housing').map((e) => e.yearIndex)[0]).toBe(2);
   });
 });

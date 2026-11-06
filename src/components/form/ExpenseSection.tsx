@@ -11,7 +11,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
-  TextArea,
+  MemoField,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -37,7 +37,7 @@ export function ExpenseSection() {
     <Accordion
       title="월 고정 지출"
       summary={`${expenses.length}개 · 월 ${formatKRWShort(monthlyTotal)}원`}
-      icon="🧾"
+      icon="receipt"
     >
       {expenses.length === 0 && (
         <EmptyState message="식비·교통비 등 고정 지출을 추가해 주세요." />
@@ -106,8 +106,7 @@ export function ExpenseSection() {
                     inflationRate: useDefault ? null : inflationRate,
                   })
                 }
-                label="전역 물가상승률 따르기"
-                description={`현재 ${inflationRate}% 적용 중`}
+                label={`기본 물가상승률 따르기 (${inflationRate}%)`}
               />
             </div>
 
@@ -124,13 +123,7 @@ export function ExpenseSection() {
               </Field>
             )}
 
-            <Field label="메모" className="col-span-2">
-              <TextArea
-                value={expense.memo ?? ''}
-                onChange={(memo) => updateExpense(expense.id, { memo })}
-                placeholder="선택 입력"
-              />
-            </Field>
+            <MemoField value={expense.memo ?? ''} onChange={(memo) => updateExpense(expense.id, { memo })} />
           </div>
         </ItemCard>
       ))}

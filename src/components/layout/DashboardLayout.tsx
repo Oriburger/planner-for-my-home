@@ -1,74 +1,127 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { InputPanel } from '@/components/form/InputPanel';
-import { ResultPanel } from '@/components/result/ResultPanel';
 import { OnboardingModal } from '@/components/onboarding/OnboardingModal';
+import { GoalEditor } from '@/components/home/GoalEditor';
+import { Sheet } from '@/components/ui/Sheet';
+import { ViewContent } from '@/components/views/Views';
+import { useSwipeNav } from '@/hooks/useSwipeNav';
 import { usePlannerStore } from '@/store/plannerStore';
-import { useUIStore } from '@/store/uiStore';
-import { AppFooter } from './AppFooter';
+import { useUIStore, type AppView } from '@/store/uiStore';
+import { haptic } from '@/utils/feedback';
 import { AppHeader } from './AppHeader';
-import { MobileSummaryBar } from './MobileSummaryBar';
+import { DesktopDock, MobileDock } from './Dock';
+import { SettingsSheet } from './SettingsSheet';
+import { Wallpaper } from './Wallpaper';
+
+/** 모바일에서 좌우로 밀 때의 화면 순서 */
+const SWIPE_ORDER: AppView[] = ['overview', 'plan', 'timeline', 'money', 'charts', 'table'];
 
 export function DashboardLayout() {
-  const viewMode = useUIStore((s) => s.viewMode);
   const onboarded = usePlannerStore((s) => s.onboarded);
+  const view = useUIStore((s) => s.view);
+  const setView = useUIStore((s) => s.setView);
+  const inputPanelOpen = useUIStore((s) => s.inputPanelOpen);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [sheet, setSheet] = useState<'wallpaper' | 'more' | null>(null);
+  const [goalsOpen, setGoalsOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
 
   // 첫 방문이면 자동으로 띄운다. (localStorage 복원이 끝난 뒤 판단)
   useEffect(() => {
     if (!onboarded) setWizardOpen(true);
   }, [onboarded]);
 
-  return (
-    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-slate-100/70 text-ink-900 transition-colors duration-300 dark:bg-[#0B0F19] dark:text-slate-100">
-      {/* Liquid Glass Background Aurora Orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -left-[10%] top-[-5%] h-[500px] w-[500px] rounded-full bg-gradient-to-br from-blue-400/25 to-indigo-500/20 blur-[130px] dark:from-blue-600/15 dark:to-indigo-700/15 animate-float-slow" />
-        <div className="absolute right-[-5%] top-[15%] h-[600px] w-[600px] rounded-full bg-gradient-to-tr from-sky-400/20 to-teal-400/15 blur-[140px] dark:from-sky-500/10 dark:to-emerald-600/10 animate-float-reverse" />
-        <div className="absolute bottom-[-10%] left-[25%] h-[550px] w-[550px] rounded-full bg-gradient-to-tr from-violet-400/20 to-pink-400/15 blur-[130px] dark:from-violet-600/10 dark:to-purple-800/10 animate-pulse-glow" />
-      </div>
+  // 화면 전환 방향 → 들어오는 애니메이션 방향
+  const prevView = useRef(view);
+  const order = (v: AppView) => SWIPE_ORDER.indexOf(v);
+  const enterClass =
+    prevView.current === view
+      ? 'animate-view-in'
+      : order(view) > order(prevView.current)
+        ? 'animate-from-right'
+        : 'animate-from-left';
+  useEffect(() => {
+    prevView.current = view;
+    window.scrollTo({ top: 0 });
+  }, [view]);
 
-      <AppHeader onOpenWizard={() => setWizardOpen(true)} />
+  // 모바일: 좌우 스와이프로 화면 넘기기
+  const onSwipe = useCallback(
+    (dir: 'left' | 'right') => {
+      const i = order(view);
+      const next = SWIPE_ORDER[i + (dir === 'left' ? 1 : -1)];
+      if (next) {
+        haptic(6);
+        setView(next);
+      }
+    },
+    [view, setView],
+  );
+  useSwipeNav(mainRef, onSwipe, !wizardOpen && !sheet && !goalsOpen);
+
+  // PC: 포인터를 따라가는 하이라이트 (.spotlight)
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== 'mouse') return;
+      const el = (e.target as HTMLElement | null)?.closest?.('.spotlight') as HTMLElement | null;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    };
+    document.addEventListener('pointermove', onMove, { passive: true });
+    return () => document.removeEventListener('pointermove', onMove);
+  }, []);
+
+  const showAside = inputPanelOpen || view === 'plan';
+  const closeSheet = useCallback(() => setSheet(null), []);
+  const closeGoals = useCallback(() => setGoalsOpen(false), []);
+
+  return (
+    <div className="relative flex min-h-screen min-h-[100dvh] flex-col overflow-x-clip text-ink-900 dark:text-slate-100">
+      <Wallpaper />
+      <AppHeader />
 
       <main
-        className={`w-full flex-1 px-4 py-4 sm:px-6 sm:py-6 transition-all duration-300 ${
-          viewMode === 'mobile'
-            ? 'mx-auto my-4 max-w-[420px] rounded-3xl border border-white/60 bg-white/75 p-4 shadow-glass-lg backdrop-blur-2xl dark:border-white/10 dark:bg-slate-900/70 dark:shadow-glass-dark'
-            : 'mx-auto max-w-[1440px]'
-        }`}
+        ref={mainRef}
+        className="mx-auto w-full max-w-[1440px] flex-1 px-3 pb-32 pt-3 sm:px-6 sm:pt-4 lg:px-8 lg:pb-36"
       >
         <div
-          className={
-            viewMode === 'mobile'
-              ? 'flex flex-col gap-4'
-              : viewMode === 'pc'
-                ? 'grid grid-cols-[380px_minmax(0,1fr)] items-start gap-6'
-                : 'grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] lg:gap-6'
-          }
+          className={`lg:grid lg:items-start lg:gap-6 ${
+            showAside ? 'lg:grid-cols-[minmax(340px,380px)_minmax(0,1fr)]' : 'lg:grid-cols-1'
+          }`}
         >
-          {/* 입력 패널 */}
-          <div
-            className={
-              viewMode === 'mobile'
-                ? 'w-full'
-                : 'lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-5.5rem)] lg:overflow-y-auto lg:pr-1 thin-scrollbar'
-            }
-          >
-            <InputPanel />
-          </div>
+          {showAside && (
+            <aside className="aside-fade thin-scrollbar hidden lg:sticky lg:top-[5.25rem] lg:-mx-3 lg:block lg:max-h-[calc(100dvh-11.5rem)] lg:overflow-y-auto lg:overscroll-contain lg:px-3 lg:pb-4">
+              <InputPanel />
+            </aside>
+          )}
 
-          {/* 결과 패널 */}
-          <div id="result" className="scroll-mt-20">
-            <ResultPanel />
+          <div key={view} className={`${enterClass} min-w-0`}>
+            <ViewContent view={view} onEditGoals={() => setGoalsOpen(true)} />
           </div>
         </div>
       </main>
 
-      <AppFooter />
-      <MobileSummaryBar />
+      <DesktopDock
+        onOpenWizard={() => setWizardOpen(true)}
+        onOpenSettings={() => setSheet(sheet === 'wallpaper' ? null : 'wallpaper')}
+        onOpenGoals={() => setGoalsOpen(true)}
+      />
+      <MobileDock onOpenMore={() => setSheet('more')} />
 
-      {wizardOpen && (
-        <OnboardingModal onClose={() => setWizardOpen(false)} />
-      )}
+      <SettingsSheet
+        open={sheet !== null}
+        mode={sheet ?? 'wallpaper'}
+        onClose={closeSheet}
+        onOpenWizard={() => setWizardOpen(true)}
+      />
+
+      <Sheet open={goalsOpen} title="연도별 목표" onClose={closeGoals} desktop="center">
+        <GoalEditor />
+      </Sheet>
+
+      {wizardOpen && <OnboardingModal onClose={() => setWizardOpen(false)} />}
     </div>
   );
 }

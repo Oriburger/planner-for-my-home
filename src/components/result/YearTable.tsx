@@ -22,9 +22,7 @@ const COLUMNS: Array<{
   { key: 'netWorth', label: '순자산' },
 ];
 
-/**
- * 연도별 상세 표 (Liquid Glass)
- */
+/** 연도별 상세 표 */
 export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? rows : rows.slice(0, 10);
@@ -33,26 +31,27 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
     <Card>
       <CardHeader
         title="연도별 상세 데이터"
+        icon="table"
         action={
           rows.length > 10 ? (
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}
-              className="shrink-0 rounded-xl border border-white/60 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink-700 shadow-xs backdrop-blur-md transition-all hover:bg-white dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="btn-glass shrink-0 px-3 text-xs"
             >
-              {expanded ? '접기' : `전체 ${rows.length}년 펼쳐보기`}
+              {expanded ? '접기' : `전체 ${rows.length}년`}
             </button>
           ) : undefined
         }
       />
 
-      <div className="overflow-x-auto thin-scrollbar">
-        <table className="w-full min-w-[960px] border-collapse text-right text-xs tabular-nums">
+      <div className="thin-scrollbar mt-3 overflow-x-auto overscroll-x-contain pb-2">
+        <table className="w-full min-w-[1000px] border-collapse text-right text-xs tabular-nums">
           <thead>
-            <tr className="border-b border-white/40 text-ink-500 dark:border-white/10 dark:text-slate-400">
+            <tr className="hairline border-y text-ink-600 dark:text-slate-400">
               <th
                 scope="col"
-                className="sticky left-0 z-10 bg-white/90 px-3.5 py-3 text-left font-bold backdrop-blur-md dark:bg-slate-900/90"
+                className="sticky left-0 z-10 bg-[#f9fafb] px-4 py-3 text-left font-semibold shadow-[1px_0_0_var(--hairline)] dark:bg-[#1b1d23] sm:px-5"
               >
                 연도
               </th>
@@ -60,7 +59,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
                 <th
                   key={col.key}
                   scope="col"
-                  className="whitespace-nowrap px-3 py-3 font-semibold"
+                  className="whitespace-nowrap px-3 py-3 font-semibold last:pr-5"
                 >
                   {col.label}
                 </th>
@@ -72,15 +71,15 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
             {visible.map((row) => (
               <tr
                 key={row.index}
-                className="border-b border-ink-100/50 transition-colors duration-150 hover:bg-brand-50/50 dark:border-white/5 dark:hover:bg-slate-800/50"
+                className="hairline group border-b transition-colors duration-150 last:border-b-0 hover:bg-brand-500/[0.04] dark:hover:bg-white/[0.03]"
               >
                 <th
                   scope="row"
-                  className="sticky left-0 z-10 whitespace-nowrap bg-white/90 px-3.5 py-2.5 text-left font-bold text-ink-800 backdrop-blur-md dark:bg-slate-900/90 dark:text-slate-200"
+                  className="sticky left-0 z-10 whitespace-nowrap bg-[#f9fafb] px-4 py-2.5 text-left font-semibold text-ink-800 shadow-[1px_0_0_var(--hairline)] dark:bg-[#1b1d23] dark:text-slate-200 sm:px-5"
                 >
                   {row.year}
-                  <span className="ml-1 text-[11px] font-normal text-ink-400 dark:text-slate-500">
-                    {row.age !== null ? `${row.age}세` : `${row.index}년차`}
+                  <span className="ml-1 text-[11px] font-normal text-ink-500 dark:text-slate-500">
+                    {row.age !== null ? `${row.age}세` : `${row.index}년 후`}
                   </span>
                 </th>
 
@@ -90,15 +89,15 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
                   return (
                     <td
                       key={col.key}
-                      className={`whitespace-nowrap px-3 py-2.5 font-medium ${
+                      className={`whitespace-nowrap px-3 py-2.5 font-medium last:pr-5 ${
                         value < 0
                           ? 'text-rose-600 dark:text-rose-400'
                           : negative
-                            ? 'text-ink-500 dark:text-slate-400'
+                            ? 'text-ink-600 dark:text-slate-400'
                             : 'text-ink-800 dark:text-slate-200'
                       }`}
                     >
-                      {col.tone === 'negative' && value > 0 ? '-' : ''}
+                      {col.tone === 'negative' && Math.round(value) > 0 ? '-' : ''}
                       {formatKRWShort(value)}
                     </td>
                   );

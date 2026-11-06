@@ -4,6 +4,7 @@ import type {
   YearResult,
 } from '@/types/planner';
 import { formatKRWShort } from './format';
+import { initialSnapshot } from './simulation';
 
 const 만 = 10_000;
 const 억 = 100_000_000;
@@ -95,7 +96,7 @@ export function extractAssetMilestones(
  */
 export function extractHorizonSnapshots(
   rows: YearResult[],
-  start: { totalAssets: number; netWorth: number; year: number },
+  start: { totalAssets: number; netWorth: number; year: number; age?: number | null },
 ): HorizonSnapshot[] {
   if (rows.length === 0) return [];
 
@@ -105,8 +106,8 @@ export function extractHorizonSnapshots(
   snapshots.push({
     yearIndex: 0,
     calendarYear: start.year,
-    age: rows[0]?.age ? rows[0].age - 1 : null,
-    label: '현재',
+    age: start.age ?? null,
+    label: '지금',
     netWorth: start.netWorth,
     liquidAssets: 0,
     totalAssets: start.totalAssets,
@@ -160,7 +161,8 @@ export function extractTimelineEvents(
   const events: TimelineEvent[] = [];
 
   // 1. 순자산 마일스톤 이벤트
-  const milestones = extractAssetMilestones(rows, rows[0].totalAssets - rows[0].loanBalance);
+  // 기준은 '지금' 순자산 — 1년차 중에 넘는 마일스톤도 잡는다
+  const milestones = extractAssetMilestones(rows, initialSnapshot(data).netWorth);
   for (const m of milestones) {
     events.push({
       id: `milestone-${m.target}`,
@@ -168,7 +170,7 @@ export function extractTimelineEvents(
       calendarYear: m.reachedCalendarYear,
       age: m.reachedAge,
       category: 'milestone',
-      title: `순자산 ${m.targetLabel} 달성 🚀`,
+      title: `순자산 ${m.targetLabel} 달성`,
       description: `예상 순자산이 ${formatKRWShort(m.netWorth)}원에 도달합니다.`,
       badge: '목표 달성',
       badgeColor: 'emerald',
@@ -200,7 +202,8 @@ export function extractTimelineEvents(
   for (const loan of data.loans) {
     // 거치 종료
     if (loan.graceYears && loan.graceYears > 0) {
-      const graceEndIndex = loan.startYear + loan.graceYears;
+      // 거치는 (startYear + grace - 1)년차의 끝에 끝나고 다음 해부터 원금 상환
+      const graceEndIndex = loan.startYear + loan.graceYears - 1;
       const targetRow = rows.find((r) => r.index === graceEndIndex);
       if (targetRow) {
         events.push({
@@ -227,7 +230,7 @@ export function extractTimelineEvents(
         calendarYear: payoffRow.year,
         age: payoffRow.age,
         category: 'loan',
-        title: `${loan.name} 완납 🎉`,
+        title: `${loan.name} 완납`,
         description: `대출 원리금 상환이 종료되어 매월 잉여 자금이 증가합니다.`,
         badge: '대출 완납',
         badgeColor: 'emerald',
@@ -238,8 +241,8 @@ export function extractTimelineEvents(
   // 4. 주거 이벤트 (전세 2년 갱신 주기 알림 등)
   for (const housing of data.housings) {
     if (housing.type === 'jeonse') {
-      // 2년 주기 전세 갱신 시점 표시 (startYear + 2, startYear + 4 ...)
-      for (let y = housing.startYear + 2; y <= data.settings.years; y += 2) {
+      // h년차에 시작한 계약은 (h-1)년 후에 시작 → 2년 뒤인 (h+1)년차 끝에 갱신
+      for (let y = housing.startYear + 1; y <= data.settings.years; y += 2) {
         const row = rows.find((r) => r.index === y);
         if (row && (housing.endYear === null || y <= housing.endYear)) {
           events.push({

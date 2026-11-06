@@ -13,10 +13,11 @@ import type { SimulationResult } from '@/types/planner';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { formatAxis } from '@/utils/format';
 import { ChartTooltip } from './ChartTooltip';
-import { CHART, SERIES, axisTick } from './chartTheme';
+import { SERIES, axisTick, useChartTheme } from './chartTheme';
 
 /** 실수령액이 어디로 흘러가는지 — 연도별 누적 막대 */
 export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
+  const CHART = useChartTheme();
   const data = useMemo(
     () =>
       rows.map((row) => ({
@@ -32,8 +33,8 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
 
   return (
     <Card>
-      <CardHeader title="연간 현금흐름" />
-      <div className="px-1 py-4 pr-3 sm:px-2 sm:pr-5">
+      <CardHeader title="현금 흐름" icon="flow" />
+      <div className="px-1 pb-3 pt-2 pr-3 sm:px-2 sm:pr-5">
         <ResponsiveContainer width="100%" height={260}>
           <BarChart
             data={data}
@@ -42,13 +43,13 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
             <CartesianGrid vertical={false} stroke={CHART.grid} />
             <XAxis
               dataKey="label"
-              tick={axisTick}
+              tick={axisTick(CHART)}
               tickLine={false}
               axisLine={{ stroke: CHART.axis }}
               minTickGap={16}
             />
             <YAxis
-              tick={axisTick}
+              tick={axisTick(CHART)}
               tickLine={false}
               axisLine={false}
               width={52}
@@ -56,7 +57,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
             />
             <Tooltip
               content={<ChartTooltip />}
-              cursor={{ fill: 'rgba(15, 23, 42, 0.04)' }}
+              cursor={{ fill: CHART.cursorFill }}
             />
             <Legend
               verticalAlign="top"
@@ -68,6 +69,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
 
             {/* stroke 를 표면색으로 주어 스택 세그먼트 사이 2px 간격을 만든다 */}
             <Bar
+              animationDuration={650}
               dataKey="livingExpense"
               name="생활비"
               stackId="flow"
@@ -76,6 +78,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
               strokeWidth={2}
             />
             <Bar
+              animationDuration={650}
               dataKey="housingCost"
               name="주거비"
               stackId="flow"
@@ -84,6 +87,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
               strokeWidth={2}
             />
             <Bar
+              animationDuration={650}
               dataKey="loanPayment"
               name="대출 상환"
               stackId="flow"
@@ -92,6 +96,7 @@ export function CashflowChart({ rows }: { rows: SimulationResult['rows'] }) {
               strokeWidth={2}
             />
             <Bar
+              animationDuration={650}
               dataKey="annualSavings"
               name="저축"
               stackId="flow"

@@ -215,8 +215,11 @@ export interface ExpenseItem {
 /* ------------------------------------------------------------------ */
 
 export interface SimulationSettings {
-  /** 시뮬레이션 시작 연도 (예: 2026) */
-  startYear: number;
+  /**
+   * 입력값을 마지막으로 정리한 해 (예: 2026).
+   * '지금'은 항상 올해이며, 현재 나이는 이 해 기준 값을 올해로 보정해 쓴다.
+   */
+  asOfYear: number;
   /** 시뮬레이션 기간 (년). 1 ~ 40 */
   years: number;
   /** 전역 물가 상승률 (%) — 지출 항목의 기본값 */
@@ -233,7 +236,7 @@ export interface SimulationSettings {
   applyAssetReturn: boolean;
   /** 매년 남은 저축액이 쌓이는 여유자금의 운용 수익률 (%) */
   savingsReturnRate: number;
-  /** 현재 나이 (선택) — 차트 x축 보조 표기용 */
+  /** 현재 나이 (선택, asOfYear 기준) — 차트 x축 보조 표기용 */
   currentAge: number | null;
   /** 연말정산 환급(저축·주거 공제 절감세액)을 매년 현금흐름에 반영할지 */
   applyTaxRefund: boolean;
@@ -248,7 +251,7 @@ export interface SimulationSettings {
 export interface YearResult {
   /** 시뮬레이션 연차 (1 = 첫 해) */
   index: number;
-  /** 실제 연도 (예: 2026) */
+  /** 실제 연도 = 올해 + 연차 (1년 후 = 올해 + 1) */
   year: number;
   age: number | null;
 
@@ -361,4 +364,18 @@ export interface PlannerData {
   housings: HousingItem[];
   loans: LoanItem[];
   expenses: ExpenseItem[];
+}
+
+/* ------------------------------------------------------------------ */
+/* 연도별 목표                                                          */
+/* ------------------------------------------------------------------ */
+
+/** 특정 연차까지 모으고 싶은 순자산 목표 */
+export interface GoalItem {
+  id: ID;
+  name: string;
+  /** 목표 연차 (1 = 1년차 말) */
+  yearIndex: number;
+  /** 목표 순자산 (원) */
+  amount: number;
 }

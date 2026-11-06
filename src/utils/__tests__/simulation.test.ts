@@ -7,7 +7,7 @@ import type { PlannerData, SimulationSettings } from '@/types/planner';
 const 만 = 10_000;
 
 const baseSettings: SimulationSettings = {
-  startYear: 2026,
+  asOfYear: 2026,
   years: 10,
   inflationRate: 0,
   taxMode: 'flatRate',

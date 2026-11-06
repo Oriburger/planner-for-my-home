@@ -1,5 +1,7 @@
-import { useId, useState, type ReactNode } from 'react';
+import { useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { fromMan, toMan } from '@/utils/format';
+import { InfoTip } from './InfoTip';
+import { Icon } from './Icon';
 
 /* ------------------------------------------------------------------ */
 /* 라벨 래퍼                                                           */
@@ -22,17 +24,24 @@ export function Field({
 }: FieldProps) {
   return (
     <label className={`block ${className}`} htmlFor={htmlFor}>
-      <span className="mb-1 flex items-baseline justify-between gap-2">
-        <span className="text-xs font-medium text-ink-600 dark:text-slate-300">{label}</span>
-        {hint && <span className="text-[11px] text-ink-400 dark:text-slate-400">{hint}</span>}
+      <span className="mb-1.5 flex items-baseline justify-between gap-2 px-0.5">
+        <span className="min-w-0 break-keep text-xs font-medium text-ink-600 dark:text-slate-300">{label}</span>
+        {/* 짧은 힌트는 그대로, 긴 설명은 ⓘ 뒤로 */}
+        {hint &&
+          (hint.length <= 6 ? (
+            <span className="min-w-0 shrink truncate text-[11px] text-ink-500 dark:text-slate-500">
+              {hint}
+            </span>
+          ) : (
+            <InfoTip text={hint} label={`${label} 설명`} />
+          ))}
       </span>
       {children}
     </label>
   );
 }
 
-const inputClass =
-  'w-full rounded-xl border border-white/80 bg-white/70 px-3 py-2.5 text-sm text-ink-900 tabular-nums shadow-xs backdrop-blur-md transition-all duration-200 placeholder:text-ink-400 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/25 disabled:bg-slate-100/60 disabled:text-ink-400 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-brand-400 dark:focus:bg-slate-900/90 dark:disabled:bg-slate-800/40';
+const inputClass = 'glass-field';
 
 /* ------------------------------------------------------------------ */
 /* 숫자 입력 (포커스 중에는 draft 문자열을 그대로 유지)                 */
@@ -108,7 +117,7 @@ function NumericInput({
         }}
       />
       {suffix && (
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink-400">
+        <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-medium text-ink-500 dark:text-slate-500">
           {suffix}
         </span>
       )}
@@ -243,17 +252,20 @@ export function TextArea({
   placeholder,
   id,
   rows = 2,
+  autoFocus,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   id?: string;
   rows?: number;
+  autoFocus?: boolean;
 }) {
   return (
     <textarea
       id={id}
       rows={rows}
+      autoFocus={autoFocus}
       className={`${inputClass} resize-none`}
       value={value}
       placeholder={placeholder}
@@ -292,7 +304,7 @@ export function Select<T extends string>({
       </select>
 
       <svg
-        className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-400"
+        className="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-500 dark:text-slate-500"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"
@@ -320,30 +332,25 @@ export function Toggle({
 }) {
   const id = useId();
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border border-ink-200 bg-white px-3 py-2.5 dark:border-slate-700 dark:bg-slate-900">
-      <label htmlFor={id} className="min-w-0 cursor-pointer">
-        <span className="block text-xs font-medium text-ink-700 dark:text-slate-200">{label}</span>
-        {description && (
-          <span className="mt-0.5 block text-[11px] text-ink-400 dark:text-slate-400">
-            {description}
-          </span>
-        )}
-      </label>
+    <div className="flex items-center justify-between gap-3 rounded-lg border border-ink-900/[0.06] px-3 py-2.5 dark:border-white/[0.07]">
+      <span className="flex min-w-0 items-center gap-1.5">
+        <label
+          htmlFor={id}
+          className="min-w-0 cursor-pointer text-[13px] font-medium text-ink-800 dark:text-slate-100"
+        >
+          {label}
+        </label>
+        {description && <InfoTip text={description} label={`${label} 설명`} />}
+      </span>
       <button
         id={id}
         type="button"
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 shrink-0 rounded-full transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1 ${
-          checked ? 'bg-brand-600' : 'bg-ink-300 dark:bg-slate-700'
-        }`}
+        className="switch"
       >
-        <span
-          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
-            checked ? 'left-[1.375rem]' : 'left-0.5'
-          }`}
-        />
+        <span className="switch-knob" />
       </button>
     </div>
   );
@@ -360,21 +367,110 @@ export function SegmentedControl<T extends string>({
   options: Array<{ value: T; label: string }>;
 }) {
   return (
-    <div className="flex rounded-xl border border-ink-200 bg-ink-100 p-0.5 dark:border-slate-700 dark:bg-slate-800">
+    <div className="segmented" role="group">
       {options.map((opt) => (
         <button
           key={opt.value}
           type="button"
+          aria-pressed={value === opt.value}
           onClick={() => onChange(opt.value)}
-          className={`flex-1 rounded-[0.625rem] px-2 py-1.5 text-xs font-medium transition ${
-            value === opt.value
-              ? 'bg-white text-brand-700 shadow-sm dark:bg-slate-900 dark:text-brand-400'
-              : 'text-ink-500 hover:text-ink-700 dark:text-slate-400 dark:hover:text-slate-200'
-          }`}
+          className="segmented-item"
         >
           {opt.label}
         </button>
       ))}
     </div>
+  );
+}
+
+/** 채워진 트랙이 있는 레인지 슬라이더 */
+export function RangeInput({
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  label,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  label: string;
+}) {
+  const progress = ((value - min) / Math.max(1, max - min)) * 100;
+  return (
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      aria-label={label}
+      style={{ '--range-progress': `${progress}%` } as CSSProperties}
+    />
+  );
+}
+
+/** 빠른 선택용 프리셋 버튼 묶음 (예: 5년 · 10년 · 20년) */
+export function PresetGroup<T extends number | string>({
+  value,
+  onChange,
+  options,
+  format,
+}: {
+  value: T;
+  onChange: (value: T) => void;
+  options: readonly T[];
+  format: (value: T) => string;
+}) {
+  return (
+    <div className="segmented">
+      {options.map((opt) => (
+        <button
+          key={String(opt)}
+          type="button"
+          aria-pressed={value === opt}
+          onClick={() => onChange(opt)}
+          className="segmented-item"
+        >
+          {format(opt)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** 메모 — 비어 있으면 '+ 메모' 버튼만 보여 입력 화면을 짧게 유지한다 */
+export function MemoField({
+  value,
+  onChange,
+  className = 'col-span-2',
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  if (!value && !open) {
+    return (
+      <div className={className}>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="-ml-1 inline-flex min-h-[2rem] items-center gap-1 rounded-md px-1.5 text-xs font-medium text-ink-500 transition-colors hover:bg-ink-900/[0.04] hover:text-ink-900 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
+        >
+          <Icon name="plus" className="h-3.5 w-3.5" />
+          메모
+        </button>
+      </div>
+    );
+  }
+  return (
+    <Field label="메모" className={className}>
+      <TextArea value={value} onChange={onChange} placeholder="선택 입력" autoFocus={open && !value} />
+    </Field>
   );
 }

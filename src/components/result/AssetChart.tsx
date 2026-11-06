@@ -14,19 +14,20 @@ import type { SimulationResult } from '@/types/planner';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { formatAxis } from '@/utils/format';
 import { ChartTooltip } from './ChartTooltip';
-import { CHART, axisTick } from './chartTheme';
+import { axisTick, useChartTheme } from './chartTheme';
 
 interface AssetChartProps {
   rows: SimulationResult['rows'];
   start: { year: number; totalAssets: number; netWorth: number };
 }
 
-/** 연도별 자산 변화 — 총자산 / 순자산 / 대출 잔액 (Liquid Glass) */
+/** 연도별 자산 변화 — 총자산 / 순자산 / 대출 잔액 */
 export function AssetChart({ rows, start }: AssetChartProps) {
+  const CHART = useChartTheme();
   const data = useMemo(
     () => [
       {
-        label: '현재',
+        label: '지금',
         totalAssets: start.totalAssets,
         netWorth: start.netWorth,
         loanBalance: start.totalAssets - start.netWorth,
@@ -43,9 +44,9 @@ export function AssetChart({ rows, start }: AssetChartProps) {
 
   return (
     <Card>
-      <CardHeader title="연도별 자산 변화 추이" />
-      <div className="px-1 py-4 pr-3 sm:px-2 sm:pr-5">
-        <ResponsiveContainer width="100%" height={320}>
+      <CardHeader title="자산 변화" icon="trend" />
+      <div className="px-1 pb-3 pt-2 pr-3 sm:px-2 sm:pr-5">
+        <ResponsiveContainer width="100%" height={300}>
           <ComposedChart
             data={data}
             margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
@@ -65,13 +66,13 @@ export function AssetChart({ rows, start }: AssetChartProps) {
             />
             <XAxis
               dataKey="label"
-              tick={axisTick}
+              tick={axisTick(CHART)}
               tickLine={false}
               axisLine={{ stroke: CHART.axis }}
               minTickGap={16}
             />
             <YAxis
-              tick={axisTick}
+              tick={axisTick(CHART)}
               tickLine={false}
               axisLine={false}
               width={52}
@@ -90,6 +91,7 @@ export function AssetChart({ rows, start }: AssetChartProps) {
             />
 
             <Area
+              animationDuration={650}
               type="monotone"
               dataKey="totalAssets"
               name="총자산"
@@ -99,15 +101,17 @@ export function AssetChart({ rows, start }: AssetChartProps) {
               activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}
             />
             <Line
+              animationDuration={650}
               type="monotone"
               dataKey="netWorth"
               name="순자산"
-              stroke="#10B981"
+              stroke="#348d6a"
               strokeWidth={2.5}
               dot={false}
               activeDot={{ r: 5, strokeWidth: 2, stroke: CHART.surface }}
             />
             <Line
+              animationDuration={650}
               type="monotone"
               dataKey="loanBalance"
               name="대출 잔액"

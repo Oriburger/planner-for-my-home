@@ -12,7 +12,7 @@ import {
   MoneyInput,
   PercentInput,
   Select,
-  TextArea,
+  MemoField,
   TextInput,
   Toggle,
 } from '@/components/ui/Fields';
@@ -43,7 +43,7 @@ export function AssetSection() {
     <Accordion
       title="현재 보유 자산"
       summary={`${assets.length}개 · 총 ${formatKRWShort(total)}원`}
-      icon="🏦"
+      icon="wallet"
       defaultOpen
     >
       {assets.length === 0 && (
@@ -102,7 +102,7 @@ export function AssetSection() {
                 />
               </Field>
 
-              <Field label="월 자동이체" hint="정기 납입" className="col-span-2">
+              <Field label="월 자동이체" hint="정기 납입">
                 <MoneyInput
                   value={asset.monthlyContribution}
                   onChange={(monthlyContribution) =>
@@ -113,7 +113,7 @@ export function AssetSection() {
 
               {hasMaturity && (
                 <>
-                  <Field label="만기/수령 연차" hint="비우면 미설정">
+                  <Field label="만기 시점" hint="비우면 미설정">
                     <CountInput
                       value={asset.maturityYear ?? 0}
                       onChange={(v) =>
@@ -121,6 +121,7 @@ export function AssetSection() {
                       }
                       min={0}
                       max={40}
+                      suffix="년 후"
                       blankOnZero
                       placeholder="만기 없음"
                     />
@@ -146,13 +147,7 @@ export function AssetSection() {
                 </>
               )}
 
-              <Field label="메모" className="col-span-2">
-                <TextArea
-                  value={asset.memo ?? ''}
-                  onChange={(memo) => updateAsset(asset.id, { memo })}
-                  placeholder="선택 입력"
-                />
-              </Field>
+              <MemoField value={asset.memo ?? ''} onChange={(memo) => updateAsset(asset.id, { memo })} />
 
               <div className="col-span-2 space-y-2 pt-1">
                 <Toggle
@@ -201,14 +196,10 @@ function ContributionBalanceHint() {
   return (
     <div
       role={short ? 'alert' : undefined}
-      className={`rounded-xl px-3 py-2.5 text-xs ${
-        short
-          ? 'bg-rose-50 text-rose-800 dark:bg-rose-950/40 dark:text-rose-300'
-          : 'bg-brand-50 text-brand-800 dark:bg-blue-950/40 dark:text-blue-200'
-      }`}
+      className={short ? 'callout-danger' : 'callout-info'}
     >
       <p>
-        1년차 자동이체{' '}
+        연 자동이체{' '}
         <strong className="font-semibold tabular-nums">
           {formatKRWShort(first.contribution)}원
         </strong>{' '}
@@ -219,9 +210,7 @@ function ContributionBalanceHint() {
       </p>
       {short && (
         <p className="mt-1 leading-relaxed">
-          {shortfallYear}년차에 여유자금이 최대{' '}
-          {formatKRWShort(summary.maxContributionShortfall)}원 모자랍니다.
-          자동이체 금액을 줄여주세요.
+          {shortfallYear}년차부터 최대 {formatKRWShort(summary.maxContributionShortfall)}원 부족해요.
         </p>
       )}
     </div>
