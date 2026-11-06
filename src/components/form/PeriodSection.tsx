@@ -140,6 +140,20 @@ export function PeriodSection() {
           label="자산 운용수익 반영"
           description="끄면 수익률 없이 저축액만 단순 누적합니다."
         />
+
+        <Toggle
+          checked={settings.applyTaxRefund}
+          onChange={(v) => updateSettings({ applyTaxRefund: v })}
+          label="연말정산 환급 반영"
+          description="연금저축·청약·월세 공제로 덜 내는 세금을 매년 현금흐름에 더합니다."
+        />
+
+        <Toggle
+          checked={settings.houselessHead}
+          onChange={(v) => updateSettings({ houselessHead: v })}
+          label="무주택 세대주"
+          description="청약·월세·전세대출 공제의 공통 요건입니다. 자가라면 꺼주세요."
+        />
       </div>
     </Card>
   );

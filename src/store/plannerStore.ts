@@ -36,6 +36,8 @@ export const DEFAULT_SETTINGS: SimulationSettings = {
   applyAssetReturn: true,
   savingsReturnRate: 3.0,
   currentAge: null,
+  applyTaxRefund: true,
+  houselessHead: true,
 };
 
 /** 초기 설정을 마치기 전의 빈 상태 */

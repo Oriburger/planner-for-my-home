@@ -15,6 +15,8 @@ const baseSettings: SimulationSettings = {
   applyAssetReturn: false,
   savingsReturnRate: 0,
   currentAge: null,
+  applyTaxRefund: false,
+  houselessHead: false,
 };
 
 function makeData(overrides: Partial<PlannerData> = {}): PlannerData {
@@ -380,6 +382,141 @@ describe('runSimulation', () => {
       small.rows[0].contribution * 10,
       0,
     );
+  });
+
+  it('연말정산 환급을 켜면 공제 대상 자동이체만큼 저축액이 늘어난다', () => {
+    const build = (applyTaxRefund: boolean) =>
+      makeData({
+        settings: {
+          ...baseSettings,
+          years: 3,
+          taxMode: 'simplified',
+          applyAssetReturn: false,
+          applyTaxRefund,
+          houselessHead: true,
+        },
+        assets: [
+          {
+            id: 'a1',
+            type: 'pension',
+            name: '연금저축',
+            amount: 0,
+            annualReturnRate: 0,
+            liquid: false,
+            monthlyContribution: 50 * 만, // 연 600만 -> 16.5% 세액공제
+          },
+        ],
+        incomes: [
+          {
+            id: 'i1',
+            type: 'salary',
+            name: '연봉',
+            annualAmount: 5000 * 만,
+            growthMode: 'fixed',
+            growthRate: 0,
+            manualGrowthRates: [],
+            taxable: true,
+            startYear: 1,
+            endYear: null,
+          },
+        ],
+      });
+
+    const off = runSimulation(build(false));
+    const on = runSimulation(build(true));
+
+    expect(off.rows[0].taxRefund).toBe(0);
+    // 연금저축 600만 x 16.5% = 99만
+    expect(on.rows[0].taxRefund).toBeCloseTo(99 * 만, 0);
+    expect(on.rows[0].annualSavings - off.rows[0].annualSavings).toBeCloseTo(
+      99 * 만,
+      0,
+    );
+    // 환급은 현금으로 들어오므로 총자산도 그만큼 늘어난다
+    expect(on.rows[0].totalAssets - off.rows[0].totalAssets).toBeCloseTo(
+      99 * 만,
+      0,
+    );
+    expect(on.summary.totalTaxRefund).toBeCloseTo(99 * 만 * 3, 0);
+    expect(off.summary.totalTaxRefund).toBe(0);
+  });
+
+  it('월세 세액공제는 관리비를 제외한 순수 월세만 대상으로 한다', () => {
+    const data = makeData({
+      settings: {
+        ...baseSettings,
+        years: 1,
+        taxMode: 'simplified',
+        applyAssetReturn: false,
+        applyTaxRefund: true,
+        houselessHead: true,
+      },
+      incomes: [
+        {
+          id: 'i1',
+          type: 'salary',
+          name: '연봉',
+          annualAmount: 5000 * 만,
+          growthMode: 'fixed',
+          growthRate: 0,
+          manualGrowthRates: [],
+          taxable: true,
+          startYear: 1,
+          endYear: null,
+        },
+      ],
+      housings: [
+        {
+          id: 'h1',
+          type: 'wolse',
+          name: '월세집',
+          deposit: 0,
+          monthlyRent: 50 * 만, // 연 600만
+          monthlyMaintenance: 20 * 만, // 공제 대상 아님
+          annualIncreaseRate: 0,
+          startYear: 1,
+          endYear: null,
+        },
+      ],
+    });
+
+    // 600만 x 17% = 102만. 관리비까지 셌다면 840만 x 17% = 142.8만이 된다.
+    expect(runSimulation(data).rows[0].taxRefund).toBeCloseTo(102 * 만, 0);
+  });
+
+  it('자산별 잔액 이력을 연차별로 돌려준다', () => {
+    const data = makeData({
+      settings: { ...baseSettings, years: 2, applyAssetReturn: false },
+      assets: [
+        {
+          id: 'a1',
+          type: 'cash',
+          name: '파킹',
+          amount: 1000 * 만,
+          annualReturnRate: 0,
+          liquid: true,
+          monthlyContribution: 10 * 만,
+        },
+      ],
+      incomes: [
+        {
+          id: 'i1',
+          type: 'salary',
+          name: '연봉',
+          annualAmount: 3000 * 만,
+          growthMode: 'fixed',
+          growthRate: 0,
+          manualGrowthRates: [],
+          taxable: false,
+          startYear: 1,
+          endYear: null,
+        },
+      ],
+    });
+
+    const { assetBalances } = runSimulation(data);
+    expect(assetBalances.get(1)?.get('a1')).toBeCloseTo(1120 * 만, 0);
+    expect(assetBalances.get(2)?.get('a1')).toBeCloseTo(1240 * 만, 0);
   });
 
   it('순자산은 대출 잔액을 뺀 값이며 상환에 따라 잔액이 줄어든다', () => {

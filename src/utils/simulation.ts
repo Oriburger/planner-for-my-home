@@ -10,6 +10,7 @@ import type {
 } from '@/types/planner';
 import { simulateLoanYear } from './loan';
 import { estimateTax } from './tax';
+import { estimateTaxRefund } from './taxRefund';
 
 /* ------------------------------------------------------------------ */
 /* 공통 헬퍼                                                            */
@@ -89,6 +90,14 @@ export function housingCostForYear(
   return monthly * 12 * Math.pow(1 + item.annualIncreaseRate / 100, steps);
 }
 
+/** 주거 항목의 해당 연차 '월세'만의 연간 금액 (관리비 제외 — 월세 세액공제용) */
+export function rentOnlyForYear(item: HousingItem, yearIndex: number): number {
+  if (!isActive(item, yearIndex)) return 0;
+
+  const steps = elapsed(item.startYear, yearIndex);
+  return item.monthlyRent * 12 * Math.pow(1 + item.annualIncreaseRate / 100, steps);
+}
+
 /* ------------------------------------------------------------------ */
 /* 메인 시뮬레이터                                                      */
 /* ------------------------------------------------------------------ */
@@ -141,6 +150,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
   const rows: YearResult[] = [];
   let totalSaved = 0;
   let totalReturn = 0;
+  let totalTaxRefund = 0;
 
   for (let yearIndex = 1; yearIndex <= years; yearIndex += 1) {
     /* ---- 1. 자산 운용수익 (연초 잔액 기준 복리) ---- */
@@ -180,9 +190,12 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
     /* ---- 4. 주거비 + 보증금 이동 ---- */
     let housingCost = 0;
+    /** 월세 세액공제 대상이 되는 순수 월세 합계 (관리비 제외) */
+    let rentPaid = 0;
 
     for (const housing of housings) {
       housingCost += housingCostForYear(housing, yearIndex);
+      rentPaid += rentOnlyForYear(housing, yearIndex);
 
       // 계약 시작: 보증금을 여유자금에서 빼서 묶인 자산으로 이동
       // (1년차 시작 계약은 이미 '현재 보유 자산'에 임대보증금으로 입력된 것으로 간주)
@@ -212,6 +225,8 @@ export function runSimulation(data: PlannerData): SimulationResult {
     let loanPayment = 0;
     let loanInterest = 0;
     let loanPrincipalPaid = 0;
+    /** 주택임차차입금(전세대출) 원리금 상환액 — 보증금 연동 대출로 본다 */
+    let rentLoanRepaid = 0;
 
     for (const loan of loans) {
       let balance = loanBalances.get(loan.id) ?? 0;
@@ -235,6 +250,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
       loanPayment += flow.payment;
       loanInterest += flow.interest;
       loanPrincipalPaid += flow.principalPaid;
+      if (loan.isDepositLinked) rentLoanRepaid += flow.payment;
 
       // 보증금 연동 원금 상환 발생 시, 비유동 임대보증금 자산에서 차감 상쇄
       if (flow.depositLinkedPrincipalPaid > 0) {
@@ -259,35 +275,50 @@ export function runSimulation(data: PlannerData): SimulationResult {
       }
     }
 
-    /* ---- 6. 연간 저축액 ---- */
-    const annualSavings =
-      netIncome - livingExpense - housingCost - loanPayment;
-
-    /* ---- 7. 자동이체 납입 (여유자금 -> 개별 자산) ---- */
-    // 시작 연차 전이거나 만기 연차에 도달한 자산은 정기 납입 중단
-    const activeAssetsForContribution = assets.filter((a) => {
-      if (a.monthlyContribution <= 0) return false;
-      if (yearIndex < (a.startYear ?? 1)) return false;
-      const matIndex = getAssetMaturityYearIndex(a, settings.currentAge);
-      if (matIndex !== null && yearIndex >= matIndex) return false;
-      return true;
-    });
+    /* ---- 6. 자동이체 납입 (여유자금 -> 개별 자산) ---- */
+    const activeAssetsForContribution = assets.filter((a) =>
+      isContributionActive(a, yearIndex, settings.currentAge),
+    );
 
     // 자동이체는 "무조건 저축"이다. 여유자금이 모자라도 깎지 않고 전액 집행하며,
     // 모자란 만큼은 여유자금이 마이너스로 남아 부족분으로 드러난다.
-    const availableForContribution = savingsPool + annualSavings;
+    const poolBeforeSavings = savingsPool;
 
     let contribution = 0;
+    /** 연금저축·IRP 연 납입액 (세액공제 대상) */
+    let pensionPaid = 0;
+    /** 주택청약 연 납입액 (소득공제 대상) */
+    let housingSubscriptionPaid = 0;
+
     for (const asset of activeAssetsForContribution) {
       const yearly = asset.monthlyContribution * 12;
       assetBalances.set(asset.id, (assetBalances.get(asset.id) ?? 0) + yearly);
       contribution += yearly;
+      if (asset.type === 'pension') pensionPaid += yearly;
+      if (asset.type === 'housingSubscription') housingSubscriptionPaid += yearly;
     }
 
-    savingsPool += annualSavings - contribution;
+    /* ---- 7. 연말정산 환급 ---- */
+    // 공제 요건은 과세 대상 근로소득(총급여)을 기준으로 판단한다.
+    const taxRefund = settings.applyTaxRefund
+      ? estimateTaxRefund({
+          grossSalary: taxableGross,
+          pensionPaid,
+          housingSubscriptionPaid,
+          rentPaid,
+          rentLoanRepaid,
+          houselessHead: settings.houselessHead,
+        }).totalSaving
+      : 0;
+
+    /* ---- 8. 연간 저축액 ---- */
+    const annualSavings =
+      netIncome - livingExpense - housingCost - loanPayment + taxRefund;
+
+    savingsPool = poolBeforeSavings + annualSavings - contribution;
 
     /** 자동이체를 전부 집행하고 남은 여유자금 (음수면 현금 부족) */
-    const contributionBalance = availableForContribution - contribution;
+    const contributionBalance = savingsPool;
 
     // 해당 연차 말 자산 잔액 스냅샷 기록
     assetHistoryByYear.set(
@@ -295,7 +326,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
       new Map<string, number>(assetBalances.entries()),
     );
 
-    /* ---- 8. 집계 ---- */
+    /* ---- 9. 집계 ---- */
     let liquidAssets = savingsPool;
     let lockedAssets = 0;
 
@@ -324,6 +355,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
     totalSaved += annualSavings;
     totalReturn += investmentReturn;
+    totalTaxRefund += taxRefund;
 
     rows.push({
       index: yearIndex,
@@ -340,6 +372,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
       loanPrincipalPaid,
       investmentReturn,
       contribution,
+      taxRefund,
       annualSavings,
       contributionBalance,
       liquidAssets,
@@ -388,6 +421,7 @@ export function runSimulation(data: PlannerData): SimulationResult {
 
   return {
     rows,
+    assetBalances: assetHistoryByYear,
     summary: {
       finalTotalAssets: last.totalAssets,
       finalNetWorth: last.netWorth,
@@ -400,11 +434,28 @@ export function runSimulation(data: PlannerData): SimulationResult {
           ? (firstRow.annualSavings / firstRow.netIncome) * 100
           : 0,
       firstNegativeYear: firstNegative ? firstNegative.index : null,
+      totalTaxRefund,
       firstContributionShortfallYear: firstShortfall ? firstShortfall.index : null,
       maxContributionShortfall,
       pensionMaturities,
     },
   };
+}
+
+/**
+ * 해당 연차에 이 자산으로 자동이체가 들어가는지.
+ * 시작 연차 전이거나 만기 연차에 도달하면 납입을 멈춘다.
+ */
+export function isContributionActive(
+  asset: AssetItem,
+  yearIndex: number,
+  currentAge: number | null,
+): boolean {
+  if (asset.monthlyContribution <= 0) return false;
+  if (yearIndex < (asset.startYear ?? 1)) return false;
+  const matIndex = getAssetMaturityYearIndex(asset, currentAge);
+  if (matIndex !== null && yearIndex >= matIndex) return false;
+  return true;
 }
 
 /** 자산의 만기 시점 연차 계산 헬퍼 */

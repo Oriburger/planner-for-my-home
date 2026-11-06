@@ -12,6 +12,7 @@ const COLUMNS: Array<{
   { key: 'livingExpense', label: '생활비', tone: 'negative' },
   { key: 'housingCost', label: '주거비', tone: 'negative' },
   { key: 'loanPayment', label: '대출상환', tone: 'negative' },
+  { key: 'taxRefund', label: '연말정산' },
   { key: 'annualSavings', label: '연 저축' },
   { key: 'contribution', label: '자동이체', tone: 'negative' },
   { key: 'contributionBalance', label: '남은 여유자금' },
@@ -46,7 +47,7 @@ export function YearTable({ rows }: { rows: SimulationResult['rows'] }) {
       />
 
       <div className="overflow-x-auto thin-scrollbar">
-        <table className="w-full min-w-[880px] border-collapse text-right text-xs tabular-nums">
+        <table className="w-full min-w-[960px] border-collapse text-right text-xs tabular-nums">
           <thead>
             <tr className="border-b border-white/40 text-ink-500 dark:border-white/10 dark:text-slate-400">
               <th

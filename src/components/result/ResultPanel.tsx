@@ -7,8 +7,17 @@ import { SummaryCards } from './SummaryCards';
 import { AssetChart } from './AssetChart';
 import { CashflowChart } from './CashflowChart';
 import { YearTable } from './YearTable';
+import { MoneyFlowView } from './MoneyFlowView';
+import { TaxRefundCard } from './TaxRefundCard';
 
-type ActiveTab = 'timeline' | 'charts' | 'table';
+type ActiveTab = 'timeline' | 'flow' | 'charts' | 'table';
+
+const TABS: Array<{ key: ActiveTab; icon: string; label: string }> = [
+  { key: 'timeline', icon: '🗺️', label: '라이프 타임라인' },
+  { key: 'flow', icon: '💸', label: '통장 & 자동이체' },
+  { key: 'charts', icon: '📊', label: '자산 & 현금흐름 차트' },
+  { key: 'table', icon: '📋', label: '연도별 상세 데이터' },
+];
 
 /** 우측(모바일에서는 하단) 결과 패널 (Liquid Glass) */
 export function ResultPanel() {
@@ -21,7 +30,7 @@ export function ResultPanel() {
     expenses: s.expenses,
   }));
 
-  const { rows, summary, start } = useSimulation();
+  const { rows, summary, start, assetBalances } = useSimulation();
   const [activeTab, setActiveTab] = useState<ActiveTab>('timeline');
   const [selectedYearIndex, setSelectedYearIndex] = useState<number>(
     rows.length >= 5 ? 5 : rows.length >= 3 ? 3 : 1,
@@ -43,42 +52,22 @@ export function ResultPanel() {
 
       {/* 2. 뷰 전환 Liquid Glass Segmented Control */}
       <div className="flex flex-col gap-2 border-b border-white/40 pb-2 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between">
-        <div className="inline-flex rounded-2xl border border-white/70 bg-white/60 p-1 shadow-glass-sm backdrop-blur-xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/60 dark:ring-white/5">
-          <button
-            type="button"
-            onClick={() => setActiveTab('timeline')}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
-              activeTab === 'timeline'
-                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
-                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
-          >
-            <span>🗺️</span> 라이프 타임라인
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('charts')}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
-              activeTab === 'charts'
-                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
-                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
-          >
-            <span>📊</span> 자산 & 현금흐름 차트
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('table')}
-            className={`flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 ${
-              activeTab === 'table'
-                ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
-                : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
-          >
-            <span>📋</span> 연도별 상세 데이터
-          </button>
+        <div className="inline-flex flex-wrap rounded-2xl border border-white/70 bg-white/60 p-1 shadow-glass-sm backdrop-blur-xl ring-1 ring-inset ring-white/30 dark:border-white/10 dark:bg-slate-900/60 dark:ring-white/5">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              aria-pressed={activeTab === tab.key}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all duration-200 sm:px-4 ${
+                activeTab === tab.key
+                  ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white shadow-md shadow-blue-500/25'
+                  : 'text-ink-600 hover:text-ink-900 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+            >
+              <span aria-hidden="true">{tab.icon}</span> {tab.label}
+            </button>
+          ))}
         </div>
 
         <span className="text-xs font-medium text-ink-500 dark:text-slate-400">
@@ -95,6 +84,17 @@ export function ResultPanel() {
           selectedYearIndex={selectedYearIndex}
           onSelectYear={handleSelectYear}
         />
+      )}
+
+      {activeTab === 'flow' && (
+        <div className="space-y-4">
+          <TaxRefundCard />
+          <MoneyFlowView
+            rows={rows}
+            assetBalances={assetBalances}
+            selectedYearIndex={selectedYearIndex}
+          />
+        </div>
       )}
 
       {activeTab === 'charts' && (

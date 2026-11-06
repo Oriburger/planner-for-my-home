@@ -235,6 +235,10 @@ export interface SimulationSettings {
   savingsReturnRate: number;
   /** 현재 나이 (선택) — 차트 x축 보조 표기용 */
   currentAge: number | null;
+  /** 연말정산 환급(저축·주거 공제 절감세액)을 매년 현금흐름에 반영할지 */
+  applyTaxRefund: boolean;
+  /** 무주택 세대주 여부 — 청약·월세·임차차입금 공제의 공통 요건 */
+  houselessHead: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -269,7 +273,13 @@ export interface YearResult {
   /** 자동이체 납입액 합계 (유동자산 -> 비유동자산 이동, 순자산 중립) */
   contribution: number;
 
-  /** 연간 저축액 = netIncome - 생활비 - 주거비 - 대출상환 */
+  /**
+   * 연말정산 환급 예상액 (저축·주거 공제로 줄어드는 세금).
+   * settings.applyTaxRefund 가 꺼져 있으면 0.
+   */
+  taxRefund: number;
+
+  /** 연간 저축액 = netIncome - 생활비 - 주거비 - 대출상환 + 연말정산 환급 */
   annualSavings: number;
 
   /**
@@ -323,6 +333,8 @@ export interface SimulationSummary {
   savingsRate: number;
   /** 순자산이 마이너스로 떨어지는 첫 연차 (없으면 null) */
   firstNegativeYear: number | null;
+  /** 누적 연말정산 환급 예상액 */
+  totalTaxRefund: number;
   /** 자동이체가 여유자금을 초과하는 첫 연차 (없으면 null) */
   firstContributionShortfallYear: number | null;
   /** 자동이체 부족액이 가장 큰 해의 부족 금액 (양수, 부족이 없으면 0) */
@@ -334,6 +346,11 @@ export interface SimulationSummary {
 export interface SimulationResult {
   rows: YearResult[];
   summary: SimulationSummary;
+  /**
+   * 연차별 · 자산별 잔액 스냅샷 (연말 기준).
+   * 통장별 현황을 보여줄 때 쓴다. key = 연차, 내부 key = 자산 id.
+   */
+  assetBalances: Map<number, Map<ID, number>>;
 }
 
 /** store 에 저장되는 전체 입력 상태 */
