@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="brand" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+    <linearGradient id="emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bg)" />
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6" />
+
+  <!-- Background decorative glow -->
+  <circle cx="256" cy="230" r="140" fill="url(#brand)" opacity="0.18" filter="url(#glow)" />
+
+  <!-- Stylized Modern Glass House -->
+  <path d="M256 100 L380 200 V370 C380 387 367 400 350 400 H162 C145 400 132 387 132 370 V200 Z"
+        fill="rgba(255,255,255,0.06)" stroke="url(#brand)" stroke-width="18" stroke-linejoin="round" stroke-linecap="round" />
+
+  <!-- Roof Peak Accent -->
+  <path d="M108 220 L256 100 L404 220"
+        fill="none" stroke="url(#brand)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Chimney with Coin sparkle -->
+  <path d="M330 140 V105 H364 V168"
+        fill="none" stroke="url(#brand)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Ascending Growth Bars inside House -->
+  <rect x="180" y="280" width="30" height="80" rx="8" fill="url(#brand)" opacity="0.8" />
+  <rect x="235" y="235" width="30" height="125" rx="8" fill="url(#brand)" />
+  <rect x="290" y="190" width="30" height="170" rx="8" fill="url(#emerald)" />
+
+  <!-- Rising Growth Sparkle/Star -->
+  <path d="M350 160 L358 178 L376 186 L358 194 L350 212 L342 194 L324 186 L342 178 Z"
+        fill="#fbbf24" filter="url(#glow)" />
+</svg>

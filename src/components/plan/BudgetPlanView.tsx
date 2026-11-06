@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useSimulation } from '@/hooks/useSimulation';
 import { useUIStore } from '@/store/uiStore';
@@ -6,6 +6,8 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
 import { MoneyInput } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
+import { haptic } from '@/utils/feedback';
+import { MoneyFlowView } from '@/components/result/MoneyFlowView';
 import {
   calculateBudgetShares,
   applyBudgetPreset,
@@ -22,20 +24,92 @@ const FLOW_COLORS = {
   leftover: '#10b981', // 여유자금 (emerald)
 } as const;
 
+/** 원터치 증감 칩 및 와이드 슬라이더 */
+function FastStepAdjuster({
+  value,
+  onChange,
+  max,
+}: {
+  value: number;
+  onChange: (val: number) => void;
+  max: number;
+}) {
+  return (
+    <div className="mt-2.5 space-y-2">
+      <input
+        type="range"
+        min={0}
+        max={max}
+        step={10000}
+        value={value}
+        onChange={(e) => {
+          haptic(3);
+          onChange(Number(e.target.value));
+        }}
+        className="h-2 w-full cursor-pointer"
+      />
+      <div className="flex flex-wrap items-center justify-between gap-1">
+        <div className="flex items-center gap-1">
+          {[-50000, -10000].map((step, idx) => (
+            <button
+              key={step}
+              type="button"
+              disabled={value + step < 0}
+              onClick={() => {
+                haptic(5);
+                onChange(Math.max(0, value + step));
+              }}
+              className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-0.5 text-[10px] font-semibold text-ink-700 transition hover:bg-white active:scale-95 disabled:opacity-30 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300"
+            >
+              {idx === 0 ? '-5만' : '-1만'}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-1">
+          {[10000, 50000].map((step, idx) => (
+            <button
+              key={step}
+              type="button"
+              disabled={value + step > max * 1.5}
+              onClick={() => {
+                haptic(5);
+                onChange(value + step);
+              }}
+              className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-0.5 text-[10px] font-semibold text-ink-700 transition hover:bg-white active:scale-95 disabled:opacity-30 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300"
+            >
+              {idx === 0 ? '+1만' : '+5만'}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function BudgetPlanView() {
-  const { rows } = useSimulation();
+  const { rows, summary } = useSimulation();
   const setView = useUIStore((s) => s.setView);
+
+  const [subTab, setSubTab] = useState<'budget' | 'accounts'>('budget');
 
   const expenses = usePlannerStore((s) => s.expenses);
   const assets = usePlannerStore((s) => s.assets);
   const housings = usePlannerStore((s) => s.housings);
   const loans = usePlannerStore((s) => s.loans);
+  const goals = usePlannerStore((s) => s.goals);
 
   const updateExpense = usePlannerStore((s) => s.updateExpense);
   const addExpense = usePlannerStore((s) => s.addExpense);
   const removeItem = usePlannerStore((s) => s.removeItem);
   const updateAsset = usePlannerStore((s) => s.updateAsset);
   const addAsset = usePlannerStore((s) => s.addAsset);
+  const updateHousing = usePlannerStore((s) => s.updateHousing);
+  const updateLoan = usePlannerStore((s) => s.updateLoan);
+
+  const [editingHousingId, setEditingHousingId] = useState<string | null>(null);
+  const [editingLoanId, setEditingLoanId] = useState<string | null>(null);
+  const [editingAssetSeedId, setEditingAssetSeedId] = useState<string | null>(null);
 
   // 1년차 기준 월 수치 (월 단위 환산: 연간 / 12)
   const firstYear = rows[0];
@@ -65,6 +139,7 @@ export function BudgetPlanView() {
 
   // 프리셋 적용
   const handleApplyPreset = (preset: BudgetPresetType) => {
+    haptic(10);
     const updated = applyBudgetPreset(
       preset,
       monthlyNetIncome,
@@ -83,8 +158,83 @@ export function BudgetPlanView() {
     [assets],
   );
 
+  // 첫 번째 목표
+  const primaryGoal = goals[0];
+
+  if (subTab === 'accounts') {
+    return (
+      <div className="space-y-4">
+        {/* 서브 탭 전환기 */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="segmented w-full sm:w-auto" role="tablist">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={false}
+              onClick={() => {
+                haptic(5);
+                setSubTab('budget');
+              }}
+              className="segmented-item flex items-center justify-center gap-1.5"
+            >
+              <Icon name="sliders" className="h-4 w-4" />
+              <span>월 지출 · 저축 배분</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={true}
+              onClick={() => {
+                haptic(5);
+                setSubTab('accounts');
+              }}
+              className="segmented-item flex items-center justify-center gap-1.5"
+            >
+              <Icon name="wallet" className="h-4 w-4" />
+              <span>내 통장 현황 (현재 기준)</span>
+            </button>
+          </div>
+        </div>
+
+        <MoneyFlowView rows={rows} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
+      {/* 서브 탭 전환기 */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="segmented w-full sm:w-auto" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={true}
+            onClick={() => {
+              haptic(5);
+              setSubTab('budget');
+            }}
+            className="segmented-item flex items-center justify-center gap-1.5"
+          >
+            <Icon name="sliders" className="h-4 w-4" />
+            <span>월 지출 · 저축 배분</span>
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={false}
+            onClick={() => {
+              haptic(5);
+              setSubTab('accounts');
+            }}
+            className="segmented-item flex items-center justify-center gap-1.5"
+          >
+            <Icon name="wallet" className="h-4 w-4" />
+            <span>내 통장 현황 (현재 기준)</span>
+          </button>
+        </div>
+      </div>
+
       {/* 1. 고정 월 소득 기준 앵커 카드 */}
       <Card className="relative overflow-hidden">
         <div className="p-4 sm:p-5">
@@ -112,7 +262,7 @@ export function BudgetPlanView() {
               <button
                 type="button"
                 onClick={() => setView('income')}
-                className="flex items-center gap-1.5 rounded-xl border border-white/60 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink-700 shadow-xs backdrop-blur-md transition-all hover:bg-white hover:text-brand-600 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="flex items-center gap-1.5 rounded-xl border border-ink-900/10 bg-white/70 px-3 py-1.5 text-xs font-semibold text-ink-700 shadow-xs backdrop-blur-md transition-all hover:bg-white hover:text-brand-600 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 <span>수입 변경</span>
                 <Icon name="chevronRight" className="h-3 w-3" />
@@ -121,11 +271,11 @@ export function BudgetPlanView() {
           </div>
 
           {/* 배분 상태 요약 바 */}
-          <div className="mt-4 rounded-xl border border-white/60 bg-white/60 p-3 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/50">
+          <div className="mt-4 rounded-xl border border-ink-900/10 bg-white/60 p-3 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/50">
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-ink-700 dark:text-slate-300">
-                  현재 총 배분액:
+                  총 배분액:
                 </span>
                 <span className="font-bold text-ink-900 dark:text-slate-100 tabular-nums">
                   {formatKRWShort(shares.totalAllocated.amount)}원 ({shares.totalAllocated.percent.toFixed(0)}%)
@@ -214,27 +364,50 @@ export function BudgetPlanView() {
                 key={p.id}
                 type="button"
                 onClick={() => handleApplyPreset(p.id)}
-                className="rounded-lg border border-white/60 bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-ink-700 shadow-xs backdrop-blur-xs transition-all hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="rounded-lg border border-ink-900/10 bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-ink-700 shadow-xs backdrop-blur-xs transition-all hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300 dark:hover:bg-slate-800"
                 title={p.desc}
               >
                 {p.label}
               </button>
             ))}
           </div>
+
+          {/* 실시간 목표 달성 임팩트 카드 */}
+          {primaryGoal && (
+            <div className="mt-3.5 flex items-center gap-2.5 rounded-xl bg-accent-500/10 p-2.5 text-xs text-accent-800 dark:bg-accent-400/10 dark:text-accent-300">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-500 text-white">
+                <Icon name="target" className="h-3 w-3" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">
+                  목표 &lsquo;{primaryGoal.name}&rsquo; ({formatKRWShort(primaryGoal.amount)}원)
+                </p>
+                <p className="text-[11px] opacity-90">
+                  현재 저축 계획 적용 시 첫 해 저축률{' '}
+                  <strong>{summary.savingsRate.toFixed(1)}%</strong>
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 
-      {/* 2. 4대 분기 주머니 (월급 통장에서 어디로 얼마나 나가는지) */}
+      {/* 2단 멘탈 모델: 파트 1. 월 지출 분기 (소비) */}
       <div className="space-y-3.5">
-        <h3 className="px-1 text-xs font-bold text-ink-700 dark:text-slate-300">
-          💸 월급 통장 분기 주머니 (지출 & 저금 배분)
-        </h3>
+        <div className="flex items-center gap-2 px-1">
+          <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400">
+            <Icon name="receipt" className="h-3.5 w-3.5" />
+          </span>
+          <h3 className="text-xs font-bold text-ink-800 dark:text-slate-200">
+            파트 1. 월 지출 분기 (고정 주거비 · 대출 원리금 · 생활비)
+          </h3>
+        </div>
 
-        {/* 주머니 1: 주거비 */}
+        {/* 1. 주거비 */}
         <Card>
           <CardHeader
-            title="1. 🏠 주거비 주머니 (월세 · 관리비)"
-            description={`월급의 ${shares.housing.percent.toFixed(1)}% (${formatKRWShort(shares.housing.amount)}원) 차지`}
+            title="주거비 (월세 · 관리비)"
+            description={`월 소득의 ${shares.housing.percent.toFixed(1)}% (${formatKRWShort(shares.housing.amount)}원)`}
             action={
               <span className="rounded-full bg-amber-100/80 px-2 py-0.5 text-[11px] font-bold text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
                 고정 주거비
@@ -246,27 +419,57 @@ export function BudgetPlanView() {
               <p className="text-xs text-ink-400 dark:text-slate-500 italic">등록된 주거 계약이 없습니다.</p>
             ) : (
               housings.map((h) => (
-                <div key={h.id} className="flex items-center justify-between rounded-xl border border-white/60 bg-white/50 p-3 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/50">
-                  <div>
-                    <span className="font-bold text-ink-900 dark:text-slate-100">{h.name}</span>
-                    <p className="mt-0.5 text-[11px] text-ink-500 dark:text-slate-400">
-                      보증금 {formatKRWShort(h.deposit)}원 · 월세 {formatKRWShort(h.monthlyRent)}원 · 관리비 {formatKRWShort(h.monthlyMaintenance)}원
-                    </p>
+                <div key={h.id} className="rounded-xl border border-ink-900/10 bg-white/50 p-3 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-ink-900 dark:text-slate-100">{h.name}</span>
+                      <p className="mt-0.5 text-[11px] text-ink-500 dark:text-slate-400">
+                        보증금 {formatKRWShort(h.deposit)}원 · 월세 {formatKRWShort(h.monthlyRent)}원 · 관리비 {formatKRWShort(h.monthlyMaintenance)}원
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-ink-900 dark:text-slate-100 tabular-nums">
+                        월 {formatKRWShort(h.monthlyRent + h.monthlyMaintenance)}원
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setEditingHousingId(editingHousingId === h.id ? null : h.id)}
+                        className="rounded-lg border border-ink-900/10 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-slate-700"
+                      >
+                        {editingHousingId === h.id ? '완료' : '수정'}
+                      </button>
+                    </div>
                   </div>
-                  <span className="font-extrabold text-ink-900 dark:text-slate-100 tabular-nums">
-                    월 {formatKRWShort(h.monthlyRent + h.monthlyMaintenance)}원
-                  </span>
+
+                  {editingHousingId === h.id && (
+                    <div className="mt-3 grid grid-cols-2 gap-2 border-t border-ink-100 pt-3 dark:border-white/10">
+                      <div>
+                        <label className="text-[10px] text-ink-500 dark:text-slate-400">월세 (원)</label>
+                        <MoneyInput
+                          value={h.monthlyRent}
+                          onChange={(v) => updateHousing(h.id, { monthlyRent: v })}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-ink-500 dark:text-slate-400">관리비 (원)</label>
+                        <MoneyInput
+                          value={h.monthlyMaintenance}
+                          onChange={(v) => updateHousing(h.id, { monthlyMaintenance: v })}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             )}
           </div>
         </Card>
 
-        {/* 주머니 2: 대출 상환 */}
+        {/* 2. 대출 상환 */}
         <Card>
           <CardHeader
-            title="2. 💳 대출 상환 주머니 (원리금 상환)"
-            description={`월급의 ${shares.loan.percent.toFixed(1)}% (${formatKRWShort(shares.loan.amount)}원) 차지`}
+            title="대출 상환 (원리금 상환)"
+            description={`월 소득의 ${shares.loan.percent.toFixed(1)}% (${formatKRWShort(shares.loan.amount)}원)`}
             action={
               <span className="rounded-full bg-rose-100/80 px-2 py-0.5 text-[11px] font-bold text-rose-800 dark:bg-rose-950/80 dark:text-rose-300">
                 부채 상환
@@ -278,27 +481,57 @@ export function BudgetPlanView() {
               <p className="text-xs text-ink-400 dark:text-slate-500 italic">상환 중인 대출이 없습니다.</p>
             ) : (
               loans.map((l) => (
-                <div key={l.id} className="flex items-center justify-between rounded-xl border border-white/60 bg-white/50 p-3 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/50">
-                  <div>
-                    <span className="font-bold text-ink-900 dark:text-slate-100">{l.name}</span>
-                    <p className="mt-0.5 text-[11px] text-ink-500 dark:text-slate-400">
-                      원금 {formatKRWShort(l.principal)}원 · 연 {l.annualRate}%
-                    </p>
+                <div key={l.id} className="rounded-xl border border-ink-900/10 bg-white/50 p-3 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-ink-900 dark:text-slate-100">{l.name}</span>
+                      <p className="mt-0.5 text-[11px] text-ink-500 dark:text-slate-400">
+                        원금 {formatKRWShort(l.principal)}원 · 연 {l.annualRate}%
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-rose-600 dark:text-rose-400 tabular-nums">
+                        월 {formatKRWShort(loanPaymentMonthly)}원
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setEditingLoanId(editingLoanId === l.id ? null : l.id)}
+                        className="rounded-lg border border-ink-900/10 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-slate-700"
+                      >
+                        {editingLoanId === l.id ? '완료' : '수정'}
+                      </button>
+                    </div>
                   </div>
-                  <span className="font-extrabold text-rose-600 dark:text-rose-400 tabular-nums">
-                    월 {formatKRWShort(loanPaymentMonthly)}원
-                  </span>
+
+                  {editingLoanId === l.id && (
+                    <div className="mt-3 grid grid-cols-2 gap-2 border-t border-ink-100 pt-3 dark:border-white/10">
+                      <div>
+                        <label className="text-[10px] text-ink-500 dark:text-slate-400">대출 원금 (원)</label>
+                        <MoneyInput
+                          value={l.principal}
+                          onChange={(v) => updateLoan(l.id, { principal: v })}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-ink-500 dark:text-slate-400">월 상환액 직접 지정 (0이면 자동계산)</label>
+                        <MoneyInput
+                          value={l.monthlyPayment}
+                          onChange={(v) => updateLoan(l.id, { monthlyPayment: v })}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             )}
           </div>
         </Card>
 
-        {/* 주머니 3: 생활비 (카테고리별 범위 슬라이더) */}
+        {/* 3. 생활비 (와이드 슬라이더 + 빠른 증감 칩) */}
         <Card>
           <CardHeader
-            title="3. 🛒 생활비 주머니 (카테고리별 한도 & 범위)"
-            description={`월급의 ${shares.living.percent.toFixed(1)}% (${formatKRWShort(shares.living.amount)}원) 차지`}
+            title="생활비 한도 & 범위 (식비 · 교통 · 여가 등)"
+            description={`월 소득의 ${shares.living.percent.toFixed(1)}% (${formatKRWShort(shares.living.amount)}원)`}
             action={
               <button
                 type="button"
@@ -313,13 +546,12 @@ export function BudgetPlanView() {
           <div className="p-4 space-y-3.5">
             {expenses.map((exp) => {
               const expShare = monthlyNetIncome > 0 ? (exp.monthlyAmount / monthlyNetIncome) * 100 : 0;
-              // 슬라이더 최대치를 소득의 50% 또는 현재 금액의 1.5배 중 큰 값으로 잡음
               const maxRange = Math.max(100 * 10000, Math.round((monthlyNetIncome * 0.5) / 10000) * 10000);
 
               return (
                 <div
                   key={exp.id}
-                  className="rounded-xl border border-white/70 bg-white/60 p-3.5 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60"
+                  className="rounded-xl border border-ink-900/10 bg-white/60 p-3.5 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -335,6 +567,9 @@ export function BudgetPlanView() {
                       <span className="rounded-full bg-orange-100/80 px-2 py-0.5 text-[11px] font-bold text-orange-800 dark:bg-orange-950/80 dark:text-orange-300">
                         월급의 {expShare.toFixed(1)}%
                       </span>
+                      <span className="font-extrabold tabular-nums text-xs text-ink-900 dark:text-slate-100">
+                        {formatKRWShort(exp.monthlyAmount)}원
+                      </span>
                       <button
                         type="button"
                         onClick={() => removeItem('expenses', exp.id)}
@@ -346,35 +581,35 @@ export function BudgetPlanView() {
                     </div>
                   </div>
 
-                  {/* 금액 및 슬라이더 */}
-                  <div className="mt-3 flex items-center gap-3">
-                    <input
-                      type="range"
-                      min={0}
-                      max={maxRange}
-                      step={10000}
-                      value={exp.monthlyAmount}
-                      onChange={(e) => updateExpense(exp.id, { monthlyAmount: Number(e.target.value) })}
-                      className="flex-1"
-                    />
-                    <div className="w-28 shrink-0">
-                      <MoneyInput
-                        value={exp.monthlyAmount}
-                        onChange={(val) => updateExpense(exp.id, { monthlyAmount: val })}
-                      />
-                    </div>
-                  </div>
+                  {/* 와이드 슬라이더 및 빠른 증감 칩 */}
+                  <FastStepAdjuster
+                    value={exp.monthlyAmount}
+                    onChange={(val) => updateExpense(exp.id, { monthlyAmount: val })}
+                    max={maxRange}
+                  />
                 </div>
               );
             })}
           </div>
         </Card>
+      </div>
 
-        {/* 주머니 4: 저축 & 투자 자동이체 (어느 계좌로 얼마나 나가는지) */}
+      {/* 2단 멘탈 모델: 파트 2. 내 통장으로 저축 & 비상금 (자산) */}
+      <div className="space-y-3.5">
+        <div className="flex items-center gap-2 px-1">
+          <span className="flex h-5 w-5 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+            <Icon name="wallet" className="h-3.5 w-3.5" />
+          </span>
+          <h3 className="text-xs font-bold text-ink-800 dark:text-slate-200">
+            파트 2. 내 통장으로 모으는 저축 (현재 계좌 잔고 & 자동이체 맵)
+          </h3>
+        </div>
+
+        {/* 4. 저축 & 투자 자동이체 (현재 잔액 + 매월 이체액 동시 관리) */}
         <Card>
           <CardHeader
-            title="4. 💎 저축 · 투자 주머니 (월급에서 계좌로 자동이체)"
-            description={`월급의 ${shares.contribution.percent.toFixed(1)}% (${formatKRWShort(shares.contribution.amount)}원) 빠져나감`}
+            title="목적 통장 자동이체 (청약 · ISA · 연금 · 적금)"
+            description={`월 소득의 ${shares.contribution.percent.toFixed(1)}% (${formatKRWShort(shares.contribution.amount)}원) 이체 중`}
             action={
               <button
                 type="button"
@@ -382,13 +617,13 @@ export function BudgetPlanView() {
                 className="flex items-center gap-1 rounded-xl border border-blue-200/80 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 shadow-xs backdrop-blur-xs transition hover:bg-blue-100 dark:border-blue-800/60 dark:bg-blue-950/80 dark:text-blue-300"
               >
                 <Icon name="plus" className="h-3.5 w-3.5" />
-                <span>계좌 추가</span>
+                <span>통장 추가</span>
               </button>
             }
           />
           <div className="p-4 space-y-3.5">
             {contributionAssets.length === 0 ? (
-              <p className="text-xs text-ink-400 dark:text-slate-500 italic">자동이체 중인 저축/투자 계좌가 없습니다.</p>
+              <p className="text-xs text-ink-400 dark:text-slate-500 italic">자동이체 중인 저축/투자 통장이 없습니다.</p>
             ) : (
               contributionAssets.map((asset) => {
                 const assetShare = monthlyNetIncome > 0 ? (asset.monthlyContribution / monthlyNetIncome) * 100 : 0;
@@ -417,28 +652,46 @@ export function BudgetPlanView() {
                       </span>
                     </div>
 
-                    <p className="mt-1 text-[11px] text-ink-500 dark:text-slate-400">
-                      👉 매달 월급 통장에서 <strong>{asset.name}</strong> 계좌로 자동이체되어 자산으로 축적됩니다.
-                    </p>
+                    {/* 통장 현재 잔액 & 이체 금액 정보 */}
+                    <div className="mt-2.5 flex items-center justify-between rounded-lg bg-white/60 px-2.5 py-1.5 text-xs dark:bg-slate-900/60">
+                      <div>
+                        <span className="text-[10px] text-ink-500 dark:text-slate-400">현재 통장 잔액: </span>
+                        <strong className="font-extrabold tabular-nums text-ink-900 dark:text-slate-100">
+                          {formatKRWShort(asset.amount)}원
+                        </strong>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setEditingAssetSeedId(editingAssetSeedId === asset.id ? null : asset.id)}
+                        className="text-[10px] text-brand-600 underline dark:text-brand-400"
+                      >
+                        {editingAssetSeedId === asset.id ? '닫기' : '잔액 수정'}
+                      </button>
+                    </div>
 
-                    {/* 이체 금액 조절 슬라이더 */}
-                    <div className="mt-3 flex items-center gap-3">
-                      <input
-                        type="range"
-                        min={0}
-                        max={maxRange}
-                        step={10000}
-                        value={asset.monthlyContribution}
-                        onChange={(e) => updateAsset(asset.id, { monthlyContribution: Number(e.target.value) })}
-                        className="flex-1"
-                      />
-                      <div className="w-28 shrink-0">
+                    {editingAssetSeedId === asset.id && (
+                      <div className="mt-2 border-t border-blue-200/40 pt-2 dark:border-white/10">
+                        <label className="text-[10px] text-ink-500 dark:text-slate-400">현재 보유 잔액 (원)</label>
                         <MoneyInput
-                          value={asset.monthlyContribution}
-                          onChange={(val) => updateAsset(asset.id, { monthlyContribution: val })}
+                          value={asset.amount}
+                          onChange={(v) => updateAsset(asset.id, { amount: v })}
                         />
                       </div>
+                    )}
+
+                    <div className="mt-2 flex items-baseline justify-between">
+                      <span className="text-[11px] text-ink-500 dark:text-slate-400">매월 자동이체:</span>
+                      <span className="font-extrabold tabular-nums text-xs text-brand-700 dark:text-brand-400">
+                        {formatKRWShort(asset.monthlyContribution)}원/월
+                      </span>
                     </div>
+
+                    {/* 이체 금액 조절 와이드 슬라이더 & 스텝 칩 */}
+                    <FastStepAdjuster
+                      value={asset.monthlyContribution}
+                      onChange={(val) => updateAsset(asset.id, { monthlyContribution: val })}
+                      max={maxRange}
+                    />
                   </div>
                 );
               })
@@ -446,21 +699,24 @@ export function BudgetPlanView() {
           </div>
         </Card>
 
-        {/* 주머니 5: 남은 자유 여유자금 */}
+        {/* 5. 비상금 파킹통장 (남은 여유자금) */}
         <Card className="border-emerald-300/80 bg-gradient-to-br from-emerald-50/60 to-white/70 dark:border-emerald-900/50 dark:from-emerald-950/30 dark:to-slate-900/70">
           <CardHeader
-            title="5. 🌊 잔여 여유자금 (자유 지출 & 비상금 저축)"
-            description={`월급의 ${Math.max(0, shares.leftover.percent).toFixed(1)}% (${formatKRWShort(Math.max(0, shares.leftover.amount))}원)`}
+            title="비상금 파킹통장 (지출과 자동이체 후 남는 돈)"
+            description={`월 소득의 ${Math.max(0, shares.leftover.percent).toFixed(1)}% (${formatKRWShort(Math.max(0, shares.leftover.amount))}원/월)`}
             action={
               <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
                 파킹통장 복리 운용
               </span>
             }
           />
-          <div className="p-4 text-xs text-ink-600 dark:text-slate-400 space-y-1.5">
-            <p>
-              지출과 자동이체를 모두 집행하고 남은 <strong>{formatKRWShort(Math.max(0, shares.leftover.amount))}원</strong>은
-              매월 유동자산(파킹통장)에 차곡차곡 쌓여, 설정된 여유자금 수익률로 굴러가며 홈 화면의 총자산과 순자산을 밀어 올립니다.
+          <div className="p-4 text-xs text-ink-600 dark:text-slate-400 space-y-2">
+            <p className="leading-relaxed">
+              모든 지출과 자동이체를 집행하고 남은 <strong>{formatKRWShort(Math.max(0, shares.leftover.amount))}원</strong>은
+              매월 유동성 비상금 통장에 자동으로 모이며, 파킹통장 수익률로 안전하게 굴러가며 홈 화면의 순자산을 밀어 올립니다.
+            </p>
+            <p className="text-[11px] text-emerald-700 dark:text-emerald-400">
+              💡 연말정산 환급금(연 약 {formatKRWShort(firstYear ? firstYear.taxRefund : 0)}원)도 매월 쪼개 쓰지 않고 이 파킹통장으로 연 1회 일시 유입됩니다.
             </p>
             {shares.status === 'deficit' && (
               <p className="font-semibold text-rose-600 dark:text-rose-400">

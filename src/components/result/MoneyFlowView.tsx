@@ -3,7 +3,6 @@ import type { AssetItem, SimulationResult, YearResult } from '@/types/planner';
 import { ASSET_TYPE_LABEL } from '@/types/planner';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { usePlannerStore } from '@/store/plannerStore';
-import { isContributionActive } from '@/utils/simulation';
 import { formatKRWShort } from '@/utils/format';
 
 /* ------------------------------------------------------------------ */
@@ -109,18 +108,21 @@ function AccountCard({
   const pct = maxBalance > 0 ? (balance / maxBalance) * 100 : 0;
 
   return (
-    <div className="rounded-xl border border-white/50 bg-white/50 px-3 py-2.5 dark:border-white/5 dark:bg-slate-900/50">
+    <div className="glass-tile rounded-2xl p-3.5">
       <div className="flex items-baseline justify-between gap-2">
         <span className="truncate text-xs font-bold text-ink-900 dark:text-slate-100">
           {asset.name || ASSET_TYPE_LABEL[asset.type]}
         </span>
-        <span className="shrink-0 text-xs font-bold tabular-nums text-ink-900 dark:text-slate-100">
-          {formatKRWShort(balance)}원
-        </span>
+        <div className="text-right">
+          <span className="block text-xs font-extrabold tabular-nums text-ink-900 dark:text-slate-100">
+            {formatKRWShort(balance)}원
+          </span>
+          <span className="text-[10px] text-ink-400 dark:text-slate-500">현재 실제 잔액</span>
+        </div>
       </div>
 
       <div
-        className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-ink-100 dark:bg-slate-800"
+        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-ink-100 dark:bg-slate-800"
         aria-hidden="true"
       >
         <span
@@ -135,7 +137,7 @@ function AccountCard({
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-1">
-        <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-500 dark:bg-slate-800 dark:text-slate-400">
+        <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-800 dark:text-slate-400">
           {ASSET_TYPE_LABEL[asset.type]}
         </span>
         <span
@@ -145,9 +147,9 @@ function AccountCard({
               : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400'
           }`}
         >
-          {asset.liquid ? '바로 인출' : '묶인 돈'}
+          {asset.liquid ? '입출금 가능' : '묶인 돈'}
         </span>
-        <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-500 dark:bg-slate-800 dark:text-slate-400">
+        <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-800 dark:text-slate-400">
           연 {asset.annualReturnRate}%
         </span>
         {taxDeductible && (
@@ -157,7 +159,7 @@ function AccountCard({
         )}
       </div>
 
-      <p className="mt-1.5 text-[11px] font-medium text-ink-500 dark:text-slate-400">
+      <p className="mt-2 text-[11px] font-medium text-ink-500 dark:text-slate-400">
         {monthlyContribution > 0 ? (
           contributing ? (
             <>
@@ -165,11 +167,11 @@ function AccountCard({
               <strong className="font-bold text-brand-700 dark:text-brand-400">
                 {formatKRWShort(monthlyContribution)}원
               </strong>{' '}
-              자동이체
+              자동이체 중
             </>
           ) : (
             <span className="text-ink-400 dark:text-slate-500">
-              이 해에는 자동이체가 멈춤 (시작 전이거나 만기)
+              현재 자동이체 멈춤
             </span>
           )
         ) : (
@@ -187,49 +189,51 @@ const DEDUCTIBLE_TYPES = ['pension', 'housingSubscription'];
 
 interface MoneyFlowViewProps {
   rows: YearResult[];
-  assetBalances: SimulationResult['assetBalances'];
-  selectedYearIndex: number;
+  assetBalances?: SimulationResult['assetBalances'];
+  selectedYearIndex?: number;
 }
 
 /**
- * 한 달치 돈이 어디로 흘러가는지, 통장별로 지금 얼마가 있고
- * 자동이체가 어디로 빠지는지를 한 화면에서 보여준다.
+ * 한 달치 돈이 어디로 흘러가는지, 통장별로 '현재' 얼마가 있고
+ * 자동이체가 어디로 빠지는지를 '현재 시점'만 기준으로 보여준다.
  */
-export function MoneyFlowView({
-  rows,
-  assetBalances,
-  selectedYearIndex,
-}: MoneyFlowViewProps) {
+export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
   const assets = usePlannerStore((s) => s.assets);
-  const currentAge = usePlannerStore((s) => s.settings.currentAge);
 
-  const yearIndex = Math.min(Math.max(1, selectedYearIndex), rows.length);
-  const row = rows[yearIndex - 1];
+  // '통장' 부분은 무조건 '현재(지금 / 1년차)' 시점만 본다. (사용자 요청 2 반영)
+  const row = rows[0] ?? {
+    grossIncome: 0,
+    taxAndInsurance: 0,
+    netIncome: 0,
+    livingExpense: 0,
+    housingCost: 0,
+    loanPayment: 0,
+    contribution: 0,
+    annualSavings: 0,
+    contributionBalance: 0,
+    year: new Date().getFullYear(),
+  };
 
   const accounts: AccountRow[] = useMemo(() => {
-    const balances = assetBalances.get(yearIndex);
+    // 미래 시뮬레이션 잔액이 아닌, '현재 실제 보유 잔액'을 사용한다.
     return assets
       .map((asset) => ({
         asset,
-        balance: balances?.get(asset.id) ?? 0,
+        balance: asset.amount,
         monthlyContribution: asset.monthlyContribution,
-        contributing: isContributionActive(asset, yearIndex, currentAge),
+        contributing: asset.monthlyContribution > 0,
       }))
       .sort((a, b) => b.balance - a.balance);
-  }, [assets, assetBalances, yearIndex, currentAge]);
+  }, [assets]);
 
   const maxBalance = accounts.reduce((m, a) => Math.max(m, a.balance), 0);
 
   // 월 기준으로 환산해서 보여준다 (연간값 / 12)
   const monthly = (annual: number) => annual / 12;
 
-  // 그 해에 실제로 남은 돈. contributionBalance 는 지난 해까지 쌓인 잔액까지
-  // 포함한 누적치라 '이번 달 흐름'으로 쓰면 수입보다 커진다.
   const yearFlow = row.annualSavings - row.contribution;
   const leftover = Math.max(0, yearFlow);
-  /** 그 해 수입만으로는 모자라 여유자금에서 꺼내 쓰는 금액 */
   const drawdown = Math.max(0, -yearFlow);
-  /** 쌓인 여유자금까지 바닥난 상태 */
   const shortfall = Math.max(0, -row.contributionBalance);
 
   const slices: FlowSlice[] = [
@@ -263,8 +267,8 @@ export function MoneyFlowView({
       monthly: monthly(leftover),
       hint:
         drawdown > 0
-          ? '이 해엔 남는 돈이 없어요'
-          : '여유자금으로 쌓여 수익률만큼 굴러감',
+          ? '현재 남는 돈이 없어요'
+          : '비상금 파킹통장으로 들어가 불어남',
     },
   ];
 
@@ -279,11 +283,16 @@ export function MoneyFlowView({
 
   return (
     <div className="space-y-4">
-      {/* 1. 들어오는 돈 */}
+      {/* 1. 들어오는 돈 (현재 기준) */}
       <Card>
         <CardHeader
-          title="한 달 돈의 흐름"
-          description={`${row.year}년 (${yearIndex}년차) 기준 · 월 단위로 환산`}
+          title="현재 월 현금흐름"
+          description="현재 시점 월급 통장에서 고정비·생활비·자동이체로 나가는 돈"
+          action={
+            <span className="rounded-full bg-brand-100 px-2.5 py-0.5 text-[11px] font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+              현재 기준
+            </span>
+          }
         />
 
         <div className="space-y-4 px-4 py-4 sm:px-5">
@@ -300,25 +309,25 @@ export function MoneyFlowView({
                 tone: 'text-rose-600 dark:text-rose-400',
               },
               {
-                label: '연말정산 환급',
+                label: '연말정산 환급(월 환산)',
                 value: monthly(row.taxRefund),
                 tone: 'text-emerald-600 dark:text-emerald-400',
               },
               {
-                label: '실제 쓸 수 있는 돈',
-                value: monthly(row.netIncome + row.taxRefund),
+                label: '실수령액',
+                value: monthly(row.netIncome),
                 tone: 'text-brand-700 dark:text-brand-400',
               },
             ].map((tile) => (
               <div
                 key={tile.label}
-                className="rounded-xl border border-white/50 bg-white/50 px-3 py-2.5 dark:border-white/5 dark:bg-slate-900/50"
+                className="glass-tile rounded-2xl p-3"
               >
                 <p className="text-[11px] font-semibold text-ink-500 dark:text-slate-400">
                   {tile.label}
                 </p>
                 <p
-                  className={`mt-1 break-keep text-sm font-bold leading-tight tabular-nums ${tile.tone}`}
+                  className={`mt-1 text-sm font-extrabold tabular-nums sm:text-base ${tile.tone}`}
                 >
                   {tile.value < 0 ? '-' : ''}
                   {formatKRWShort(Math.abs(tile.value))}원
@@ -329,32 +338,22 @@ export function MoneyFlowView({
 
           <ShareBar slices={slices} total={outflowTotal} />
 
-          <ul className="space-y-2.5">
+          <ul className="space-y-2 border-t border-ink-100 pt-3 dark:border-white/5">
             {slices.map((slice) => (
               <FlowRow key={slice.key} slice={slice} total={outflowTotal} />
             ))}
           </ul>
-
-          {drawdown > 0 && (
-            <p className="rounded-xl bg-amber-50/70 px-3 py-2.5 text-[11px] leading-relaxed text-amber-900 dark:bg-amber-950/30 dark:text-amber-300">
-              이 해에는 수입만으로 모자라 매달{' '}
-              <strong className="font-bold">
-                {formatKRWShort(monthly(drawdown))}원
-              </strong>
-              씩 그동안 쌓아둔 여유자금에서 꺼내 씁니다.
-            </p>
-          )}
 
           {shortfall > 0 && (
             <p
               role="alert"
               className="rounded-xl bg-rose-50 px-3 py-2.5 text-[11px] leading-relaxed text-rose-800 dark:bg-rose-950/40 dark:text-rose-300"
             >
-              쌓아둔 여유자금까지 바닥나서{' '}
+              현재 자동이체와 지출의 합이 소득을 초과하여{' '}
               <strong className="font-bold">
                 {formatKRWShort(shortfall)}원
               </strong>{' '}
-              모자랍니다. 자동이체를 줄이거나 지출을 조정해 주세요.
+              모자랍니다.
             </p>
           )}
         </div>
@@ -363,22 +362,21 @@ export function MoneyFlowView({
       {/* 2. 자동이체 흐름 */}
       <Card>
         <CardHeader
-          title="자동이체가 가는 곳"
+          title="자동이체가 나가는 통장들"
           description={
             contributionTotal > 0
-              ? `매달 ${formatKRWShort(contributionTotal)}원이 ${
+              ? `매달 총 ${formatKRWShort(contributionTotal)}원이 ${
                   contributingAccounts.length
-                }개 계좌로 나뉘어 들어갑니다.`
-              : '아직 설정된 자동이체가 없어요.'
+                }개 통장으로 자동이체됩니다.`
+              : '현재 설정된 자동이체가 없어요.'
           }
         />
 
         <div className="px-4 py-4 sm:px-5">
           {contributingAccounts.length === 0 ? (
             <p className="text-xs leading-relaxed text-ink-500 dark:text-slate-400">
-              자산 항목의 &lsquo;월 자동이체&rsquo;를 채우면 매달 어느 통장으로
-              얼마가 빠지는지 여기에 표시됩니다. 연금저축·IRP와 주택청약은
-              자동이체를 늘릴수록 연말정산 환급도 함께 늘어납니다.
+              계획 탭이나 자산 항목에서 &lsquo;월 자동이체&rsquo;를 설정하면
+              매달 어느 통장으로 얼마가 빠지는지 여기에 표시됩니다.
             </p>
           ) : (
             <ul className="space-y-3">
@@ -438,48 +436,36 @@ export function MoneyFlowView({
         </div>
       </Card>
 
-      {/* 3. 통장 현황 */}
+      {/* 3. 통장 현황 (현재 실제 잔액) */}
       <Card>
         <CardHeader
-          title="통장 현황"
-          description={`${row.year}년 말 기준 계좌별 잔액`}
+          title="통장 현황 (현재 실제 잔액)"
+          description="현재 보유 중인 통장(계좌)별 실제 잔고"
+          action={
+            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              현재 시점 (Stock)
+            </span>
+          }
         />
 
         <div className="px-4 py-4 sm:px-5">
           {accounts.length === 0 ? (
             <p className="text-xs text-ink-500 dark:text-slate-400">
-              자산 항목을 추가하면 통장별 잔액이 표시됩니다.
+              등록된 통장/자산 항목이 없습니다.
             </p>
           ) : (
-            <>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {accounts.map((account) => (
-                  <AccountCard
-                    key={account.asset.id}
-                    row={account}
-                    maxBalance={maxBalance}
-                    taxDeductible={DEDUCTIBLE_TYPES.includes(
-                      account.asset.type,
-                    )}
-                  />
-                ))}
-              </div>
-
-              <div className="mt-3 rounded-xl border border-white/50 bg-white/50 px-3 py-2.5 dark:border-white/5 dark:bg-slate-900/50">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-xs font-bold text-ink-800 dark:text-slate-200">
-                    여유자금 (어느 통장에도 안 넣은 돈)
-                  </span>
-                  <span className="shrink-0 text-xs font-bold tabular-nums text-ink-900 dark:text-slate-100">
-                    {formatKRWShort(row.contributionBalance)}원
-                  </span>
-                </div>
-                <p className="mt-0.5 text-[11px] leading-relaxed text-ink-400 dark:text-slate-500">
-                  매년 남은 저축액이 쌓이는 자리입니다. 여기 있는 돈도 설정한
-                  여유자금 수익률만큼 굴러갑니다.
-                </p>
-              </div>
-            </>
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              {accounts.map((account) => (
+                <AccountCard
+                  key={account.asset.id}
+                  row={account}
+                  maxBalance={maxBalance}
+                  taxDeductible={DEDUCTIBLE_TYPES.includes(
+                    account.asset.type,
+                  )}
+                />
+              ))}
+            </div>
           )}
         </div>
       </Card>

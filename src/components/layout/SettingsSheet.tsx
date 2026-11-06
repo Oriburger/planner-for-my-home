@@ -3,10 +3,11 @@ import { Sheet } from '@/components/ui/Sheet';
 import { useUIStore } from '@/store/uiStore';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { WALLPAPERS, fileToWallpaperDataUrl } from '@/utils/wallpaper';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 interface SettingsSheetProps {
   open: boolean;
-  /** 'more' 는 모바일 더보기 — 차트·상세표·테마·마법사 바로가기를 함께 보여준다 */
+  /** 'more' 는 모바일 더보기 — 앱 설치·차트·상세표·테마·마법사 바로가기를 함께 보여준다 */
   mode: 'wallpaper' | 'more';
   onClose: () => void;
   onOpenWizard: () => void;
@@ -21,6 +22,8 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
   const setCustomWallpaper = useUIStore((s) => s.setCustomWallpaper);
   const setView = useUIStore((s) => s.setView);
   const view = useUIStore((s) => s.view);
+  const { canInstall, installApp } = usePWAInstall();
+
   const fileRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -46,6 +49,23 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
     <Sheet open={open} title={mode === 'more' ? '더보기' : '배경화면'} onClose={onClose}>
         {mode === 'more' && (
           <div className="mb-5 space-y-1.5">
+            {canInstall && (
+              <button
+                type="button"
+                onClick={async () => {
+                  await installApp();
+                  onClose();
+                }}
+                className="flex w-full items-center gap-3 rounded-xl border border-brand-300 bg-brand-500/10 px-3 py-3 text-left text-sm font-bold text-brand-700 transition hover:bg-brand-500/20 dark:border-brand-700 dark:bg-brand-400/10 dark:text-brand-300"
+              >
+                <Icon name="upload" className="h-[18px] w-[18px]" />
+                <span className="flex-1">📱 홈 화면에 앱으로 설치</span>
+                <span className="rounded bg-brand-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  안드로이드 설치
+                </span>
+              </button>
+            )}
+
             <SheetRow
               icon="chart"
               label="자산 · 현금흐름 차트"
