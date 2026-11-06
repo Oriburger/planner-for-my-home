@@ -12,9 +12,10 @@ import { TimelineView } from '@/components/result/TimelineView';
 import { AssetChart } from '@/components/result/AssetChart';
 import { CashflowChart } from '@/components/result/CashflowChart';
 import { YearTable } from '@/components/result/YearTable';
-import { TaxRefundCard } from '@/components/result/TaxRefundCard';
-import { MoneyFlowView } from '@/components/result/MoneyFlowView';
-import { InputPanel } from '@/components/form/InputPanel';
+import { IncomeView } from '@/components/plan/IncomeView';
+import { BudgetPlanView } from '@/components/plan/BudgetPlanView';
+import { formatKRWShort } from '@/utils/format';
+import { Icon } from '@/components/ui/Icon';
 
 function Disclaimer() {
   return (
@@ -27,12 +28,45 @@ function Disclaimer() {
 export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
   const { rows, summary, start } = useSimulation();
   const years = usePlannerStore((s) => s.settings.years);
+  const setView = useUIStore((s) => s.setView);
   const selected = useSelectedYear(rows);
   const points = useMemo(() => buildYearPoints(rows, start), [rows, start]);
   const point = points.find((p) => p.index === selected) ?? points[points.length - 1];
+
+  const firstYear = rows[0];
+  const monthlyNet = firstYear ? firstYear.netIncome / 12 : 0;
+  const monthlySavings = firstYear ? firstYear.annualSavings / 12 : 0;
+  const savingsPct = monthlyNet > 0 ? (monthlySavings / monthlyNet) * 100 : 0;
+
   return (
     <div className="space-y-3">
       <HomeHero onAddGoal={onEditGoals} />
+
+      {/* 한 달 머니 계획 바로가기 퀵 배너 */}
+      <button
+        type="button"
+        onClick={() => setView('budget')}
+        className="glass glass-card group flex w-full items-center justify-between gap-3 rounded-2xl p-3.5 text-left transition-all hover:border-brand-400"
+      >
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-300">
+            <Icon name="sliders" className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="text-xs font-bold text-ink-900 dark:text-slate-100">
+              월 지출 · 저축 계획 현황
+            </p>
+            <p className="text-[11px] text-ink-500 dark:text-slate-400">
+              세후 월 {formatKRWShort(monthlyNet)}원 중 {formatKRWShort(monthlySavings)}원({savingsPct.toFixed(0)}%) 저축 계획 중
+            </p>
+          </div>
+        </div>
+        <span className="flex items-center gap-1 text-xs font-semibold text-brand-600 dark:text-brand-400 group-hover:translate-x-0.5 transition-transform">
+          <span>계획 조정</span>
+          <Icon name="chevronRight" className="h-3 w-3" />
+        </span>
+      </button>
+
       <SummaryCards summary={summary} firstYear={rows[0]} point={point} years={years} />
       <GoalCarousel onEdit={onEditGoals} />
       <Disclaimer />
@@ -66,23 +100,6 @@ export function TimelineScreen() {
   );
 }
 
-/** 통장 · 자동이체 · 연말정산 — 돈이 어디로 가는지 */
-export function MoneyView() {
-  const { rows, assetBalances } = useSimulation();
-  const selectedYearIndex = useSelectedYear(rows);
-  return (
-    <div className="space-y-3">
-      <TaxRefundCard />
-      <MoneyFlowView
-        rows={rows}
-        assetBalances={assetBalances}
-        selectedYearIndex={selectedYearIndex}
-      />
-      <Disclaimer />
-    </div>
-  );
-}
-
 export function ChartsView() {
   const { rows, start } = useSimulation();
   return (
@@ -104,26 +121,18 @@ export function TableView() {
 }
 
 /**
- * 현재 화면 렌더링.
- * 'plan'(입력)은 모바일 전용 화면 — 데스크톱에서는 입력이 좌측 패널에 있으므로 개요를 보여준다.
+ * 메인 / 수입 관리 / 계획(지출, 저축) / 타임라인 / 차트 / 상세표 화면 렌더링
  */
 export function ViewContent({ view, onEditGoals }: { view: AppView; onEditGoals: () => void }) {
   switch (view) {
-    case 'plan':
-      return (
-        <>
-          <div className="mx-auto max-w-2xl lg:hidden">
-            <InputPanel />
-          </div>
-          <div className="hidden lg:block">
-            <OverviewView onEditGoals={onEditGoals} />
-          </div>
-        </>
-      );
+    case 'overview':
+      return <OverviewView onEditGoals={onEditGoals} />;
+    case 'income':
+      return <IncomeView />;
+    case 'budget':
+      return <BudgetPlanView />;
     case 'timeline':
       return <TimelineScreen />;
-    case 'money':
-      return <MoneyView />;
     case 'charts':
       return <ChartsView />;
     case 'table':

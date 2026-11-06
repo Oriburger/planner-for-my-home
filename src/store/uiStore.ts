@@ -7,13 +7,13 @@ import {
 } from '@/utils/wallpaper';
 
 export type ThemeMode = 'light' | 'dark';
-export type AppView = 'overview' | 'plan' | 'timeline' | 'money' | 'charts' | 'table';
+export type AppView = 'overview' | 'income' | 'budget' | 'timeline' | 'charts' | 'table';
 
 export const VIEW_LABEL: Record<AppView, string> = {
-  overview: '홈',
-  plan: '입력',
+  overview: '메인',
+  income: '수입 관리',
+  budget: '계획',
   timeline: '타임라인',
-  money: '통장',
   charts: '차트',
   table: '상세표',
 };
@@ -58,7 +58,11 @@ export const useUIStore = create<UIState>()(
         applyThemeClass(theme);
       },
       toggleTheme: () => get().setTheme(get().theme === 'light' ? 'dark' : 'light'),
-      setView: (view) => set({ view }),
+      setView: (view) => {
+        // 하위 호환
+        const targetView = (view as string) === 'plan' || (view as string) === 'money' ? 'budget' : view;
+        set({ view: targetView });
+      },
       toggleInputPanel: () => set({ inputPanelOpen: !get().inputPanelOpen }),
       setWallpaper: (wallpaper) => set({ wallpaper }),
       setCustomWallpaper: (dataUrl) => {
@@ -81,10 +85,16 @@ export const useUIStore = create<UIState>()(
         inputPanelOpen: s.inputPanelOpen,
         wallpaper: s.wallpaper,
       }),
-      // v0/v1 에 있던 viewMode(PC/모바일 강제) 설정은 버린다
       migrate: (persisted) => {
         const p = (persisted ?? {}) as Partial<UIState>;
-        return { theme: p.theme === 'dark' ? 'dark' : 'light' } as UIState;
+        let view = p.view ?? 'overview';
+        if ((view as string) === 'plan' || (view as string) === 'money') {
+          view = 'budget';
+        }
+        return {
+          theme: p.theme === 'dark' ? 'dark' : 'light',
+          view,
+        } as UIState;
       },
       onRehydrateStorage: () => (state) => {
         if (state) applyThemeClass(state.theme);

@@ -14,7 +14,7 @@ import { SettingsSheet } from './SettingsSheet';
 import { Wallpaper } from './Wallpaper';
 
 /** 모바일에서 좌우로 밀 때의 화면 순서 */
-const SWIPE_ORDER: AppView[] = ['overview', 'plan', 'timeline', 'money', 'charts', 'table'];
+const SWIPE_ORDER: AppView[] = ['overview', 'income', 'budget', 'timeline', 'charts', 'table'];
 
 export function DashboardLayout() {
   const onboarded = usePlannerStore((s) => s.onboarded);
@@ -73,7 +73,7 @@ export function DashboardLayout() {
     return () => document.removeEventListener('pointermove', onMove);
   }, []);
 
-  const showAside = inputPanelOpen || view === 'plan';
+  const showAside = inputPanelOpen;
   const closeSheet = useCallback(() => setSheet(null), []);
   const closeGoals = useCallback(() => setGoalsOpen(false), []);
 

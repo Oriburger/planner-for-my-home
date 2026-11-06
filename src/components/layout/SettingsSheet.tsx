@@ -6,7 +6,7 @@ import { WALLPAPERS, fileToWallpaperDataUrl } from '@/utils/wallpaper';
 
 interface SettingsSheetProps {
   open: boolean;
-  /** 'more' 는 모바일 더보기 — 상세표·테마·마법사 바로가기를 함께 보여준다 */
+  /** 'more' 는 모바일 더보기 — 차트·상세표·테마·마법사 바로가기를 함께 보여준다 */
   mode: 'wallpaper' | 'more';
   onClose: () => void;
   onOpenWizard: () => void;
@@ -47,11 +47,11 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
         {mode === 'more' && (
           <div className="mb-5 space-y-1.5">
             <SheetRow
-              icon="wallet"
-              label="통장 · 자동이체 · 연말정산"
-              active={view === 'money'}
+              icon="chart"
+              label="자산 · 현금흐름 차트"
+              active={view === 'charts'}
               onClick={() => {
-                setView('money');
+                setView('charts');
                 onClose();
               }}
             />

@@ -7,9 +7,10 @@ import { formatKRWShort } from '@/utils/format';
 import { haptic } from '@/utils/feedback';
 
 const NAV: Array<{ view: AppView; icon: IconName; label: string }> = [
-  { view: 'overview', icon: 'home', label: '홈' },
+  { view: 'overview', icon: 'home', label: '메인' },
+  { view: 'income', icon: 'banknote', label: '수입 관리' },
+  { view: 'budget', icon: 'sliders', label: '계획' },
   { view: 'timeline', icon: 'timeline', label: '타임라인' },
-  { view: 'money', icon: 'wallet', label: '통장' },
   { view: 'charts', icon: 'chart', label: '차트' },
   { view: 'table', icon: 'table', label: '상세표' },
 ];
@@ -52,7 +53,7 @@ export function DesktopDock({ onOpenWizard, onOpenSettings, onOpenGoals }: DockP
             key={item.view}
             mouseX={mouseX}
             label={item.label}
-            active={view === item.view || (item.view === 'overview' && view === 'plan')}
+            active={view === item.view}
             indicator
             onClick={() => setView(item.view)}
           >
@@ -151,10 +152,10 @@ function DockItem({
 /* ------------------------------------------------------------------ */
 
 const MOBILE_NAV: Array<{ view: AppView; icon: IconName; label: string }> = [
-  { view: 'overview', icon: 'home', label: '홈' },
-  { view: 'plan', icon: 'sliders', label: '입력' },
+  { view: 'overview', icon: 'home', label: '메인' },
+  { view: 'income', icon: 'banknote', label: '수입' },
+  { view: 'budget', icon: 'sliders', label: '계획' },
   { view: 'timeline', icon: 'timeline', label: '타임라인' },
-  { view: 'charts', icon: 'chart', label: '차트' },
 ];
 
 export function MobileDock({ onOpenMore }: { onOpenMore: () => void }) {
@@ -169,8 +170,8 @@ export function MobileDock({ onOpenMore }: { onOpenMore: () => void }) {
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden"
     >
       <div className="mx-auto max-w-md">
-        {/* 입력 중에는 결과를 바로 볼 수 있는 미리보기 */}
-        {view === 'plan' && (
+        {/* 입력 및 계획 중에는 결과를 바로 볼 수 있는 미리보기 */}
+        {(view === 'budget' || view === 'income') && (
           <button
             type="button"
             onClick={() => setView('overview')}
@@ -199,7 +200,7 @@ export function MobileDock({ onOpenMore }: { onOpenMore: () => void }) {
           <MobileDockButton
             icon="more"
             label="더보기"
-            active={view === 'table' || view === 'money'}
+            active={view === 'charts' || view === 'table'}
             onClick={onOpenMore}
           />
         </div>
