@@ -3,6 +3,7 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useSimulation } from '@/hooks/useSimulation';
 import { incomeForYear, rentOnlyForYear } from '@/utils/simulation';
+import { simulateLoanYear } from '@/utils/loan';
 import { estimateTaxRefund, type TaxRefundItem } from '@/utils/taxRefund';
 import { formatKRWShort } from '@/utils/format';
 
@@ -100,7 +101,14 @@ export function TaxRefundCard() {
       rentPaid: housings.reduce((sum, h) => sum + rentOnlyForYear(h, 1), 0),
       rentLoanRepaid: loans
         .filter((l) => l.isDepositLinked && l.startYear <= 1)
-        .reduce((sum, l) => sum + l.monthlyPayment * 12, 0),
+        .reduce(
+          (sum, l) =>
+            sum +
+            (l.monthlyPayment > 0
+              ? l.monthlyPayment * 12
+              : simulateLoanYear(l, 1, l.principal).payment),
+          0,
+        ),
       houselessHead: settings.houselessHead,
     });
   }, [assets, incomes, housings, loans, settings.houselessHead]);

@@ -29,12 +29,12 @@ export function HomeHero({ onAddGoal }: { onAddGoal: () => void }) {
     [goals, rows, start.netWorth],
   );
   const target = goalForYear(progress, Math.max(1, selected));
-  const ratio = target ? current.netWorth / Math.max(1, target.goal.amount) : 0;
+  const ratio = target && target.goal.amount > 0 ? Math.max(0, current.netWorth / target.goal.amount) : 0;
 
-  const value = useAnimatedNumber(current.netWorth, 800);
-  const savedV = useAnimatedNumber(current.saved, 800);
-  const grownV = useAnimatedNumber(current.grown, 800);
-  const pct = useAnimatedNumber(Math.round(ratio * 100), 700);
+  const value = useAnimatedNumber(current.netWorth, 400);
+  const savedV = useAnimatedNumber(current.saved, 400);
+  const grownV = useAnimatedNumber(current.grown, 400);
+  const pct = useAnimatedNumber(Math.round(ratio * 100), 350);
 
   /* 앞으로 나아갈 때 늘어난 만큼을 조용히 보여준다 */
   const [delta, setDelta] = useState<{ id: number; value: number } | null>(null);
@@ -135,12 +135,14 @@ export function HomeHero({ onAddGoal }: { onAddGoal: () => void }) {
                 </span>
               )}
             </p>
-            <p className="hero-amount mt-2 whitespace-nowrap font-semibold leading-none tabular-nums text-ink-900 dark:text-white">
-              {formatKRWShort(value)}
-              <span className="ml-1.5 text-[0.42em] font-medium tracking-normal text-ink-400 dark:text-slate-500">
+            <div className="mt-2 flex items-baseline">
+              <span className="hero-amount font-semibold leading-none tabular-nums text-ink-900 dark:text-white">
+                {formatKRWShort(value)}
+              </span>
+              <span className="ml-1.5 text-base font-medium text-ink-400 dark:text-slate-400 sm:text-lg">
                 원
               </span>
-            </p>
+            </div>
           </div>
 
           <dl className="flex min-w-0 flex-col justify-center gap-1.5 text-[13px] [grid-area:layers] sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-x-5">
@@ -186,7 +188,7 @@ export function HomeHero({ onAddGoal }: { onAddGoal: () => void }) {
             </span>
             {playing ? '재생 중' : '시간 흐름 재생'}
           </button>
-          <span className="text-[11px] text-ink-500 dark:text-slate-500">그래프를 끌어 연도 이동</span>
+          <span className="text-[11px] text-ink-500 dark:text-slate-400">그래프를 끌어 연도 이동</span>
         </div>
       </div>
     </section>

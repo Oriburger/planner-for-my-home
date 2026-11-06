@@ -22,9 +22,10 @@ export function monthlyEqualPayment(
   const n = Math.max(1, Math.round(termYears * 12));
   const r = annualRatePercent / 100 / 12;
 
-  if (r === 0) return principal / n;
+  if (r <= 0) return principal / n;
 
   const factor = Math.pow(1 + r, n);
+  if (factor <= 1) return principal / n;
   return (principal * r * factor) / (factor - 1);
 }
 

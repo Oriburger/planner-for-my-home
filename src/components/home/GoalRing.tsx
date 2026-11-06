@@ -23,7 +23,8 @@ export const GoalRing = forwardRef<HTMLDivElement, GoalRingProps>(function GoalR
   const r = (size - stroke) / 2 - 2;
   const c = 2 * Math.PI * r;
   const done = ratio >= 1;
-  const offset = c * (1 - Math.min(1, shown));
+  const safeShown = Math.max(0, Math.min(1, Number.isFinite(shown) ? shown : 0));
+  const offset = c * (1 - safeShown);
 
   return (
     <div
@@ -49,8 +50,8 @@ export const GoalRing = forwardRef<HTMLDivElement, GoalRingProps>(function GoalR
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={offset}
-          className={done ? 'stroke-accent-500 dark:stroke-accent-400' : 'stroke-ink-900 dark:stroke-white'}
-          style={{ transition: 'stroke-dashoffset 0.9s cubic-bezier(0.22,1,0.36,1), stroke 0.4s' }}
+          className={done ? 'stroke-accent-500 dark:stroke-accent-400' : 'stroke-ink-900 dark:text-accent-400'}
+          style={{ transition: 'stroke-dashoffset 0.45s cubic-bezier(0.22,1,0.36,1), stroke 0.3s' }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">

@@ -84,7 +84,7 @@ export function DashboardLayout() {
 
       <main
         ref={mainRef}
-        className="mx-auto w-full max-w-[1440px] flex-1 px-3 pb-32 pt-3 sm:px-6 sm:pt-4 lg:px-8 lg:pb-36"
+        className="mx-auto w-full max-w-[1440px] flex-1 px-3 pb-44 pt-3 sm:px-6 sm:pt-4 lg:px-8 lg:pb-36"
       >
         <div
           className={`lg:grid lg:items-start lg:gap-6 ${

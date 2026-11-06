@@ -11,6 +11,7 @@ import { MoneyFlowView } from '@/components/result/MoneyFlowView';
 import {
   calculateBudgetShares,
   applyBudgetPreset,
+  applyBudgetSavingsPreset,
   BUDGET_PRESETS,
   type BudgetPresetType,
 } from '@/utils/budget';
@@ -35,7 +36,7 @@ function FastStepAdjuster({
   max: number;
 }) {
   return (
-    <div className="mt-2.5 space-y-2">
+    <div className="mt-2.5 space-y-2.5" data-no-swipe>
       <input
         type="range"
         min={0}
@@ -46,10 +47,10 @@ function FastStepAdjuster({
           haptic(3);
           onChange(Number(e.target.value));
         }}
-        className="h-2 w-full cursor-pointer"
+        className="h-8 w-full cursor-pointer py-2 touch-none"
       />
-      <div className="flex flex-wrap items-center justify-between gap-1">
-        <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center justify-between gap-1.5 pt-0.5">
+        <div className="flex items-center gap-1.5">
           {[-50000, -10000].map((step, idx) => (
             <button
               key={step}
@@ -59,14 +60,14 @@ function FastStepAdjuster({
                 haptic(5);
                 onChange(Math.max(0, value + step));
               }}
-              className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-0.5 text-[10px] font-semibold text-ink-700 transition hover:bg-white active:scale-95 disabled:opacity-30 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300"
+              className="min-h-[34px] min-w-[44px] rounded-lg border border-ink-900/10 bg-white/70 px-2.5 py-1.5 text-xs font-semibold text-ink-700 transition hover:bg-white active:scale-95 disabled:opacity-30 touch-manipulation dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300"
             >
               {idx === 0 ? '-5만' : '-1만'}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {[10000, 50000].map((step, idx) => (
             <button
               key={step}
@@ -76,7 +77,7 @@ function FastStepAdjuster({
                 haptic(5);
                 onChange(value + step);
               }}
-              className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-0.5 text-[10px] font-semibold text-ink-700 transition hover:bg-white active:scale-95 disabled:opacity-30 dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300"
+              className="min-h-[34px] min-w-[44px] rounded-lg border border-ink-900/10 bg-white/70 px-2.5 py-1.5 text-xs font-semibold text-ink-700 transition hover:bg-white active:scale-95 disabled:opacity-30 touch-manipulation dark:border-white/10 dark:bg-slate-800/70 dark:text-slate-300"
             >
               {idx === 0 ? '+1만' : '+5만'}
             </button>
@@ -137,18 +138,22 @@ export function BudgetPlanView() {
     ],
   );
 
-  // 프리셋 적용
+  // 프리셋 적용 (지출과 저축 자산 동시 스케일링)
   const handleApplyPreset = (preset: BudgetPresetType) => {
     haptic(10);
-    const updated = applyBudgetPreset(
+    const updatedExpenses = applyBudgetPreset(
       preset,
       monthlyNetIncome,
       expenses,
       housingCostMonthly,
       loanPaymentMonthly,
     );
-    for (const exp of updated) {
+    for (const exp of updatedExpenses) {
       updateExpense(exp.id, { monthlyAmount: exp.monthlyAmount });
+    }
+    const updatedAssets = applyBudgetSavingsPreset(preset, monthlyNetIncome, assets);
+    for (const a of updatedAssets) {
+      updateAsset(a.id, { monthlyContribution: a.monthlyContribution });
     }
   };
 

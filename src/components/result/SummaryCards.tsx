@@ -29,10 +29,10 @@ function Kpi({
   /** 비교 기준 (예: 전체 기간 합계) */
   sub?: string;
 }) {
-  const v = useAnimatedNumber(value);
+  const v = useAnimatedNumber(value, 400);
   return (
-    <div className="glass spotlight lift min-w-0 rounded-2xl px-4 py-3.5">
-      <div className="flex items-center justify-between gap-2">
+    <div className="glass spotlight lift min-w-0 rounded-2xl px-3 py-3 sm:px-4 sm:py-3.5">
+      <div className="flex items-center justify-between gap-1.5">
         <p className="truncate text-xs font-medium text-ink-600 dark:text-slate-400">{label}</p>
         {tag && (
           <span className="shrink-0 rounded bg-ink-900/[0.06] px-1.5 py-px text-[10px] font-medium tabular-nums text-ink-600 dark:bg-white/[0.08] dark:text-slate-400">
@@ -40,11 +40,11 @@ function Kpi({
           </span>
         )}
       </div>
-      <p className={`mt-1 truncate text-lg font-semibold tracking-tight tabular-nums sm:text-xl ${TONE[tone]}`}>
+      <p className={`mt-1 truncate text-base font-semibold tracking-tight tabular-nums sm:text-xl ${TONE[tone]}`}>
         {format(v)}
       </p>
       {sub && (
-        <p className="mt-0.5 truncate text-[11px] font-medium tabular-nums text-ink-500 dark:text-slate-500">
+        <p className="mt-0.5 truncate text-[10px] font-medium tabular-nums text-ink-500 dark:text-slate-400 sm:text-[11px]">
           {sub}
         </p>
       )}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { calculateBudgetShares, applyBudgetPreset } from '../budget';
-import type { ExpenseItem } from '@/types/planner';
+import { calculateBudgetShares, applyBudgetPreset, applyBudgetSavingsPreset } from '../budget';
+import type { AssetItem, ExpenseItem } from '@/types/planner';
 
 const 만 = 10_000;
 
@@ -37,6 +37,20 @@ describe('calculateBudgetShares', () => {
     expect(shares.leftover.amount).toBe(-30 * 만);
     expect(shares.leftover.percent).toBeCloseTo(-15, 1);
   });
+
+  it('소득이 0원일 때 1억% 폭증 없이 비율 0%로 안전하게 처리한다', () => {
+    const shares = calculateBudgetShares({
+      monthlyNetIncome: 0,
+      housingCost: 50 * 만,
+      loanPayment: 0,
+      livingExpense: 50 * 만,
+      contribution: 0,
+    });
+
+    expect(shares.status).toBe('deficit');
+    expect(shares.housing.percent).toBe(0);
+    expect(shares.living.percent).toBe(0);
+  });
 });
 
 describe('applyBudgetPreset', () => {
@@ -70,5 +84,39 @@ describe('applyBudgetPreset', () => {
 
     expect(newTotal).toBeCloseTo(100 * 만, -2);
     expect(scaled.find((e) => e.id === 'e1')?.monthlyAmount).toBeCloseTo(75 * 만, -2);
+  });
+});
+
+describe('applyBudgetSavingsPreset', () => {
+  it('50-30-20 프리셋 적용 시 저축 자산 항목들의 월 자동이체액을 30% 목표에 맞게 스케일링한다', () => {
+    const assets: AssetItem[] = [
+      {
+        id: 'a1',
+        type: 'savings',
+        name: '적금',
+        amount: 500 * 만,
+        annualReturnRate: 3.5,
+        liquid: true,
+        monthlyContribution: 40 * 만,
+      },
+      {
+        id: 'a2',
+        type: 'isa',
+        name: 'ISA',
+        amount: 300 * 만,
+        annualReturnRate: 6,
+        liquid: false,
+        monthlyContribution: 20 * 만,
+      },
+    ];
+
+    // 소득 400만 -> 50-30-20 저축 목표 30% = 120만
+    // 기존 저축 합 60만(40만+20만)이 120만으로 2배 스케일링 -> a1: 80만, a2: 40만
+    const updated = applyBudgetSavingsPreset('50-30-20', 400 * 만, assets);
+    const totalContrib = updated.reduce((sum, a) => sum + a.monthlyContribution, 0);
+
+    expect(totalContrib).toBeCloseTo(120 * 만, -2);
+    expect(updated.find((a) => a.id === 'a1')?.monthlyContribution).toBeCloseTo(80 * 만, -2);
+    expect(updated.find((a) => a.id === 'a2')?.monthlyContribution).toBeCloseTo(40 * 만, -2);
   });
 });

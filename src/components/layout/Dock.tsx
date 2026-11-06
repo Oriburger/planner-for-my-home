@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useSimulation } from '@/hooks/useSimulation';
 import { usePlannerStore } from '@/store/plannerStore';
 import { useUIStore, type AppView } from '@/store/uiStore';
@@ -23,6 +23,28 @@ interface DockProps {
   onOpenWizard: () => void;
   onOpenSettings: () => void;
   onOpenGoals: () => void;
+}
+
+/** 모바일 가상 키보드 활성화 감지 (입력 필드 포커스 시 독 숨김) */
+function useIsInputFocused() {
+  const [isFocused, setIsFocused] = useState(false);
+  useEffect(() => {
+    const handleFocusIn = (e: FocusEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') {
+        setIsFocused(true);
+      }
+    };
+    const handleFocusOut = () => setIsFocused(false);
+
+    window.addEventListener('focusin', handleFocusIn);
+    window.addEventListener('focusout', handleFocusOut);
+    return () => {
+      window.removeEventListener('focusin', handleFocusIn);
+      window.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+  return isFocused;
 }
 
 /* ------------------------------------------------------------------ */
@@ -159,6 +181,7 @@ const MOBILE_NAV: Array<{ view: AppView; icon: IconName; label: string }> = [
 ];
 
 export function MobileDock({ onOpenMore }: { onOpenMore: () => void }) {
+  const isInputFocused = useIsInputFocused();
   const view = useUIStore((s) => s.view);
   const setView = useUIStore((s) => s.setView);
   const years = usePlannerStore((s) => s.settings.years);
@@ -167,7 +190,9 @@ export function MobileDock({ onOpenMore }: { onOpenMore: () => void }) {
   return (
     <nav
       aria-label="주 메뉴"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden"
+      className={`pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-all duration-200 lg:hidden ${
+        isInputFocused ? 'translate-y-[150%] opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+      }`}
     >
       <div className="mx-auto max-w-md">
         {/* 입력 및 계획 중에는 결과를 바로 볼 수 있는 미리보기 */}
@@ -228,8 +253,8 @@ function MobileDockButton({
         onClick();
       }}
       aria-current={active ? 'page' : undefined}
-      className={`flex min-w-0 flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-medium transition-colors ${
-        active ? 'text-ink-900 dark:text-white' : 'text-ink-500 dark:text-slate-500'
+      className={`flex min-w-0 flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-medium transition-colors touch-manipulation ${
+        active ? 'text-ink-900 dark:text-white' : 'text-ink-500 dark:text-slate-400'
       }`}
     >
       <span

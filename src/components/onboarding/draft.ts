@@ -19,16 +19,17 @@ import { DEFAULT_SETTINGS } from '@/store/plannerStore';
 
 /** 자산 단계에서 물어보는 칸 (보증금은 주거 단계에서 자동으로 만들어진다) */
 export const ASSET_PRESETS = [
-  { key: 'cash', label: '현금 · 파킹통장', rate: 2.5, liquid: true },
-  { key: 'savings', label: '예금 · 적금', rate: 3.5, liquid: true },
-  { key: 'isa', label: 'ISA', rate: 6, liquid: false },
-  { key: 'investment', label: '주식 · ETF', rate: 6, liquid: true },
-  { key: 'pension', label: '연금저축 · IRP', rate: 5.5, liquid: false },
+  { key: 'cash', label: '현금 · 파킹통장', rate: 2.5, liquid: true, hint: '수시 입출금' },
+  { key: 'savings', label: '예금 · 적금', rate: 3.5, liquid: true, hint: '정기 예·적금' },
+  { key: 'isa', label: 'ISA', rate: 6, liquid: false, hint: '비과세 계좌' },
+  { key: 'investment', label: '주식 · ETF', rate: 6, liquid: true, hint: '국내/해외 투자' },
+  { key: 'pension', label: '연금저축 · IRP', rate: 5.5, liquid: false, hint: '최대 16.5% 세액공제' },
   {
     key: 'housingSubscription',
     label: '주택청약',
     rate: 2.8,
     liquid: false,
+
   },
 ] as const;
 
@@ -146,6 +147,7 @@ export function draftToPlannerData(draft: OnboardingDraft): PlannerData {
       amount: draft.housing.deposit,
       annualReturnRate: 0,
       liquid: false,
+
       monthlyContribution: 0,
     });
   }

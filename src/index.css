@@ -40,11 +40,11 @@
 .dark {
   --bg-base: #0b0d12;
 
-  --glass-fill: rgba(24, 26, 32, 0.64);
-  --glass-fill-strong: rgba(24, 26, 32, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-edge: rgba(0, 0, 0, 0.35);
-  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-fill: rgba(20, 23, 29, 0.72);
+  --glass-fill-strong: rgba(20, 23, 29, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-edge: rgba(0, 0, 0, 0.45);
+  --glass-highlight: rgba(255, 255, 255, 0.16);
   --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 14px 36px -16px rgba(0, 0, 0, 0.7);
 
   --tile-fill: rgba(255, 255, 255, 0.04);
@@ -166,7 +166,7 @@
     backdrop-filter: blur(20px) saturate(150%);
     border: 1px solid var(--glass-border);
     box-shadow:
-      0 0 0 0.5px var(--glass-edge),
+      0 0 0 1px var(--glass-edge),
       inset 0 1px 0 0 var(--glass-highlight),
       var(--glass-shadow);
   }

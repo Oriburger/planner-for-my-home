@@ -1,4 +1,4 @@
-import { useId, useState, type CSSProperties, type ReactNode } from 'react';
+import { useId, useState, useRef, useEffect, type CSSProperties, type ReactNode } from 'react';
 import { fromMan, toMan } from '@/utils/format';
 import { InfoTip } from './InfoTip';
 import { Icon } from './Icon';
@@ -44,7 +44,7 @@ export function Field({
 const inputClass = 'glass-field';
 
 /* ------------------------------------------------------------------ */
-/* 숫자 입력 (포커스 중에는 draft 문자열을 그대로 유지)                 */
+/* 숫자 입력 (포커스 중에는 draft 유지, 200ms 디바운스로 시뮬레이션 폭주 방지) */
 /* ------------------------------------------------------------------ */
 
 interface NumericInputProps {
@@ -75,6 +75,26 @@ function NumericInput({
 }: NumericInputProps) {
   const [focused, setFocused] = useState(false);
   const [draft, setDraft] = useState('');
+  const timerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  const clamp = (n: number) => {
+    let next = n;
+    if (min !== undefined) next = Math.max(min, next);
+    if (max !== undefined) next = Math.min(max, next);
+    return next;
+  };
+
+  const commit = (rawVal: string) => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    const parsed = rawVal === '' || rawVal === '-' ? 0 : Number(rawVal);
+    if (!Number.isNaN(parsed)) onChange(clamp(parsed));
+  };
 
   const display = focused
     ? draft
@@ -83,13 +103,6 @@ function NumericInput({
       : Number.isFinite(value)
         ? String(Number(value.toFixed(2)))
         : '';
-
-  const clamp = (n: number) => {
-    let next = n;
-    if (min !== undefined) next = Math.max(min, next);
-    if (max !== undefined) next = Math.min(max, next);
-    return next;
-  };
 
   return (
     <div className="relative">
@@ -108,12 +121,15 @@ function NumericInput({
           setDraft(value === 0 ? '' : String(Number(value.toFixed(2))));
           setFocused(true);
         }}
-        onBlur={() => setFocused(false)}
+        onBlur={() => {
+          setFocused(false);
+          commit(draft);
+        }}
         onChange={(e) => {
           const raw = e.target.value;
           setDraft(raw);
-          const parsed = raw === '' || raw === '-' ? 0 : Number(raw);
-          if (!Number.isNaN(parsed)) onChange(clamp(parsed));
+          if (timerRef.current) window.clearTimeout(timerRef.current);
+          timerRef.current = window.setTimeout(() => commit(raw), 200);
         }}
       />
       {suffix && (

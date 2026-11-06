@@ -171,18 +171,22 @@ export function runSimulation(data: PlannerData, baseYear = currentYear()): Simu
       investmentReturn += poolGain;
     }
 
-    /* ---- 2. 수입과 세금 ---- */
+    /* ---- 2. 수입과 세금 (개인별 과세 원칙) ---- */
     let taxableGross = 0;
     let nonTaxableGross = 0;
+    let taxAndInsurance = 0;
 
     for (const income of incomes) {
       const amount = incomeForYear(income, yearIndex);
-      if (income.taxable) taxableGross += amount;
-      else nonTaxableGross += amount;
+      if (income.taxable) {
+        taxableGross += amount;
+        taxAndInsurance += estimateTax(amount, settings);
+      } else {
+        nonTaxableGross += amount;
+      }
     }
 
     const grossIncome = taxableGross + nonTaxableGross;
-    const taxAndInsurance = estimateTax(taxableGross, settings);
     const netIncome = grossIncome - taxAndInsurance;
 
     /* ---- 3. 지출 ---- */

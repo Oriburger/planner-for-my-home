@@ -25,11 +25,11 @@ export function AppHeader() {
 
         <div className="flex min-w-0 flex-1 items-baseline gap-2">
           <h1 className="truncate text-sm font-semibold tracking-tight text-ink-900 dark:text-white sm:text-[15px]">
-            <span className="hidden min-[400px]:inline">내 집 마련 플래너</span>
-            <span className="min-[400px]:hidden">{VIEW_LABEL[view]}</span>
+            <span className="hidden sm:inline">내 집 마련 플래너</span>
+            <span className="sm:hidden">{VIEW_LABEL[view]}</span>
           </h1>
-          <span className="hidden text-sm text-ink-300 dark:text-slate-600 min-[400px]:inline">/</span>
-          <span className="hidden truncate text-sm text-ink-600 dark:text-slate-400 min-[400px]:inline">
+          <span className="hidden text-sm text-ink-300 dark:text-slate-600 sm:inline">/</span>
+          <span className="hidden truncate text-sm text-ink-600 dark:text-slate-400 sm:inline">
             {VIEW_LABEL[view]}
           </span>
         </div>
@@ -39,10 +39,10 @@ export function AppHeader() {
         <button
           type="button"
           onClick={() => setView('overview')}
-          className="hidden min-w-0 text-right min-[360px]:block"
+          className="hidden min-w-0 text-right sm:block"
           aria-label={`${years}년 후 예상 순자산 ${formatKRWShort(summary.finalNetWorth)}원`}
         >
-          <span className="block text-[10px] font-medium text-ink-500 dark:text-slate-500 sm:text-[11px]">
+          <span className="block text-[10px] font-medium text-ink-500 dark:text-slate-400 sm:text-[11px]">
             최종 순자산
           </span>
           <span className="block truncate text-sm font-semibold tabular-nums tracking-tight text-ink-900 dark:text-white sm:text-[15px]">

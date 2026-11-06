@@ -1,4 +1,4 @@
-import type { ExpenseItem } from '@/types/planner';
+import type { AssetItem, ExpenseItem } from '@/types/planner';
 
 export interface BudgetShareItem {
   amount: number;
@@ -65,13 +65,12 @@ export function calculateBudgetShares({
   livingExpense: number;
   contribution: number;
 }): BudgetShares {
-  const safeIncome = Math.max(1, monthlyNetIncome);
   const totalAllocated = housingCost + loanPayment + livingExpense + contribution;
   const leftover = monthlyNetIncome - totalAllocated;
 
   const toItem = (amt: number): BudgetShareItem => ({
     amount: amt,
-    percent: (amt / safeIncome) * 100,
+    percent: monthlyNetIncome > 0 ? (amt / monthlyNetIncome) * 100 : 0,
   });
 
   let status: BudgetShares['status'] = 'balanced';
@@ -119,4 +118,36 @@ export function applyBudgetPreset(
     ...e,
     monthlyAmount: Math.round((e.monthlyAmount * factor) / 10000) * 10000,
   }));
+}
+
+/**
+ * 선택한 프리셋의 목표 저축 비율에 맞춰 저축/투자 목적 자산들의 월 납입액을 비례적으로 스케일링한다.
+ */
+export function applyBudgetSavingsPreset(
+  preset: BudgetPresetType,
+  monthlyNetIncome: number,
+  assets: AssetItem[],
+): AssetItem[] {
+  if (monthlyNetIncome <= 0 || assets.length === 0) return assets;
+  const config = BUDGET_PRESETS.find((p) => p.id === preset) ?? BUDGET_PRESETS[0];
+  const targetSavingsTotal = (monthlyNetIncome * config.savingsShare) / 100;
+
+  const targetAssets = assets.filter(
+    (a) =>
+      ['savings', 'isa', 'pension', 'housingSubscription'].includes(a.type) ||
+      a.monthlyContribution > 0,
+  );
+  if (targetAssets.length === 0) return assets;
+
+  const currentTotal = targetAssets.reduce((sum, a) => sum + a.monthlyContribution, 0);
+  const factor = currentTotal > 0 ? targetSavingsTotal / currentTotal : targetSavingsTotal / targetAssets.length;
+
+  return assets.map((a) => {
+    if (!targetAssets.some((ta) => ta.id === a.id)) return a;
+    const nextContribution =
+      currentTotal > 0
+        ? Math.round((a.monthlyContribution * factor) / 10000) * 10000
+        : Math.round(targetSavingsTotal / targetAssets.length / 10000) * 10000;
+    return { ...a, monthlyContribution: Math.max(0, nextContribution) };
+  });
 }

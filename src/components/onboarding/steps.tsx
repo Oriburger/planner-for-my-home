@@ -218,9 +218,9 @@ export function HousingStep({ draft, patch }: StepProps) {
 /* ------------------------------------------------------------------ */
 
 const REPAYMENT_OPTIONS: Array<{ value: RepaymentType; label: string }> = [
-  { value: 'equalPayment', label: '원리금균등' },
-  { value: 'equalPrincipal', label: '원금균등' },
-  { value: 'interestOnly', label: '만기일시상환' },
+  { value: 'equalPayment', label: '원리금균등 (매달 같은 금액 · 추천)' },
+  { value: 'equalPrincipal', label: '원금균등 (원금 균등 상환 · 초기 부담)' },
+  { value: 'interestOnly', label: '만기일시 (이자만 납부 · 전세대출 흔함)' },
 ];
 
 export function LoanStep({ draft, patch }: StepProps) {
