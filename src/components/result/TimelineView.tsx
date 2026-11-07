@@ -102,6 +102,39 @@ export function TimelineView({
           </div>
         </div>
 
+        {/* 주요 이벤트 연도 바로가기 칩 */}
+        {eventsByYear.size > 0 && (
+          <div
+            data-no-swipe
+            className="no-scrollbar mt-3 flex items-center gap-1.5 overflow-x-auto px-4 sm:px-5"
+          >
+            <span className="shrink-0 text-[11px] font-semibold text-ink-500 dark:text-slate-400">
+              주요 시점:
+            </span>
+            {Array.from(eventsByYear.entries()).map(([yearIdx, evs]) => {
+              const row = rows.find((r) => r.index === yearIdx);
+              if (!row) return null;
+              const isSelected = activeRow?.index === yearIdx;
+              const firstEv = evs[0];
+              return (
+                <button
+                  key={yearIdx}
+                  type="button"
+                  onClick={() => onSelectYear(yearIdx)}
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${
+                    isSelected
+                      ? 'bg-ink-900 text-white dark:bg-white dark:text-ink-900'
+                      : 'border border-ink-900/10 bg-white/60 text-ink-700 hover:bg-white dark:border-white/10 dark:bg-slate-800/60 dark:text-slate-300'
+                  }`}
+                >
+                  {row.year}년 · {firstEv.badge}
+                  {evs.length > 1 ? ` +${evs.length - 1}` : ''}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* 가로 스크롤 타임라인 트랙 */}
         <div
           ref={trackRef}

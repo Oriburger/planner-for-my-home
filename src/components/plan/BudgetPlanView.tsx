@@ -526,23 +526,32 @@ export function BudgetPlanView() {
                     className="rounded-xl border border-ink-900/10 bg-white/60 p-3.5 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/60"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="font-bold text-ink-900 dark:text-slate-100">
-                            {h.name || '주거 계약'}
+                      <div className="flex min-w-[180px] flex-1 items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={h.name}
+                          onChange={(e) => updateHousing(h.id, { name: e.target.value })}
+                          placeholder="주거 계약 이름"
+                          aria-label="주거 계약 이름"
+                          className="min-w-[90px] flex-1 rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-xs font-bold text-ink-900 transition hover:border-ink-900/15 hover:bg-white/80 focus:border-brand-500 focus:bg-white focus:outline-none dark:text-slate-100 dark:hover:border-white/15 dark:hover:bg-slate-900/60 dark:focus:bg-slate-900"
+                        />
+                        <select
+                          value={h.type}
+                          onChange={(e) => updateHousing(h.id, { type: e.target.value as HousingType })}
+                          aria-label="거주 형태"
+                          className="shrink-0 cursor-pointer rounded-md border border-amber-200/80 bg-amber-100/90 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 focus:outline-none dark:border-amber-800/60 dark:bg-amber-950/80 dark:text-amber-300"
+                        >
+                          {HOUSING_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        {h.startYear > 1 && (
+                          <span className="shrink-0 rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
+                            {h.startYear}년차~
                           </span>
-                          <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-950/70 dark:text-amber-300">
-                            {HOUSING_TYPE_LABEL[h.type]}
-                          </span>
-                          {h.startYear > 1 && (
-                            <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
-                              {h.startYear}년차~
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-0.5 break-keep text-[11px] text-ink-500 dark:text-slate-400">
-                          보증금 {formatKRWShort(h.deposit)}원 · 월세 {formatKRWShort(h.monthlyRent)}원 · 관리비 {formatKRWShort(h.monthlyMaintenance)}원 (연 {h.annualIncreaseRate}% 상승)
-                        </p>
+                        )}
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span className="font-extrabold text-ink-900 dark:text-slate-100 tabular-nums">
@@ -551,9 +560,9 @@ export function BudgetPlanView() {
                         <button
                           type="button"
                           onClick={() => setEditingHousingId(isEditing ? null : h.id)}
-                          className="rounded-lg border border-ink-900/10 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-slate-700"
+                          className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                         >
-                          {isEditing ? '접기' : '상세·수정'}
+                          {isEditing ? '접기' : '상세옵션'}
                         </button>
                         <button
                           type="button"
@@ -575,6 +584,9 @@ export function BudgetPlanView() {
                         </button>
                       </div>
                     </div>
+                    <p className="mt-1 px-1.5 break-keep text-[11px] text-ink-500 dark:text-slate-400">
+                      보증금 {formatKRWShort(h.deposit)}원 · 월세 {formatKRWShort(h.monthlyRent)}원 · 관리비 {formatKRWShort(h.monthlyMaintenance)}원 (연 {h.annualIncreaseRate}% 상승)
+                    </p>
 
                     {isEditing && (
                       <div className="mt-3 grid grid-cols-2 gap-2.5 border-t border-ink-100 pt-3 dark:border-white/10">
@@ -686,29 +698,39 @@ export function BudgetPlanView() {
                     className="rounded-xl border border-ink-900/10 bg-white/60 p-3.5 text-xs backdrop-blur-xs dark:border-white/10 dark:bg-slate-800/60"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="font-bold text-ink-900 dark:text-slate-100">
-                            {l.name || '대출'}
+                      <div className="flex min-w-[180px] flex-1 items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={l.name}
+                          onChange={(e) => updateLoan(l.id, { name: e.target.value })}
+                          placeholder="대출 이름"
+                          aria-label="대출 이름"
+                          className="min-w-[90px] flex-1 rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-xs font-bold text-ink-900 transition hover:border-ink-900/15 hover:bg-white/80 focus:border-brand-500 focus:bg-white focus:outline-none dark:text-slate-100 dark:hover:border-white/15 dark:hover:bg-slate-900/60 dark:focus:bg-slate-900"
+                        />
+                        <select
+                          value={l.repaymentType}
+                          onChange={(e) =>
+                            updateLoan(l.id, { repaymentType: e.target.value as RepaymentType })
+                          }
+                          aria-label="상환 방식"
+                          className="shrink-0 cursor-pointer rounded-md border border-rose-200/80 bg-rose-100/80 px-1.5 py-0.5 text-[10px] font-semibold text-rose-800 focus:outline-none dark:border-rose-800/60 dark:bg-rose-950/70 dark:text-rose-300"
+                        >
+                          {REPAYMENT_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        {l.isDepositLinked && (
+                          <span className="shrink-0 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
+                            보증금 상환
                           </span>
-                          <span className="rounded bg-rose-100/80 px-1.5 py-0.5 text-[10px] font-semibold text-rose-800 dark:bg-rose-950/70 dark:text-rose-300">
-                            {REPAYMENT_TYPE_LABEL[l.repaymentType]}
+                        )}
+                        {l.startYear > 1 && (
+                          <span className="shrink-0 rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
+                            {l.startYear}년차~
                           </span>
-                          {l.isDepositLinked && (
-                            <span className="rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
-                              보증금 상환
-                            </span>
-                          )}
-                          {l.startYear > 1 && (
-                            <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
-                              {l.startYear}년차~
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-0.5 break-keep text-[11px] text-ink-500 dark:text-slate-400">
-                          원금 {formatKRWShort(l.principal)}원 · 연 {l.annualRate}% · {l.termYears}년 만기
-                          {l.isDepositLinked && ' (만기 원금은 보증금에서 상환)'}
-                        </p>
+                        )}
                       </div>
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span className="font-extrabold text-rose-600 dark:text-rose-400 tabular-nums">
@@ -717,9 +739,9 @@ export function BudgetPlanView() {
                         <button
                           type="button"
                           onClick={() => setEditingLoanId(isEditing ? null : l.id)}
-                          className="rounded-lg border border-ink-900/10 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-slate-700"
+                          className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                         >
-                          {isEditing ? '접기' : '상세·수정'}
+                          {isEditing ? '접기' : '상세옵션'}
                         </button>
                         <button
                           type="button"
@@ -741,6 +763,10 @@ export function BudgetPlanView() {
                         </button>
                       </div>
                     </div>
+                    <p className="mt-1 px-1.5 break-keep text-[11px] text-ink-500 dark:text-slate-400">
+                      원금 {formatKRWShort(l.principal)}원 · 연 {l.annualRate}% · {l.termYears}년 만기
+                      {l.isDepositLinked && ' (만기 원금은 보증금에서 상환)'}
+                    </p>
 
                     {isEditing && (
                       <div className="mt-3 grid grid-cols-2 gap-2.5 border-t border-ink-100 pt-3 dark:border-white/10">
@@ -892,24 +918,35 @@ export function BudgetPlanView() {
                     className="rounded-xl border border-ink-900/10 bg-white/60 p-3.5 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-slate-800/60"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setEditingExpenseId(isEditing ? null : exp.id)}
-                        className="flex min-w-0 flex-1 items-center gap-2 text-left group"
-                        title="클릭하여 이름·카테고리·상세 옵션 수정"
-                      >
-                        <span className="truncate font-bold text-ink-900 group-hover:text-brand-600 dark:text-slate-100 dark:group-hover:text-brand-400 text-xs">
-                          {exp.name || '새 지출'}
-                        </span>
-                        <span className="shrink-0 rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
-                          {EXPENSE_CATEGORY_LABEL[exp.category]}
-                        </span>
+                      <div className="flex min-w-[170px] flex-1 items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={exp.name}
+                          onChange={(e) => updateExpense(exp.id, { name: e.target.value })}
+                          placeholder="지출 이름 입력"
+                          aria-label="지출 이름"
+                          className="min-w-[85px] flex-1 rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-xs font-bold text-ink-900 transition hover:border-ink-900/15 hover:bg-white/80 focus:border-brand-500 focus:bg-white focus:outline-none dark:text-slate-100 dark:hover:border-white/15 dark:hover:bg-slate-900/60 dark:focus:bg-slate-900"
+                        />
+                        <select
+                          value={exp.category}
+                          onChange={(e) =>
+                            updateExpense(exp.id, { category: e.target.value as ExpenseCategory })
+                          }
+                          aria-label="지출 카테고리"
+                          className="shrink-0 cursor-pointer rounded-md border border-ink-900/10 bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-700 focus:outline-none dark:border-white/10 dark:bg-slate-700 dark:text-slate-200"
+                        >
+                          {EXPENSE_CATEGORY_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
                         {exp.startYear > 1 && (
                           <span className="shrink-0 rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-700 dark:text-slate-300">
                             {exp.startYear}년차~
                           </span>
                         )}
-                      </button>
+                      </div>
 
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span className="whitespace-nowrap rounded-full bg-orange-100/80 px-2 py-0.5 text-[10px] font-bold text-orange-800 dark:bg-orange-950/80 dark:text-orange-300">
@@ -921,9 +958,9 @@ export function BudgetPlanView() {
                         <button
                           type="button"
                           onClick={() => setEditingExpenseId(isEditing ? null : exp.id)}
-                          className="rounded-lg border border-ink-900/10 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:text-slate-300 dark:hover:bg-slate-700"
+                          className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-ink-100 dark:border-white/10 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                         >
-                          {isEditing ? '접기' : '이름·상세'}
+                          {isEditing ? '접기' : '상세옵션'}
                         </button>
                         <button
                           type="button"
@@ -1081,21 +1118,31 @@ export function BudgetPlanView() {
                     className="rounded-xl border border-blue-200/60 bg-blue-50/40 p-3.5 shadow-xs backdrop-blur-md dark:border-blue-900/40 dark:bg-slate-800/60"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setEditingAssetSeedId(isEditing ? null : asset.id)}
-                        className="flex min-w-0 flex-1 flex-wrap items-center gap-1.5 text-left group"
-                      >
-                        <span className="font-bold text-ink-900 group-hover:text-brand-600 dark:text-slate-100 dark:group-hover:text-brand-400 text-xs">
-                          {asset.name || '새 통장'}
+                      <div className="flex min-w-[180px] flex-1 items-center gap-1.5">
+                        <input
+                          type="text"
+                          value={asset.name}
+                          onChange={(e) => updateAsset(asset.id, { name: e.target.value })}
+                          placeholder="통장 이름 입력"
+                          aria-label="통장 이름"
+                          className="min-w-[85px] flex-1 rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-xs font-bold text-ink-900 transition hover:border-ink-900/15 hover:bg-white/80 focus:border-brand-500 focus:bg-white focus:outline-none dark:text-slate-100 dark:hover:border-white/15 dark:hover:bg-slate-900/60 dark:focus:bg-slate-900"
+                        />
+                        <select
+                          value={asset.type}
+                          onChange={(e) => updateAsset(asset.id, { type: e.target.value as AssetType })}
+                          aria-label="통장 분류"
+                          className="shrink-0 cursor-pointer rounded-md border border-brand-200/80 bg-brand-100 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700 focus:outline-none dark:border-brand-800/60 dark:bg-brand-950 dark:text-brand-300"
+                        >
+                          {ASSET_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        <span className="shrink-0 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                          연 {asset.annualReturnRate}%
                         </span>
-                        <span className="rounded bg-brand-100 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                          {ASSET_TYPE_LABEL[asset.type]}
-                        </span>
-                        <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                          연 {asset.annualReturnRate}% 복리
-                        </span>
-                      </button>
+                      </div>
 
                       <div className="flex shrink-0 items-center gap-1.5">
                         <span className="rounded-full bg-blue-100/90 px-2 py-0.5 text-[10px] font-bold text-blue-800 dark:bg-blue-950/80 dark:text-blue-300">
@@ -1106,7 +1153,7 @@ export function BudgetPlanView() {
                           onClick={() => setEditingAssetSeedId(isEditing ? null : asset.id)}
                           className="rounded-lg border border-ink-900/10 bg-white/70 px-2 py-1 text-[11px] font-semibold text-ink-600 hover:bg-white dark:border-white/10 dark:bg-slate-800 dark:text-slate-300"
                         >
-                          {isEditing ? '접기' : '상세·수정'}
+                          {isEditing ? '접기' : '상세옵션'}
                         </button>
                         <button
                           type="button"

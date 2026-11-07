@@ -74,6 +74,45 @@ export interface OnboardingDraft {
   expenses: Record<ExpensePresetKey, number>;
 }
 
+/**
+ * 마법사를 다시 열었을 때 기존에 입력해둔 세부 커스텀 옵션(자동이체, 다중 항목, 메모, 만기 등)이
+ * 날아가지 않도록 기존 PlannerData 를 병합해 반영한다.
+ */
+export function applyDraftToPlannerData(
+  draft: OnboardingDraft,
+  existing?: PlannerData,
+): PlannerData {
+  const base = draftToPlannerData(draft);
+  if (!existing) return base;
+
+  // 기존 자산의 monthlyContribution, maturityYear, maturityAge, memo 등을 보존
+  const mergedAssets: AssetItem[] = base.assets.map((newAsset) => {
+    const prev = existing.assets.find((a) => a.type === newAsset.type);
+    if (!prev) return newAsset;
+    return {
+      ...prev,
+      amount: newAsset.amount,
+    };
+  });
+  // 프리셋에 없는 추가 자산(etc 등)이나 자동이체만 걸어둔 자산도 보존
+  for (const prev of existing.assets) {
+    const inPreset = ASSET_PRESETS.some((p) => p.key === prev.type);
+    const alreadyMerged = mergedAssets.some((m) => m.id === prev.id || m.type === prev.type);
+    if (!alreadyMerged && (!inPreset || prev.monthlyContribution > 0)) {
+      mergedAssets.push(prev);
+    }
+  }
+
+  return {
+    ...base,
+    settings: {
+      ...existing.settings,
+      ...base.settings,
+    },
+    assets: mergedAssets,
+  };
+}
+
 const zeroAssets = () =>
   Object.fromEntries(ASSET_PRESETS.map((p) => [p.key, 0])) as Record<
     AssetPresetKey,

@@ -34,11 +34,11 @@ export function Accordion({
         {icon && <IconBadge name={icon} />}
 
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold tracking-tight text-ink-900 dark:text-slate-50">
+          <span className="block break-keep text-sm font-semibold tracking-tight text-ink-900 dark:text-slate-50">
             {title}
           </span>
           {summary && (
-            <span className="mt-0.5 block truncate text-xs text-ink-600 dark:text-slate-400">
+            <span className="mt-0.5 block break-keep text-xs text-ink-600 dark:text-slate-400">
               {summary}
             </span>
           )}

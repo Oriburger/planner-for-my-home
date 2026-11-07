@@ -4,6 +4,7 @@ import { Icon } from '@/components/ui/Icon';
 import { formatKRWShort } from '@/utils/format';
 import { runSimulation } from '@/utils/simulation';
 import {
+  applyDraftToPlannerData,
   draftToPlannerData,
   plannerDataToDraft,
   type OnboardingDraft,
@@ -88,7 +89,14 @@ export function OnboardingModal({ onClose }: OnboardingModalProps) {
   }, [draft]);
 
   const finish = () => {
-    importData(draftToPlannerData(draft));
+    const current = usePlannerStore.getState();
+    const hasExisting =
+      current.assets.length > 0 ||
+      current.incomes.length > 0 ||
+      current.expenses.length > 0;
+    importData(
+      hasExisting ? applyDraftToPlannerData(draft, current) : draftToPlannerData(draft),
+    );
     setOnboarded(true);
     onClose();
   };

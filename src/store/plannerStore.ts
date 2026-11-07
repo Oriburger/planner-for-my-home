@@ -393,7 +393,32 @@ export const usePlannerStore = create<PlannerStore>()(
       updateIncome: (id, patch) =>
         set((s) => ({ incomes: patchList(s.incomes, id, patch) })),
       updateHousing: (id, patch) =>
-        set((s) => ({ housings: patchList(s.housings, id, patch) })),
+        set((s) => {
+          const nextHousings = patchList(s.housings, id, patch);
+          const updated = nextHousings.find((h) => h.id === id);
+          let nextAssets = s.assets;
+          // 1년차 주거 계약의 보증금을 수정하면 보유 자산의 '임대보증금(rentDeposit)'도 함께 동기화한다
+          if (updated && updated.startYear <= 1 && 'deposit' in patch) {
+            const idx = s.assets.findIndex((a) => a.type === 'rentDeposit');
+            if (idx >= 0) {
+              nextAssets = s.assets.map((a, i) =>
+                i === idx ? { ...a, amount: updated.deposit } : a,
+              );
+            } else if (updated.deposit > 0) {
+              nextAssets = [
+                ...s.assets,
+                createAsset({
+                  type: 'rentDeposit',
+                  name: '전월세 보증금',
+                  amount: updated.deposit,
+                  annualReturnRate: 0,
+                  liquid: false,
+                }),
+              ];
+            }
+          }
+          return { housings: nextHousings, assets: nextAssets };
+        }),
       updateLoan: (id, patch) =>
         set((s) => ({ loans: patchList(s.loans, id, patch) })),
       updateExpense: (id, patch) =>

@@ -1,7 +1,9 @@
 import { useMemo } from 'react';
 import type { AssetItem, SimulationResult, YearResult } from '@/types/planner';
-import { ASSET_TYPE_LABEL } from '@/types/planner';
+import { ASSET_TYPE_LABEL, type AssetType } from '@/types/planner';
 import { Card, CardHeader } from '@/components/ui/Card';
+import { MoneyInput } from '@/components/ui/Fields';
+import { Icon } from '@/components/ui/Icon';
 import { usePlannerStore } from '@/store/plannerStore';
 import { formatKRWShort } from '@/utils/format';
 
@@ -94,7 +96,11 @@ interface AccountRow {
   contributing: boolean;
 }
 
-/** 통장(계좌) 한 장 */
+const ASSET_TYPE_OPTIONS = (Object.keys(ASSET_TYPE_LABEL) as AssetType[]).map(
+  (value) => ({ value, label: ASSET_TYPE_LABEL[value] }),
+);
+
+/** 통장(계좌) 한 장 — 이름·분류·잔액·자동이체액을 바로 수정할 수 있다 */
 function AccountCard({
   row,
   maxBalance,
@@ -104,21 +110,43 @@ function AccountCard({
   maxBalance: number;
   taxDeductible: boolean;
 }) {
-  const { asset, balance, monthlyContribution, contributing } = row;
+  const { asset, balance } = row;
+  const updateAsset = usePlannerStore((s) => s.updateAsset);
+  const removeItem = usePlannerStore((s) => s.removeItem);
   const pct = maxBalance > 0 ? (balance / maxBalance) * 100 : 0;
 
   return (
     <div className="glass-tile rounded-2xl p-3.5">
-      <div className="flex items-baseline justify-between gap-2">
-        <span className="truncate text-xs font-bold text-ink-900 dark:text-slate-100">
-          {asset.name || ASSET_TYPE_LABEL[asset.type]}
-        </span>
-        <div className="text-right">
-          <span className="block text-xs font-extrabold tabular-nums text-ink-900 dark:text-slate-100">
-            {formatKRWShort(balance)}원
-          </span>
-          <span className="text-[10px] text-ink-400 dark:text-slate-500">현재 잔액</span>
-        </div>
+      <div className="flex items-center justify-between gap-1.5">
+        <input
+          type="text"
+          value={asset.name}
+          onChange={(e) => updateAsset(asset.id, { name: e.target.value })}
+          placeholder="계좌 이름 입력"
+          aria-label="계좌 이름"
+          className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-1.5 py-1 text-xs font-bold text-ink-900 transition hover:border-ink-900/15 hover:bg-white/80 focus:border-brand-500 focus:bg-white focus:outline-none dark:text-slate-100 dark:hover:border-white/15 dark:hover:bg-slate-900/60 dark:focus:bg-slate-900"
+        />
+        <select
+          value={asset.type}
+          onChange={(e) => updateAsset(asset.id, { type: e.target.value as AssetType })}
+          aria-label="계좌 분류"
+          className="shrink-0 cursor-pointer rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-700 focus:outline-none dark:bg-slate-800 dark:text-slate-300"
+        >
+          {ASSET_TYPE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => removeItem('assets', asset.id)}
+          className="btn-icon h-6 w-6 text-ink-400 hover:text-rose-600 dark:text-slate-500"
+          title="삭제"
+          aria-label="계좌 삭제"
+        >
+          <Icon name="trash" className="h-3.5 w-3.5" />
+        </button>
       </div>
 
       <div
@@ -136,19 +164,42 @@ function AccountCard({
         />
       </div>
 
+      <div className="mt-2.5 grid grid-cols-2 gap-2">
+        <div>
+          <span className="mb-1 block text-[10px] font-medium text-ink-500 dark:text-slate-400">
+            현재 잔액
+          </span>
+          <MoneyInput
+            value={asset.amount}
+            onChange={(amount) => updateAsset(asset.id, { amount })}
+          />
+        </div>
+        <div>
+          <span className="mb-1 block text-[10px] font-medium text-ink-500 dark:text-slate-400">
+            월 자동이체
+          </span>
+          <MoneyInput
+            value={asset.monthlyContribution}
+            onChange={(monthlyContribution) =>
+              updateAsset(asset.id, { monthlyContribution })
+            }
+          />
+        </div>
+      </div>
+
       <div className="mt-2 flex flex-wrap items-center gap-1">
-        <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-800 dark:text-slate-400">
-          {ASSET_TYPE_LABEL[asset.type]}
-        </span>
-        <span
-          className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+        <button
+          type="button"
+          onClick={() => updateAsset(asset.id, { liquid: !asset.liquid })}
+          className={`rounded px-1.5 py-0.5 text-[10px] font-semibold transition ${
             asset.liquid
               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400'
               : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400'
           }`}
+          title="클릭하여 입출금 가능 여부 전환"
         >
           {asset.liquid ? '입출금 가능' : '묶인 돈'}
-        </span>
+        </button>
         <span className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] font-semibold text-ink-600 dark:bg-slate-800 dark:text-slate-400">
           연 {asset.annualReturnRate}%
         </span>
@@ -158,26 +209,6 @@ function AccountCard({
           </span>
         )}
       </div>
-
-      <p className="mt-2 text-[11px] font-medium text-ink-500 dark:text-slate-400">
-        {monthlyContribution > 0 ? (
-          contributing ? (
-            <>
-              매달{' '}
-              <strong className="font-bold text-brand-700 dark:text-brand-400">
-                {formatKRWShort(monthlyContribution)}원
-              </strong>{' '}
-              자동이체 중
-            </>
-          ) : (
-            <span className="text-ink-400 dark:text-slate-500">
-              현재 자동이체 멈춤
-            </span>
-          )
-        ) : (
-          <span className="text-ink-400 dark:text-slate-500">자동이체 없음</span>
-        )}
-      </p>
     </div>
   );
 }
@@ -198,6 +229,7 @@ interface MoneyFlowViewProps {
  * 자동이체가 어디로 빠지는지를 '현재 시점'만 기준으로 보여준다.
  */
 export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
+  const addAsset = usePlannerStore((s) => s.addAsset);
   const assets = usePlannerStore((s) => s.assets);
   const loans = usePlannerStore((s) => s.loans);
 
@@ -248,12 +280,6 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
 
   const slices: FlowSlice[] = [
     {
-      key: 'living',
-      label: '생활비',
-      monthly: monthly(row.livingExpense),
-      hint: '식비·교통·통신 등 고정 생활비',
-    },
-    {
       key: 'housing',
       label: '주거비',
       monthly: monthly(row.housingCost),
@@ -264,6 +290,12 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
       label: '대출 상환',
       monthly: monthly(row.loanPayment),
       hint: loanHint,
+    },
+    {
+      key: 'living',
+      label: '생활비',
+      monthly: monthly(row.livingExpense),
+      hint: '식비·교통·통신 등 고정 생활비',
     },
     {
       key: 'contribution',
@@ -445,11 +477,23 @@ export function MoneyFlowView({ rows }: MoneyFlowViewProps) {
       <Card>
         <CardHeader
           title="보유 계좌 잔액"
-          description="계좌별 잔액 및 자동이체 현황"
+          description="계좌별 이름 · 분류 · 잔액 · 자동이체 현황 직접 편집"
           action={
-            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-              현재 잔액
-            </span>
+            <button
+              type="button"
+              onClick={() =>
+                addAsset({
+                  type: 'cash',
+                  name: '새 계좌',
+                  annualReturnRate: 2.5,
+                  liquid: true,
+                })
+              }
+              className="flex items-center gap-1 rounded-xl border border-emerald-300/80 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 shadow-xs transition hover:bg-emerald-100 dark:border-emerald-800/60 dark:bg-emerald-950/80 dark:text-emerald-300"
+            >
+              <Icon name="plus" className="h-3.5 w-3.5" />
+              <span>계좌 추가</span>
+            </button>
           }
         />
 

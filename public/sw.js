@@ -1,5 +1,5 @@
 // Service Worker for 내 집 마련 플래너 (PWA)
-const CACHE_NAME = 'planner-cache-v1';
+const CACHE_NAME = 'planner-cache-v3';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -32,13 +32,32 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
+
+  // HTML/네비게이션 요청은 항상 네트워크 우선(Network-First)으로 처리하여 배포 시 구버전 JS에 갇히지 않게 한다
+  const isNavOrHtml =
+    event.request.mode === 'navigate' ||
+    event.request.destination === 'document' ||
+    event.request.url.endsWith('.html');
+
+  if (isNavOrHtml) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html'))),
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Fetch in background to update cache (stale-while-revalidate for fast loads)
         fetch(event.request)
           .then((networkResponse) => {
             if (networkResponse && networkResponse.status === 200) {
@@ -61,11 +80,6 @@ self.addEventListener('fetch', (event) => {
           cache.put(event.request, responseClone);
         });
         return networkResponse;
-      }).catch(() => {
-        // Fallback for navigation requests
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
       });
     }),
   );

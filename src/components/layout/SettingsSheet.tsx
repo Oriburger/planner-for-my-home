@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Sheet } from '@/components/ui/Sheet';
+import { usePlannerStore } from '@/store/plannerStore';
 import { useUIStore } from '@/store/uiStore';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { WALLPAPERS, fileToWallpaperDataUrl } from '@/utils/wallpaper';
@@ -15,6 +16,8 @@ interface SettingsSheetProps {
 }
 
 export function SettingsSheet({ open, mode, onClose, onOpenWizard, onOpenGoals }: SettingsSheetProps) {
+  const resetAll = usePlannerStore((s) => s.resetAll);
+  const loadSample = usePlannerStore((s) => s.loadSample);
   const theme = useUIStore((s) => s.theme);
   const setTheme = useUIStore((s) => s.setTheme);
   const wallpaper = useUIStore((s) => s.wallpaper);
@@ -99,6 +102,26 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard, onOpenGoals }
               onClick={() => {
                 onClose();
                 onOpenWizard();
+              }}
+            />
+            <SheetRow
+              icon="copy"
+              label="2030 직장인 예시 데이터 불러오기"
+              onClick={() => {
+                if (window.confirm('현재 데이터를 예시 데이터로 덮어쓸까요?')) {
+                  loadSample();
+                  onClose();
+                }
+              }}
+            />
+            <SheetRow
+              icon="reset"
+              label="입력값 전체 초기화"
+              onClick={() => {
+                if (window.confirm('입력값을 모두 초기화하고 처음부터 다시 설정할까요?')) {
+                  resetAll();
+                  onClose();
+                }
               }}
             />
           </div>
