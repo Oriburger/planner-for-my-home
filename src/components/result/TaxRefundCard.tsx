@@ -102,11 +102,7 @@ export function TaxRefundCard() {
       rentLoanRepaid: loans
         .filter((l) => l.isDepositLinked && l.startYear <= 1)
         .reduce(
-          (sum, l) =>
-            sum +
-            (l.monthlyPayment > 0
-              ? l.monthlyPayment * 12
-              : simulateLoanYear(l, 1, l.principal).payment),
+          (sum, l) => sum + simulateLoanYear(l, 1, l.principal).payment,
           0,
         ),
       houselessHead: settings.houselessHead,

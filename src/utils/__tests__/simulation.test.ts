@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { runSimulation, incomeForYear } from '../simulation';
-import { monthlyEqualPayment, simulateLoanYear } from '../loan';
+import { estimateMonthlyLoanPayment, monthlyEqualPayment, simulateLoanYear } from '../loan';
 import { estimateNetIncome } from '../tax';
+import { createEmptyDraft, draftToPlannerData } from '@/components/onboarding/draft';
 import type { PlannerData, SimulationSettings } from '@/types/planner';
 
 const 만 = 10_000;
@@ -699,6 +700,20 @@ describe('loan', () => {
       startYear: 3,
     };
     expect(simulateLoanYear(loan, 1, 1000 * 만).payment).toBe(0);
+  });
+
+  it('초기 설정(draftToPlannerData)은 전세 거주여도 사용자가 선택한 상환 방식을 덮어쓰지 않고 보증금 상환을 기본 강제하지 않는다', () => {
+    const draft = createEmptyDraft();
+    draft.housing.type = 'jeonse';
+    draft.housing.deposit = 20000 * 만;
+    draft.loan.principal = 8000 * 만;
+    draft.loan.repaymentType = 'equalPayment';
+
+    const data = draftToPlannerData(draft);
+    expect(data.loans).toHaveLength(1);
+    expect(data.loans[0].repaymentType).toBe('equalPayment');
+    expect(data.loans[0].isDepositLinked).toBe(false);
+    expect(estimateMonthlyLoanPayment(data.loans[0])).toBeGreaterThan(0);
   });
 
   it('미래 대출(startYear > 1)은 시작 연차 전까지 대출 잔액이 0이다', () => {

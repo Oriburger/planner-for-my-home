@@ -157,12 +157,12 @@ function createSampleData(): PlannerData {
         name: '전세자금대출',
         principal: 8000 * 만,
         annualRate: 3.8,
-        termYears: 2,
-        repaymentType: 'interestOnly',
+        termYears: 10,
+        repaymentType: 'equalPayment',
         monthlyPayment: 0,
         startYear: 1,
-        isDepositLinked: true,
-        autoRenew: true,
+        isDepositLinked: false,
+        autoRenew: false,
       },
     ],
     expenses: [
@@ -219,7 +219,7 @@ function createSampleData(): PlannerData {
 /* 신규 항목 팩토리 ('항목 추가' 버튼용)                                */
 /* ------------------------------------------------------------------ */
 
-export const createAsset = (): AssetItem => ({
+export const createAsset = (patch?: Partial<AssetItem>): AssetItem => ({
   id: uid(),
   type: 'etc',
   name: '새 자산',
@@ -229,6 +229,7 @@ export const createAsset = (): AssetItem => ({
   monthlyContribution: 0,
   memo: '',
   startYear: 1,
+  ...patch,
 });
 
 export const createIncome = (): IncomeItem => ({
@@ -308,7 +309,7 @@ interface PlannerActions {
   /** 예시 시나리오 불러오기 */
   loadSample: () => void;
 
-  addAsset: () => void;
+  addAsset: (patch?: Partial<AssetItem>) => void;
   addIncome: () => void;
   addHousing: () => void;
   addLoan: () => void;
@@ -378,7 +379,8 @@ export const usePlannerStore = create<PlannerStore>()(
           },
         })),
 
-      addAsset: () => set((s) => ({ assets: [...s.assets, createAsset()] })),
+      addAsset: (patch) =>
+        set((s) => ({ assets: [...s.assets, createAsset(patch)] })),
       addIncome: () => set((s) => ({ incomes: [...s.incomes, createIncome()] })),
       addHousing: () =>
         set((s) => ({ housings: [...s.housings, createHousing()] })),

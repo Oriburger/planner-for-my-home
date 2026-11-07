@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
 import { currentYear } from '@/utils/time';
-import { monthlyEqualPayment } from '@/utils/loan';
+import { estimateMonthlyLoanPayment } from '@/utils/loan';
 
 const TYPE_OPTIONS = (
   Object.keys(REPAYMENT_TYPE_LABEL) as RepaymentType[]
@@ -39,20 +39,7 @@ export function LoanSection() {
 
       {loans.map((loan) => {
         const graceYears = loan.graceYears ?? 0;
-        const amortizationYears = Math.max(1, loan.termYears - graceYears);
-
-        // 상환 방식별 예상 월 납입액 (거치 기간 중이면 이자만)
-        const estimatedMonthly =
-          graceYears > 0
-            ? (loan.principal * loan.annualRate) / 100 / 12
-            : loan.repaymentType === 'fixedMonthly'
-              ? loan.monthlyPayment
-              : loan.repaymentType === 'equalPayment'
-                ? monthlyEqualPayment(loan.principal, loan.annualRate, amortizationYears)
-                : loan.repaymentType === 'equalPrincipal'
-                  ? loan.principal / Math.max(1, amortizationYears * 12) +
-                    (loan.principal * loan.annualRate) / 100 / 12
-                  : (loan.principal * loan.annualRate) / 100 / 12;
+        const estimatedMonthly = estimateMonthlyLoanPayment(loan);
 
         return (
           <ItemCard

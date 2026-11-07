@@ -175,7 +175,7 @@ export function AssetSection() {
 
       <ContributionBalanceHint />
 
-      <AddItemButton onClick={addAsset} label="자산 항목 추가" />
+      <AddItemButton onClick={() => addAsset()} label="자산 항목 추가" />
     </Accordion>
   );
 }

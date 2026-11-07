@@ -30,7 +30,7 @@ export function InputPanel() {
       <button
         type="button"
         onClick={() => {
-          if (window.confirm('입력값을 모두 예시 데이터로 되돌릴까요?')) {
+          if (window.confirm('입력값을 모두 초기화하고 처음부터 다시 설정할까요?')) {
             resetAll();
           }
         }}

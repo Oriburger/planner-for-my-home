@@ -99,6 +99,8 @@ export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
 
       <HomeHero onAddGoal={onEditGoals} />
 
+      <SummaryCards summary={summary} firstYear={rows[0]} point={point} years={years} />
+
       {/* 한 달 머니 계획 바로가기 퀵 배너 */}
       <button
         type="button"
@@ -121,7 +123,6 @@ export function OverviewView({ onEditGoals }: { onEditGoals: () => void }) {
         </span>
       </button>
 
-      <SummaryCards summary={summary} firstYear={rows[0]} point={point} years={years} />
       <GoalCarousel onEdit={onEditGoals} />
       <Disclaimer />
     </div>

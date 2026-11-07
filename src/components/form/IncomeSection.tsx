@@ -143,7 +143,7 @@ function NetIncomeHint() {
   );
 }
 
-export function IncomeSection() {
+export function IncomeSection({ defaultOpen = false }: { defaultOpen?: boolean } = {}) {
   const incomes = usePlannerStore((s) => s.incomes);
   const years = usePlannerStore((s) => s.settings.years);
   const addIncome = usePlannerStore((s) => s.addIncome);
@@ -161,6 +161,7 @@ export function IncomeSection() {
         total,
       )}원 · 세후 월 ${formatKRWShort(rows[0].netIncome / 12)}원`}
       icon="banknote"
+      defaultOpen={defaultOpen}
     >
       {incomes.length === 0 && <EmptyState message="수입 항목을 추가해 주세요." />}
 

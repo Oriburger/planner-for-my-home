@@ -73,7 +73,8 @@ export function DashboardLayout() {
     return () => document.removeEventListener('pointermove', onMove);
   }, []);
 
-  const showAside = inputPanelOpen;
+  const isPlanningView = view === 'income' || view === 'budget';
+  const showAside = inputPanelOpen && !isPlanningView;
   const closeSheet = useCallback(() => setSheet(null), []);
   const closeGoals = useCallback(() => setGoalsOpen(false), []);
 
@@ -115,6 +116,7 @@ export function DashboardLayout() {
         mode={sheet ?? 'wallpaper'}
         onClose={closeSheet}
         onOpenWizard={() => setWizardOpen(true)}
+        onOpenGoals={() => setGoalsOpen(true)}
       />
 
       <Sheet open={goalsOpen} title="연도별 목표" onClose={closeGoals} desktop="center">

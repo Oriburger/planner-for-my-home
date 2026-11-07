@@ -68,6 +68,7 @@ export interface OnboardingDraft {
     annualRate: number;
     termYears: number;
     repaymentType: RepaymentType;
+    isDepositLinked?: boolean;
   };
   /** 지출 칸별 월 금액 (원) */
   expenses: Record<ExpensePresetKey, number>;
@@ -103,6 +104,7 @@ export function createEmptyDraft(): OnboardingDraft {
       annualRate: 4,
       termYears: 10,
       repaymentType: 'equalPayment',
+      isDepositLinked: false,
     },
     expenses: zeroExpenses(),
   };
@@ -203,21 +205,21 @@ export function draftToPlannerData(draft: OnboardingDraft): PlannerData {
       ]
     : [];
 
-  const isJeonse = draft.housing.type === 'jeonse';
+  const isDepositLinked = draft.loan.isDepositLinked ?? false;
   const loans =
     draft.loan.principal > 0
       ? [
           {
             id: uid(),
-            name: isJeonse ? '전세자금대출' : '대출',
+            name: isDepositLinked ? '전세자금대출' : '대출',
             principal: draft.loan.principal,
             annualRate: draft.loan.annualRate,
             termYears: draft.loan.termYears,
-            repaymentType: isJeonse ? 'interestOnly' : draft.loan.repaymentType,
+            repaymentType: draft.loan.repaymentType,
             monthlyPayment: 0,
             startYear: 1,
-            isDepositLinked: isJeonse,
-            autoRenew: isJeonse,
+            isDepositLinked,
+            autoRenew: draft.loan.repaymentType === 'interestOnly' && isDepositLinked,
           },
         ]
       : [];
@@ -285,6 +287,7 @@ export function plannerDataToDraft(data: PlannerData): OnboardingDraft {
       annualRate: loan.annualRate,
       termYears: loan.termYears,
       repaymentType: loan.repaymentType,
+      isDepositLinked: loan.isDepositLinked ?? false,
     };
   }
 

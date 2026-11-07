@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { Icon } from '@/components/ui/Icon';
 import { formatKRWShort } from '@/utils/format';
 import { IncomeSection } from '@/components/form/IncomeSection';
+import { PeriodSection } from '@/components/form/PeriodSection';
 import { TaxRefundCard } from '@/components/result/TaxRefundCard';
 
 export function IncomeView() {
@@ -93,11 +94,10 @@ export function IncomeView() {
       <TaxRefundCard />
 
       {/* 3. 소득 원천 및 인상률 상세 입력 */}
-      <Card>
-        <div className="p-4 sm:p-5">
-          <IncomeSection />
-        </div>
-      </Card>
+      <IncomeSection defaultOpen />
+
+      {/* 4. 세금 계산 방식 및 기본 가정 */}
+      <PeriodSection />
     </div>
   );
 }

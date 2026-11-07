@@ -6,6 +6,7 @@ import {
   PercentInput,
   SegmentedControl,
   Select,
+  Toggle,
 } from '@/components/ui/Fields';
 import { formatKRWShort } from '@/utils/format';
 import { currentYear } from '@/utils/time';
@@ -265,6 +266,13 @@ export function LoanStep({ draft, patch }: StepProps) {
               options={REPAYMENT_OPTIONS}
             />
           </Field>
+
+          <Toggle
+            checked={draft.loan.isDepositLinked ?? false}
+            onChange={(isDepositLinked) => set({ isDepositLinked })}
+            label="전세보증금으로 만기 상환 (전세대출)"
+            description="만기 시 돌려받는 보증금에서 대출 원금을 차감합니다."
+          />
         </>
       )}
     </div>

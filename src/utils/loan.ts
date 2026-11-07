@@ -29,6 +29,29 @@ export function monthlyEqualPayment(
   return (principal * r * factor) / (factor - 1);
 }
 
+/** 대출 항목 1건의 예상 월 납입액 (거치 기간 중이면 이자만) */
+export function estimateMonthlyLoanPayment(loan: LoanItem): number {
+  const graceYears = loan.graceYears ?? 0;
+  const amortizationYears = Math.max(1, loan.termYears - graceYears);
+  if (graceYears > 0) {
+    return (loan.principal * loan.annualRate) / 100 / 12;
+  }
+  switch (loan.repaymentType) {
+    case 'fixedMonthly':
+      return loan.monthlyPayment;
+    case 'equalPayment':
+      return monthlyEqualPayment(loan.principal, loan.annualRate, amortizationYears);
+    case 'equalPrincipal':
+      return (
+        loan.principal / Math.max(1, amortizationYears * 12) +
+        (loan.principal * loan.annualRate) / 100 / 12
+      );
+    case 'interestOnly':
+    default:
+      return (loan.principal * loan.annualRate) / 100 / 12;
+  }
+}
+
 /**
  * 대출 1건의 특정 연차 현금흐름을 월 단위로 시뮬레이션한다.
  *

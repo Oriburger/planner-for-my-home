@@ -11,9 +11,10 @@ interface SettingsSheetProps {
   mode: 'wallpaper' | 'more';
   onClose: () => void;
   onOpenWizard: () => void;
+  onOpenGoals: () => void;
 }
 
-export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsSheetProps) {
+export function SettingsSheet({ open, mode, onClose, onOpenWizard, onOpenGoals }: SettingsSheetProps) {
   const theme = useUIStore((s) => s.theme);
   const setTheme = useUIStore((s) => s.setTheme);
   const wallpaper = useUIStore((s) => s.wallpaper);
@@ -82,6 +83,14 @@ export function SettingsSheet({ open, mode, onClose, onOpenWizard }: SettingsShe
               onClick={() => {
                 setView('table');
                 onClose();
+              }}
+            />
+            <SheetRow
+              icon="target"
+              label="연도별 목표 편집"
+              onClick={() => {
+                onClose();
+                onOpenGoals();
               }}
             />
             <SheetRow
